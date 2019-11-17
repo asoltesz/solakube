@@ -1,0 +1,8 @@
+- src: https://github.com/vitobotta/ansible-bootstrap-role.git
+- src: https://github.com/vitobotta/ansible-docker-role.git
+- src: https://github.com/asoltesz/ansible-fail2ban-role.git
+- src: https://github.com/asoltesz/ansible-firewalld-role.git
+- src: https://github.com/vitobotta/ansible-hcloud-floating-ip-role.git
+- src: https://github.com/vitobotta/ansible-kernelcare-role.git
+- src: https://github.com/vitobotta/ansible-postfix-role.git
+- src: https://github.com/vitobotta/ansible-users-role.git

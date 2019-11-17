@@ -1,0 +1,57 @@
+#!/bin/bash
+
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -h "${SOURCE}" ]]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+
+    case $key in
+      --cluster)
+        CLUSTER="$2"
+        shift # past argument
+        shift # past value
+      ;;
+      *)    # unknown option
+        POSITIONAL+=("$1") # save it in an array for later
+        shift # past argument
+      ;;
+    esac
+done
+
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+[[ -z "$CLUSTER" ]] && { echo "Please specify the name of the cluster with '--cluster'" ; exit 1; }
+
+cd ${DIR}/../terraform/clusters/${CLUSTER}
+if [[ $? != 0 ]]
+then
+    echo "Couldn't enter the Terraform folder of the cluster".
+    exit 1
+fi
+
+echo "Loading secrets for the cluster from ~/.secrets"
+SECRET_FILE=~/.secrets/terraform-${CLUSTER}.sh
+source ${SECRET_FILE}
+if [[ $? != 0 ]]
+then
+    echo "Couldn't load secrets for the cluster from ${SECRET_FILE}"
+    exit 1
+fi
+
+terraform "$@"
+if [[ $? != 0 ]]
+then
+    echo "Terraform execution has FAILED"
+    exit 1
+fi
+
+echo "Terraform execution was SUCCESSFUL"

@@ -1,0 +1,15 @@
+variable "cluster_name" {}
+variable "hcloud_token" {}
+variable "ssh_private_key" {}
+variable "ssh_public_key" {}
+variable "rancher_api_url" {}
+variable "rancher_api_token" {}
+variable "etcd_backup_enabled" {}
+variable "etcd_s3_access_key" {}
+variable "etcd_s3_secret_key" {}
+variable "etcd_s3_bucket_name" {}
+variable "etcd_s3_endpoint" {}
+variable "etcd_s3_region" {}
+variable "servers" {}
+variable "ansible_playbook_path" {}
+variable "ansible_vault_password_path" {}
