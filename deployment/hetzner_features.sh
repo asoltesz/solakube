@@ -108,3 +108,7 @@ stringData:
 EOF
 
 kubectl apply -f https://raw.githubusercontent.com/hetznercloud/csi-driver/master/deploy/kubernetes/hcloud-csi.yml
+
+echo "-------------------------------------------------------------------------"
+echo "SUCCESS: All Hetzner features have been installed into your cluster."
+echo "-------------------------------------------------------------------------"
