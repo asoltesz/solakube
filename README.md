@@ -1,21 +1,49 @@
-# K8s cluster builder on Hetzner Cloud with Terraform, Ansible and Rancher 
+# Kubernetes cluster builder on Hetzner Cloud with Terraform, Ansible and Rancher 
 
 It is based on Vito Botta's Ansible and Terraform plugins and his article: [From zero to Kubernetes in Hetzner Cloud with Terraform, Ansible and Rancher](https://vitobotta.com/2019/10/14/kubernetes-hetzner-cloud-terraform-ansible-rancher/).
 
 # Work In Progress
  
-WARNING: This is a work in progress and shared only in hope that it may come useful for others. See the issues.
+WARNING: This is a work in progress and shared only in the hope that it may come useful for others. See the [Issues](https://github.com/asoltesz/hetzner-k8s-builder/issues).
 
+The configuration describe my personal test cloud (named "andromeda"). If you want to utilize it, please read Vito's article and customize everything accordingly according to your own preferences, tokens...etc.
 
-The configuration describe my personal test cloud (named andromeda). If you want to utilize it, please read Vito's article and customize everything accordingly.
+# Cluster Features
+
+The resulting cluster has the following features:
+
+Availability
+- A single [Hetzner Floating IP (Fip)](https://wiki.hetzner.de/index.php/CloudServer/en#What_are_floating_IPs_and_how_do_they_work.3F) is used to direct incoming traffic to the cluster. The Fip is always assigned to a cluster node and that node will accept traffic and direct it inside the cluster.
+-  The Fip is automatically transferred when node failure is detected by Kubernetes, so if the Fip-holder node crashes the Fip is reassigned to a healthy node and the cluster remains operational and available for external requests. 
+- The Nginx Ingress Controller (ingress-nginx) is installed on all of the nodes, so if the Fip transfer happens, the new gateway can immediately start directing traffic without manual intervention and minimal delay.
+
+Node structure/resources
+- You can choose any node structure and resources you want by declaring every node with Hetzner VM type and cluster role (master, etcd, worker) in the Terraform config before cluster creation.
+- The cluster can later be extended with new nodes by defining them in the config and re-executing Terraform.
+
+Networking
+- All cluster nodes are attached to a [Hetzner Network](https://wiki.hetzner.de/index.php/CloudServer/en#Networks) which allows isolated and private communication between the nodes. However the communication is unencrypted.
+
+Storage & persistence
+- [Hetzner Volumes (HVol)](https://wiki.hetzner.de/index.php/CloudServer/en#Volumes) are immediately usable for persistence after cluster provisioning, so PVCs get automatically served by allocating them on new Hetzner Volumes.
+- HVols have the minimum size of 10 GB, are extendable and are stored on redundant storage.
+- Databases like PostgreSQL and other workloads requiring persistence can be deployed  
+
+Cluster Management (Rancher)
+- The newly provisioned cluster is registered into your Rancher instance, so RBAC, Monitoring, Catalog, Etcd backups and other management features are available for it.
+
+Applications
+- After the cluster is fully provisioned, you can immediately start install applications from Rancher Catalogs
 
 # Requirements
  
 ## Software versions
+
+The tools and their versions, this cluster building method is tested on:
  
- Terraform 0.12.15
- Ansible 2.9.1
- Rancher 2.3.2
+- Terraform 0.12.15
+- Ansible 2.9.1
+- Rancher 2.3.2
  
 ## Rancher
  
