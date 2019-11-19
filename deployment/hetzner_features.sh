@@ -78,8 +78,8 @@ metadata:
 data:
   config.json: |
     {
-      "hcloudFloatingIPs": [ "${FLOATING_IP}" ],
-      "nodeAddressType": "external"
+      "hcloud_floating_ips": [ "${FLOATING_IP}" ],
+      "node_address_type": "external"
     }
 ---
 apiVersion: v1
