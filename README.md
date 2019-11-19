@@ -1,6 +1,6 @@
 # Kubernetes cluster builder on Hetzner Cloud with Terraform, Ansible and Rancher 
 
-It is based on Vito Botta's Ansible and Terraform plugins and his article: [From zero to Kubernetes in Hetzner Cloud with Terraform, Ansible and Rancher](https://vitobotta.com/2019/10/14/kubernetes-hetzner-cloud-terraform-ansible-rancher/).
+This project is based on Vito Botta's Ansible and Terraform plugins and his article: [From zero to Kubernetes in Hetzner Cloud with Terraform, Ansible and Rancher](https://vitobotta.com/2019/10/14/kubernetes-hetzner-cloud-terraform-ansible-rancher/) and strives to add example values, documentation, bugfixes, more reproducibility and further automation on top of it.
 
 # Work In Progress
  
