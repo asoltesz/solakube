@@ -21,6 +21,9 @@ Node structure/resources
 - You can choose any node structure and resources you want by declaring every node with Hetzner VM type and cluster role (master, etcd, worker) in the Terraform config before cluster creation.
 - The cluster can later be extended with new nodes by defining them in the config and re-executing Terraform.
 
+HTTPS Access
+- Cert-Manager gets installed
+
 Networking
 - All cluster nodes are attached to a [Hetzner Network](https://wiki.hetzner.de/index.php/CloudServer/en#Networks) which allows isolated and private communication between the nodes. However the communication is unencrypted.
 
@@ -28,12 +31,13 @@ Storage & persistence
 - [Hetzner Volumes (HVol)](https://wiki.hetzner.de/index.php/CloudServer/en#Volumes) are immediately usable for persistence after cluster provisioning, so PVCs get automatically served by allocating them on new Hetzner Volumes.
 - HVols have the minimum size of 10 GB, are extendable and are stored on redundant storage.
 - Databases like PostgreSQL and other workloads requiring persistence can be deployed  
-
-Cluster Management (Rancher)
+Cluster Management
 - The newly provisioned cluster is registered into your Rancher instance, so RBAC, Monitoring, Catalog, Etcd backups and other management features are available for it.
 
 Applications
 - After the cluster is fully provisioned, you can immediately start install applications from Rancher Catalogs
+- Helm's Tiller component gets installed into the cluster so you can install applications with Helm from your client machine as well (not only from Rancher's UI). Several components are installed with Helm during the cluster provisioning
+
 
 # Requirements
  
@@ -44,6 +48,7 @@ The tools and their versions, this cluster building method is tested on:
 - Terraform 0.12.15
 - Ansible 2.9.1
 - Rancher 2.3.2
+- Helm 2.16.1
  
 ## Rancher
  
@@ -65,7 +70,7 @@ In production, these will be needed. Wasabe seems to be a good provider.
 
 I don't have access to it, so this is commented out in provision.yml
 
-# Usage
+# Creating and provisioning the cluster
 
 The general flow of work is as follows.
 
@@ -105,6 +110,17 @@ Define FLOATING_IP and HETZNER_TOKEN in your shell.
 Execute deployment/hetzner_features.sh.
 
 The deployer should print a SUCCESS message at the end if everything deployed successfully.
+
+## Add basic cluster features
+
+- Helm's server side component (Tiller) for being able to install applications via Helm charts from CLI, without going to the Rancher UI
+- HTTPS related tooling
+  - Cert-Manager for semi-automatically getting TLS certificates for applications made available via Ingresses. Also handles automatic renewals 
+  - A default certificate issuer for Cert-Manager (Let's Encrypt)
+
+Define LETS_ENCRIPT_ACME_EMAIL in your shell. This is the email address you want to present to Let's Encrypt as the person responsible for the certs of your domain.
+
+Execute deployment/basic_features.sh.
 
 
 # Cluster validation checks
