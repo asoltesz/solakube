@@ -121,11 +121,15 @@ This will create the cluster and registers it with your Rancher installation.
 
 When Terraform finishes, wait until Rancher shows the cluster status as "Active" (as opposed to "Provisioning").
 
-## Execute Hetzner feature deployment
+## Download cluster config for kubectl 
 
 Download the cluster settings from Rancher and place them into ~/.kube/config.
 
+You can use the 'download-cluster-config.sh' script for this. This automatically backs up the current config file in case later it is needed.
+
 Check kubectl and the access to your cluster by executing "kubectl get nodes". This should show the virtual-machines/nodes you configured in terraform.tfvars when you configured the cluster.
+
+## Execute Hetzner feature deployment
 
 Define FLOATING_IP and HETZNER_TOKEN in your shell.
 
