@@ -74,6 +74,28 @@ I don't have access to it, so this is commented out in provision.yml
 
 The general flow of work is as follows.
 
+## Check dependencies
+
+As a one-time check, this makes sure that all necessary software components are available on your machine that are needed for executing the scripts and provisioning artifacts.
+
+Execute the check_dependencies.sh script and check versions on its output.
+
+### Helm
+
+If you don't have Helm installed, the installer/helm.sh script may help you. 
+
+### Ansible, Terraform
+
+Use publicly available installation guides. 
+
+Observe the minimal required versions.
+
+### Ansible roles
+
+A set of Ansible roles need to be installed for the successful provisioning of the nodes of the cluster.
+
+run installer/ansible-roles.sh 
+
 ## Configure Terraform and Ansible
 
 Read Vito's article, I only include highlights here.
