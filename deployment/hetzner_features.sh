@@ -11,14 +11,22 @@
 # It assumes that you have already configured Kubectl to your cluster.
 #
 
+function echoSection() {
+
+    echo
+    echo "--------------------------------------------------------"
+    echo ${1}
+    echo "--------------------------------------------------------"
+    echo
+
+}
+
+
 # Stop immediately if any of the deployments fail
 set -e
 
 # ------------------------------------------------------------------------------
-
-echo "-------------------------------------------------------------------------"
-echo "Validating parameters"
-echo "-------------------------------------------------------------------------"
+echoSection "Validating parameters"
 
 
 if [[ ! ${HETZNER_CLOUD_TOKEN} ]]
@@ -35,9 +43,8 @@ then
     exit 1
 fi
 
-echo "-------------------------------------------------------------------------"
-echo "Creating HETZNER_CLOUD_TOKEN secret"
-echo "-------------------------------------------------------------------------"
+# ------------------------------------------------------------------------------
+echoSection "Creating HETZNER_CLOUD_TOKEN secret"
 
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -50,16 +57,14 @@ stringData:
     network: "default"
 EOF
 
-echo "-------------------------------------------------------------------------"
-echo "Installing HETZNER cloud controller with networks driver"
-echo "-------------------------------------------------------------------------"
+# ------------------------------------------------------------------------------
+echoSection "Installing HETZNER cloud controller with networks driver"
 
 kubectl apply -f https://raw.githubusercontent.com/hetznercloud/hcloud-cloud-controller-manager/master/deploy/v1.4.0-networks.yaml
 
 
-echo "-------------------------------------------------------------------------"
-echo "Installing HETZNER Floating IP support"
-echo "-------------------------------------------------------------------------"
+# ------------------------------------------------------------------------------
+echoSection "Installing HETZNER Floating IP support"
 
 kubectl -n kube-system patch ds canal --type json -p '[{"op":"add","path":"/spec/template/spec/tolerations/-","value":{"key":"node.cloudprovider.kubernetes.io/uninitialized","value":"true","effect":"NoSchedule"}}]'
 
@@ -109,6 +114,10 @@ EOF
 
 kubectl apply -f https://raw.githubusercontent.com/hetznercloud/csi-driver/master/deploy/kubernetes/hcloud-csi.yml
 
-echo "-------------------------------------------------------------------------"
-echo "SUCCESS: All Hetzner features have been installed into your cluster."
-echo "-------------------------------------------------------------------------"
+
+
+
+kubectl get po -A | grep Evicted | awk '{system ("kubectl -n " $1 " delete po " $2)}'
+
+# ------------------------------------------------------------------------------
+echoSection "SUCCESS: All Hetzner features have been installed into your cluster."
