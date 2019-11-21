@@ -132,10 +132,5 @@ EOF
 
 kubectl apply -f https://raw.githubusercontent.com/hetznercloud/csi-driver/master/deploy/kubernetes/hcloud-csi.yml
 
-
-
-
-kubectl get po -A | grep Evicted | awk '{system ("kubectl -n " $1 " delete po " $2)}'
-
 # ------------------------------------------------------------------------------
 echoSection "SUCCESS: All Hetzner features have been installed into your cluster."
