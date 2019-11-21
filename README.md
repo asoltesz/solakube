@@ -141,14 +141,21 @@ The deployer should print a SUCCESS message at the end if everything deployed su
 
 ## Add basic cluster features
 
-- Helm's server side component (Tiller) for being able to install applications via Helm charts from CLI, without going to the Rancher UI
-- HTTPS related tooling
-  - Cert-Manager for semi-automatically getting TLS certificates for applications made available via Ingresses. Also handles automatic renewals 
-  - A default certificate issuer for Cert-Manager (Let's Encrypt)
+### Helm and Tiller
+
+Helm's server side component (Tiller) for being able to install applications via Helm charts from CLI, without going to the Rancher UI
+
+Execute deployment/tiller.sh.
+
+### Cert-Manager and Let'sEncrypt
+
+Cert-Manager for semi-automatically getting TLS certificates for applications made available via Ingresses. Also handles automatic renewals 
+
+A default certificate issuer for Cert-Manager (Let's Encrypt)
 
 Define LETS_ENCRIPT_ACME_EMAIL in your shell. This is the email address you want to present to Let's Encrypt as the person responsible for the certs of your domain.
 
-Execute deployment/basic_features.sh.
+Execute deployment/cert-manager.sh.
 
 
 # Cluster validation checks

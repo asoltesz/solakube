@@ -44,23 +44,6 @@ then
     exit 1
 fi
 
-
-# ------------------------------------------------------------------------------
-echoSection "Installing Helm's server-side component: Tiller"
-
-kubectl create serviceaccount tiller \
-    --namespace kube-system
-
-kubectl create clusterrolebinding tiller \
-    --clusterrole cluster-admin \
-    --serviceaccount=kube-system:tiller
-
-helm init --upgrade --service-account tiller
-
-echoSection "Helm's Tiller has been installed in the cluster and inited"
-
-
-
 # ------------------------------------------------------------------------------
 echoSection "Installing cert-manager for Let's Encrypt"
 
@@ -85,6 +68,8 @@ helm install \
 
 
 echoSection "cert-manager has been installed, testing the installation"
+
+sleep 20s
 
 echo "Create a ClusterIssuer to test the webhook works okay"
 
