@@ -48,6 +48,8 @@ The tools and their versions, this cluster building method is tested on:
 - Terraform 0.12.15
 - Ansible 2.9.1
 - Rancher 2.3.2
+- kubectl 1.15.5
+  - (always the major+minor version of the k8s cluster created by Rancher)
 - Helm 2.16.1
  
 ## Rancher
@@ -84,7 +86,7 @@ Execute the check_dependencies.sh script and check versions on its output.
 
 If you don't have Helm installed, the installer/helm.sh script may help you. 
 
-### Ansible, Terraform
+### Ansible, Terraform, Kubectl
 
 Use publicly available installation guides. 
 
