@@ -135,7 +135,7 @@ Check kubectl and the access to your cluster by executing "kubectl get nodes". T
 
 Define FLOATING_IP and HETZNER_TOKEN in your shell.
 
-Execute deployment/hetzner_features.sh.
+Execute deployment/hetzner-features.sh.
 
 The deployer should print a SUCCESS message at the end if everything deployed successfully.
 
@@ -145,9 +145,9 @@ The deployer should print a SUCCESS message at the end if everything deployed su
 
 Helm's server side component (Tiller) for being able to install applications via Helm charts from CLI, without going to the Rancher UI
 
-Execute deployment/tiller.sh.
+Execute deployment/helm-tiller.sh.
 
-### Cert-Manager and Let'sEncrypt
+### Cert-Manager and Let's Encrypt
 
 Cert-Manager for semi-automatically getting TLS certificates for applications made available via Ingresses. Also handles automatic renewals 
 
