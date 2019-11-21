@@ -96,10 +96,28 @@ stringData:
   HCLOUD_API_TOKEN: ${HETZNER_CLOUD_TOKEN}
 EOF
 
+# ------------------------------------------------------------------------------
+echoSection "Re-distributing fip-controller pods"
 
-echo "-------------------------------------------------------------------------"
-echo "Installing HETZNER storage/volume support"
-echo "-------------------------------------------------------------------------"
+echo "Waiting 20 seconds so that fip-controller pods are created"
+
+sleep 20s
+
+# For some reason, all fip-controller pods get scheduled on the same node
+# by default which defeats the purpose and makes fip reassignment much slower
+# than it should be
+
+echo "Killing all fip-controller pods to get a better node distribution"
+
+for podName in $(kubectl get pods --no-headers --namespace="fip-controller" | awk '{print $1}');
+do
+    # echo "Deleting pod: ${podName}"
+    kubectl delete pods ${podName}
+    sleep 3
+done
+
+# ------------------------------------------------------------------------------
+echoSection "Installing HETZNER storage/volume support"
 
 
 cat <<EOF | kubectl apply -f -
