@@ -10,6 +10,8 @@
 #
 # It assumes that you have already configured Kubectl to your cluster.
 #
+# Expected variables: See the "Validating parameters" section
+#
 
 function echoSection() {
 
@@ -20,6 +22,21 @@ function echoSection() {
     echo
 
 }
+
+#
+# The Hcloud Fip Controller version (branch/tag on GitHub)
+#
+HETZNER_FIP_CTRL_VERSION=v0.2.1
+
+#
+# The Hetzner CSI Driver version (branch/tag on GitHub)
+#
+HETZNER_CSI_DRIVER_VERSION=v1.1.5
+
+#
+# The Hetzner Cloud Controller Manager version (branch/tag on GitHub)
+#
+HETZNER_CLOUD_CTRL_VERSION=v1.4.0
 
 
 # Stop immediately if any of the deployments fail
@@ -60,19 +77,21 @@ EOF
 # ------------------------------------------------------------------------------
 echoSection "Installing HETZNER cloud controller with networks driver"
 
-kubectl apply -f https://raw.githubusercontent.com/hetznercloud/hcloud-cloud-controller-manager/master/deploy/v1.4.0-networks.yaml
+kubectl apply -f https://raw.githubusercontent.com/hetznercloud/hcloud-cloud-controller-manager/${HETZNER_CLOUD_CTRL_VERSION}/deploy/${HETZNER_CLOUD_CTRL_VERSION}-networks.yaml
 
 
 # ------------------------------------------------------------------------------
 echoSection "Installing HETZNER Floating IP support"
 
-kubectl -n kube-system patch ds canal --type json -p '[{"op":"add","path":"/spec/template/spec/tolerations/-","value":{"key":"node.cloudprovider.kubernetes.io/uninitialized","value":"true","effect":"NoSchedule"}}]'
+kubectl -n kube-system patch ds canal \
+  --type json -p \
+    '[{"op":"add","path":"/spec/template/spec/tolerations/-","value":{"key":"node.cloudprovider.kubernetes.io/uninitialized","value":"true","effect":"NoSchedule"}}]'
 
 kubectl create namespace fip-controller
 
-kubectl apply -f https://raw.githubusercontent.com/cbeneke/hcloud-fip-controller/master/deploy/rbac.yaml
+kubectl apply -f https://raw.githubusercontent.com/cbeneke/hcloud-fip-controller/${HETZNER_FIP_CTRL_VERSION}/deploy/rbac.yaml
 
-kubectl apply -f https://raw.githubusercontent.com/cbeneke/hcloud-fip-controller/master/deploy/deployment.yaml
+kubectl apply -f https://raw.githubusercontent.com/cbeneke/hcloud-fip-controller/${HETZNER_FIP_CTRL_VERSION}/deploy/deployment.yaml
 
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -127,10 +146,13 @@ metadata:
   name: hcloud-csi
   namespace: kube-system
 stringData:
-  token: $HETZNER_CLOUD_TOKEN
+  token: ${HETZNER_CLOUD_TOKEN}
 EOF
 
-kubectl apply -f https://raw.githubusercontent.com/hetznercloud/csi-driver/master/deploy/kubernetes/hcloud-csi.yml
+kubectl apply -f https://raw.githubusercontent.com/hetznercloud/csi-driver/${HETZNER_CSI_DRIVER_VERSION}/deploy/kubernetes/hcloud-csi.yml
+
+echo "Waiting for the CSI driver to initialize"
+sleep 10
 
 # ------------------------------------------------------------------------------
 echoSection "SUCCESS: All Hetzner features have been installed into your cluster."
