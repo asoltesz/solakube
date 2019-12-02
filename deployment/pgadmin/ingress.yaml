@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: ${PGADMIN_APP_NAME}
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+        nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+        certmanager.k8s.io/cluster-issuer: 'letsencrypt-prod'
+    labels:
+        app: ${PGADMIN_APP_NAME}
+spec:
+    tls:
+        - secretName: ${PGADMIN_APP_NAME}-andromeda-nostran-com
+          hosts:
+              - ${PGADMIN_APP_NAME}.andromeda.nostran.com
+
+    rules:
+        - host: ${PGADMIN_APP_NAME}.andromeda.nostran.com
+          http:
+              paths:
+                  - path: /
+                    backend:
+                        serviceName: ${PGADMIN_APP_NAME}
+                        servicePort: http

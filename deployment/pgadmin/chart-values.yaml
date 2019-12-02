@@ -1,0 +1,10 @@
+ingress:
+    enabled: false
+
+persistence:
+    enabled: true
+    existingClaim: ${PGADMIN_APP_NAME}
+
+env:
+    email: ${PGADMIN_ADMIN_EMAIL}
+    password: ${PGADMIN_ADMIN_PASSWORD}
