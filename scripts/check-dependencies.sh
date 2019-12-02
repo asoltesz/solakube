@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 #
 # Checks if all necessary software that are needed by the scripts (dependencies)
 # are present.
 #
 # WARNING: It does not (yet) check necessary minimum and maximum versions
 #
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 
 function hr() {
     echo "----------------------------------------------"

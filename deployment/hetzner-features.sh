@@ -42,7 +42,7 @@ HETZNER_CLOUD_CTRL_VERSION=v1.4.0
 # Stop immediately if any of the deployments fail
 set -e
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "Validating parameters"
 
 
@@ -60,7 +60,7 @@ then
     exit 1
 fi
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "Creating HETZNER_CLOUD_TOKEN secret"
 
 cat <<EOF | kubectl apply -f -
@@ -74,13 +74,13 @@ stringData:
     network: "default"
 EOF
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "Installing HETZNER cloud controller with networks driver"
 
 kubectl apply -f https://raw.githubusercontent.com/hetznercloud/hcloud-cloud-controller-manager/${HETZNER_CLOUD_CTRL_VERSION}/deploy/${HETZNER_CLOUD_CTRL_VERSION}-networks.yaml
 
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "Installing HETZNER Floating IP support"
 
 kubectl -n kube-system patch ds canal \
@@ -115,7 +115,7 @@ stringData:
   HCLOUD_API_TOKEN: ${HETZNER_CLOUD_TOKEN}
 EOF
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "Re-distributing fip-controller pods"
 
 echo "Waiting 20 seconds so that fip-controller pods are created"
@@ -135,7 +135,7 @@ do
     sleep 3
 done
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "Installing HETZNER storage/volume support"
 
 
@@ -154,5 +154,5 @@ kubectl apply -f https://raw.githubusercontent.com/hetznercloud/csi-driver/${HET
 echo "Waiting for the CSI driver to initialize"
 sleep 10
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "SUCCESS: All Hetzner features have been installed into your cluster."

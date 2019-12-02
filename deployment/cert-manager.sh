@@ -1,50 +1,34 @@
 #!/usr/bin/env bash
 
+# ==============================================================================
 #
 # Installs Basic Cluster features that are typically needed in all clusters.
 #
 # - Helm's Tiller
 #
+# ==============================================================================
+
+source shared.sh
+
 
 # Stop immediately if any of the deployments fail
-set -e
-
-# ------------------------------------------------------------------------------
-
-function checkResult() {
-
-    if [[ $? != 0 ]]
-    then
-        echo "${1} failed"
-        exit 1
-    fi
-}
+trap errorHandler ERR
 
 
-function echoSection() {
-
-    echo
-    echo "-------------------------------------------------------------------------"
-    echo ${1}
-    echo "-------------------------------------------------------------------------"
-    echo
-
-}
-
-
+# ------------------------------------------------------------
 echoSection "Validating parameters"
 
 
-if [[ ! ${LETS_ENCRIPT_ACME_EMAIL} ]]
+if [[ ! ${LETS_ENCRYPT_ACME_EMAIL} ]]
 then
-    echo "ERROR: LETS_ENCRIPT_ACME_EMAIL env var is not defined."
+    echo "ERROR: LETS_ENCRYPT_ACME_EMAIL env var is not defined."
 
     echo "Please define it with the email address you want to present to Let's Encript as the person responsible for the certs of your domain."
 
     exit 1
 fi
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "Installing cert-manager for Let's Encrypt"
 
 echo "Install the CustomResourceDefinition resources separately"
@@ -120,7 +104,7 @@ echo "Cert manager validation successful"
 echoSection "Cert-manager has been installed and validated on your cluster"
 
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echo "Adding a default ClusterIssuer to the cluster (http01, Let's Encrypt)"
 
 cat <<EOF | kubectl apply --namespace cert-manager -f -
@@ -131,7 +115,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: "${LETS_ENCRIPT_ACME_EMAIL}"
+    email: "${LETS_ENCRYPT_ACME_EMAIL}"
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
@@ -141,10 +125,10 @@ spec:
 EOF
 
 echoSection "Cert-manager has been installed and validated on your cluster"
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 
 
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "SUCCESS: All Basic cluster features have been installed into your cluster."
 

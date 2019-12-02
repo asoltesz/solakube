@@ -9,7 +9,7 @@
 # Stop immediately if any of the deployments fail
 set -e
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 
 function checkResult() {
 
@@ -30,7 +30,7 @@ function echoSection() {
     echo
 
 }
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------
 echoSection "Installing Helm's server-side component: Tiller"
 
 kubectl create serviceaccount tiller \
