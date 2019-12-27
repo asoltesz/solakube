@@ -8,7 +8,7 @@
 
 # Internal parameters
 
-HELM_CHART_VERSION=1.1.7
+ROOK_VERSION=1.1
 
 # ------------------------------------------------------------
 source ../shared.sh
@@ -27,47 +27,35 @@ echoSection "Validating parameters"
 # ------------------------------------------------------------
 echoSection "Preparing temp folder"
 
-TMP_DIR=/tmp/helm/rook
-rm -Rf ${TMP_DIR}
-mkdir -p ${TMP_DIR}
-
-# ------------------------------------------------------------
-echoSection "Adding the Rook Helm chart repo"
-
-helm repo add rook-release https://charts.rook.io/release
-
-# ------------------------------------------------------------
-echoSection "Preparing Helm chart values"
-
-envsubst < chart-values.yaml > ${TMP_DIR}/chart-values.yaml
-
-envsubst < storage-cluster.yaml > ${TMP_DIR}/storage-cluster.yaml
+createTempDir "rook"
 
 # ------------------------------------------------------------
 echoSection "Creating namespace"
 
-addNamespace rook-ceph
+defineNamespace rook-ceph
 
 # ------------------------------------------------------------
-echoSection "Installing with Helm chart"
+echoSection "Creating the Rook storage operator"
 
-helm install rook-release/rook-ceph \
-    --namespace rook-ceph \
-    --version=${HELM_CHART_VERSION} \
-    --values ${TMP_DIR}/chart-values.yaml
+kubectl apply -f k8s/common.yaml \
+    --namespace=rook-ceph
 
+kubectl apply -f k8s/operator.yaml \
+    --namespace=rook-ceph
 
 # ------------------------------------------------------------
-echoSection "Creating the storage cluster"
+echoSection "Creating the Rook/Ceph storage cluster"
 
-kubectl create -f ${TMP_DIR}/storage-cluster.yaml
+kubectl create -f k8s/cluster-test.yaml \
+    --namespace=rook-ceph
 
 # ------------------------------------------------------------
 echoSection "Creating the 'rook-ceph-block' storage class"
 
-kubectl create -f storage-class.yaml
+kubectl create -f k8s/storageclass.yaml \
+    --namespace=rook-ceph
 
 
 # ------------------------------------------------------------
-echoSection "Rook/Ceph has been installed on your cluster"
+echoSection "Rook/Ceph ${ROOK_VERSION} has been installed on your cluster"
 

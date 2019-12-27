@@ -32,11 +32,13 @@ fi
 # ------------------------------------------------------------
 echoSection "Installing the Rook Toolbox Deployment"
 
-kubectl create -f toolbox.yaml \
+kubectl create -f k8s/toolbox.yaml \
         --namespace rook-ceph
 
 # ------------------------------------------------------------
 echoSection "Waiting until the Toolbox starts up"
+
+sleep 5s
 
 kubectl get pod -l "app=rook-ceph-tools" \
         --namespace rook-ceph
@@ -52,7 +54,7 @@ kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-t
 # Run "ceph status" manually and check:
 #
 # - Health must be 'HEALTH_OK'
-# - All mons should be in quorum
+# - All mons should be in quorum (in the services section)
 # - A mgr should be active
 # - At least one OSD should be active
 #
