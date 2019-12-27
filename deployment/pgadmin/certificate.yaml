@@ -1,20 +1,18 @@
 apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
-    name: ${PGADMIN_APP_NAME}-andromeda-nostran-com
-    labels:
-        app: ${PGADMIN_APP_NAME}
+    name: ${PGADMIN_APP_NAME}
 spec:
-    secretName: ${PGADMIN_APP_NAME}-andromeda-nostran-com
+    secretName: ${PGADMIN_APP_NAME}-tls
     issuerRef:
         name: letsencrypt-http01
         kind: ClusterIssuer
-    commonName: ${PGADMIN_APP_NAME}.andromeda.nostran.com
+    commonName: ${PGADMIN_FQN}
     dnsNames:
-        - ${PGADMIN_APP_NAME}.andromeda.nostran.com
+        - ${PGADMIN_FQN}
     acme:
         config:
             - http01:
                   ingressClass: nginx
               domains:
-                  - ${PGADMIN_APP_NAME}.andromeda.nostran.com
+                  - ${PGADMIN_FQN}
