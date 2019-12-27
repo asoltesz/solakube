@@ -13,34 +13,27 @@
 # Expected variables: See the "Validating parameters" section
 #
 
-function echoSection() {
+source ../shared.sh
 
-    echo
-    echo "--------------------------------------------------------"
-    echo ${1}
-    echo "--------------------------------------------------------"
-    echo
+# Stop immediately if any of the deployments fail
+trap errorHandler ERR
 
-}
 
 #
 # The Hcloud Fip Controller version (branch/tag on GitHub)
 #
-HETZNER_FIP_CTRL_VERSION=v0.2.1
+export HETZNER_FIP_CTRL_VERSION=v0.3.0
 
 #
 # The Hetzner CSI Driver version (branch/tag on GitHub)
 #
-HETZNER_CSI_DRIVER_VERSION=v1.1.5
+export HETZNER_CSI_DRIVER_VERSION=v1.1.5
 
 #
 # The Hetzner Cloud Controller Manager version (branch/tag on GitHub)
 #
-HETZNER_CLOUD_CTRL_VERSION=v1.4.0
+export HETZNER_CLOUD_CTRL_VERSION=v1.4.0
 
-
-# Stop immediately if any of the deployments fail
-set -e
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
@@ -53,67 +46,55 @@ then
     exit 1
 fi
 
-if [[ ! ${FLOATING_IP} ]]
+if [[ ! ${HETZNER_FLOATING_IP} ]]
 then
-    echo "ERROR: The FLOATING_IP env var is not defined. Cannot continue."
+    echo "ERROR: The HETZNER_FLOATING_IP env var is not defined. Cannot continue."
     echo "Please define it with the IP you got from the Terraform output."
     exit 1
 fi
 
+
+# ------------------------------------------------------------
+echoSection "Preparing temp folder"
+
+createTempDir "hetzner"
+
+export DEPLOY_NAMESPACE="NOT_SPECIFIED"
+
 # ------------------------------------------------------------
 echoSection "Creating HETZNER_CLOUD_TOKEN secret"
 
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Secret
-metadata:
-    name: hcloud
-    namespace: kube-system
-stringData:
-    token: "${HETZNER_CLOUD_TOKEN}"
-    network: "default"
-EOF
+applyTemplate cloud-controller-secret.yaml
+
 
 # ------------------------------------------------------------
 echoSection "Installing HETZNER cloud controller with networks driver"
 
-kubectl apply -f https://raw.githubusercontent.com/hetznercloud/hcloud-cloud-controller-manager/${HETZNER_CLOUD_CTRL_VERSION}/deploy/${HETZNER_CLOUD_CTRL_VERSION}-networks.yaml
+kubectl apply -f  \
+    https://raw.githubusercontent.com/hetznercloud/hcloud-cloud-controller-manager/${HETZNER_CLOUD_CTRL_VERSION}/deploy/${HETZNER_CLOUD_CTRL_VERSION}-networks.yaml
 
 
 # ------------------------------------------------------------
 echoSection "Installing HETZNER Floating IP support"
 
+echo "Patching canal to allow scheduling"
+
 kubectl -n kube-system patch ds canal \
   --type json -p \
     '[{"op":"add","path":"/spec/template/spec/tolerations/-","value":{"key":"node.cloudprovider.kubernetes.io/uninitialized","value":"true","effect":"NoSchedule"}}]'
 
-kubectl create namespace fip-controller
+echo "Waiting until the canal patch takes effect"
+sleep 10s
 
-kubectl apply -f https://raw.githubusercontent.com/cbeneke/hcloud-fip-controller/${HETZNER_FIP_CTRL_VERSION}/deploy/rbac.yaml
+defineNamespace fip-controller
 
-kubectl apply -f https://raw.githubusercontent.com/cbeneke/hcloud-fip-controller/${HETZNER_FIP_CTRL_VERSION}/deploy/deployment.yaml
+kubectl apply  \
+    -f https://raw.githubusercontent.com/cbeneke/hcloud-fip-controller/${HETZNER_FIP_CTRL_VERSION}/deploy/rbac.yaml
 
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: fip-controller-config
-  namespace: fip-controller
-data:
-  config.json: |
-    {
-      "hcloud_floating_ips": [ "${FLOATING_IP}" ],
-      "node_address_type": "external"
-    }
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: fip-controller-secrets
-  namespace: fip-controller
-stringData:
-  HCLOUD_API_TOKEN: ${HETZNER_CLOUD_TOKEN}
-EOF
+applyTemplate fip-controller-config.yaml
+
+applyTemplate fip-controller-deployment.yaml
+
 
 # ------------------------------------------------------------
 echoSection "Re-distributing fip-controller pods"
@@ -122,34 +103,38 @@ echo "Waiting 20 seconds so that fip-controller pods are created"
 
 sleep 20s
 
-# For some reason, all fip-controller pods get scheduled on the same node
+#
+# For some reason, all 3 fip-controller pods get scheduled on the same node
 # by default which defeats the purpose and makes fip reassignment much slower
 # than it should be
-
+#
+# fip-controller pods should be distributed on 3 different nodes
+#
+# We try to redistribute by killing the default pods. This usually results at least
+# in a 2-node distribution in a 3-node set
+#
 echo "Killing all fip-controller pods to get a better node distribution"
 
 for podName in $(kubectl get pods --no-headers --namespace="fip-controller" | awk '{print $1}');
 do
     # echo "Deleting pod: ${podName}"
-    kubectl delete pods ${podName}
+    kubectl delete pods ${podName} --namespace="fip-controller"
     sleep 3
 done
+
+echo "Waiting for new fip-controller pods to stabilize"
+
+sleep 10s
 
 # ------------------------------------------------------------
 echoSection "Installing HETZNER storage/volume support"
 
+export DEPLOY_NAMESPACE="NOT_SPECIFIED"
 
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Secret
-metadata:
-  name: hcloud-csi
-  namespace: kube-system
-stringData:
-  token: ${HETZNER_CLOUD_TOKEN}
-EOF
+applyTemplate csi-secret.yaml
 
-kubectl apply -f https://raw.githubusercontent.com/hetznercloud/csi-driver/${HETZNER_CSI_DRIVER_VERSION}/deploy/kubernetes/hcloud-csi.yml
+kubectl apply  \
+    -f https://raw.githubusercontent.com/hetznercloud/csi-driver/${HETZNER_CSI_DRIVER_VERSION}/deploy/kubernetes/hcloud-csi.yml
 
 echo "Waiting for the CSI driver to initialize"
 sleep 10
