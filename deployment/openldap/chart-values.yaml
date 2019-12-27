@@ -1,0 +1,10 @@
+ingress:
+    enabled: false
+
+persistence:
+    enabled: true
+    storageClass: ${OPENLDAP_STORAGE_CLASS}
+    size: 4Gi
+
+adminPassword: ${OPENLDAP_ADMIN_PASSWORD}
+configPassword: ${OPENLDAP_ADMIN_PASSWORD}

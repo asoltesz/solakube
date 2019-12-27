@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: ${OPENLDAP_APP_NAME}
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+        nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+        certmanager.k8s.io/cluster-issuer: 'letsencrypt-http01'
+    labels:
+        app: ${OPENLDAP_APP_NAME}
+spec:
+    tls:
+        - secretName: ${OPENLDAP_APP_NAME}-andromeda-nostran-com
+          hosts:
+              - ${OPENLDAP_APP_NAME}.andromeda.nostran.com
+
+    rules:
+        - host: ${OPENLDAP_APP_NAME}.andromeda.nostran.com
+          http:
+              paths:
+                  - path: /
+                    backend:
+                        serviceName: ${OPENLDAP_APP_NAME}
+                        servicePort: http

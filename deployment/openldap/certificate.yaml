@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+    name: ${OPENLDAP_APP_NAME}
+spec:
+    secretName: ${OPENLDAP_APP_NAME}-tls
+    issuerRef:
+        name: letsencrypt-http01
+        kind: ClusterIssuer
+    commonName: ${OPENLDAP_FQN}
+    dnsNames:
+        - ${OPENLDAP_FQN}
+    acme:
+        config:
+            - http01:
+                  ingressClass: nginx
+              domains:
+                  - ${OPENLDAP_FQN}
