@@ -24,7 +24,7 @@ open_services:
 # Admin email notifications
 # -------------------------------
 
-admin_email: andromeda--k8s-cluster@nostran.com
+admin_email: andromeda-k8s-cluster@nostran.com
 notifications_email: soltesz.andras@gmail.com
 
 

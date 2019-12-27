@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 
-# After configure-shell
-
 ./tf --cluster andromeda init
 
 #tf --cluster andromeda init \
