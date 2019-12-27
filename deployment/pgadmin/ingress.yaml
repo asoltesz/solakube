@@ -6,17 +6,16 @@ metadata:
         kubernetes.io/ingress.class: nginx
         nginx.ingress.kubernetes.io/rewrite-target: /
         nginx.ingress.kubernetes.io/ssl-redirect: 'true'
-        certmanager.k8s.io/cluster-issuer: 'letsencrypt-prod'
+        # certmanager.k8s.io/cluster-issuer: 'letsencrypt-http01'
     labels:
         app: ${PGADMIN_APP_NAME}
 spec:
     tls:
-        - secretName: ${PGADMIN_APP_NAME}-andromeda-nostran-com
+        - secretName: ${PGADMIN_TLS_SECRET_NAME}
           hosts:
-              - ${PGADMIN_APP_NAME}.andromeda.nostran.com
-
+              - ${PGADMIN_FQN}
     rules:
-        - host: ${PGADMIN_APP_NAME}.andromeda.nostran.com
+        - host: ${PGADMIN_FQN}
           http:
               paths:
                   - path: /

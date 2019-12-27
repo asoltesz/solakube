@@ -2,7 +2,7 @@
 
 # ==============================================================================
 #
-# Deletes pgAdmin from the cluster
+# Deletes PostgreSQL from the cluster
 #
 # ==============================================================================
 
@@ -17,18 +17,18 @@ trap errorHandler ERR
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
-checkAppName "pgadmin"
+checkAppName "postgres"
 
 # ------------------------------------------------------------
 echoSection "Removing via Helm"
 
-helm del --purge ${PGADMIN_APP_NAME}
+helm del --purge ${POSTGRES_APP_NAME}
 
 # ------------------------------------------------------------
 echoSection "Deleting namespace"
 
-deleteNamespace ${PGADMIN_APP_NAME}
+deleteNamespace ${POSTGRES_APP_NAME}
 
 # ------------------------------------------------------------
-echoSection "PgAdmin has been removed from your cluster"
+echoSection "Postgres has been removed from your cluster"
 

@@ -6,16 +6,16 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-    name: ${PGADMIN_APP_NAME}
+    name: ${POSTGRES_APP_NAME}
     labels:
-        app.kubernetes.io/name: ${PGADMIN_APP_NAME}
-        app.kubernetes.io/instance: ${PGADMIN_APP_NAME}
+        app.kubernetes.io/name: ${POSTGRES_APP_NAME}
+        app.kubernetes.io/instance: ${POSTGRES_APP_NAME}
     annotations:
-        volume.beta.kubernetes.io/storage-class: ${PGADMIN_STORAGE_CLASS}
+        volume.beta.kubernetes.io/storage-class: ${POSTGRES_STORAGE_CLASS}
 spec:
     accessModes:
     - "ReadWriteOnce"
-    storageClassName: ${PGADMIN_STORAGE_CLASS}
+    storageClassName: ${POSTGRES_STORAGE_CLASS}
     resources:
         requests:
-            storage: "5Gi"
+            storage: "10Gi"

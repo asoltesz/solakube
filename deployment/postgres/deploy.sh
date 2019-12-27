@@ -2,10 +2,10 @@
 
 # ==============================================================================
 #
-# Install pgAdmin on your cluster
+# Install PostgreSQL on your cluster (Bitnami variant)
 #
 # Installs the appropriate Ingress and cert-manager Certificate descriptor
-# for HTTPS access of pgAdmin
+# for HTTPS access of postgres
 #
 # WARNING: Assumes that a cert-manager ClusterIssuer named "letsencrypt-http01"
 # is already deployed on the cluster (it will define the Certificate to be
@@ -15,7 +15,8 @@
 
 # Internal parameters
 
-HELM_CHART_VERSION=1.0.4
+HELM_CHART_VERSION=8.1.2
+POSTGRES_VERSION=11.6.0
 
 # ------------------------------------------------------------
 source ../shared.sh
@@ -27,18 +28,14 @@ trap errorHandler ERR
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
-checkAppName "pgadmin"
+checkAppName "postgres"
 
-checkStorageClass "pgadmin"
-
-checkFQN "pgadmin"
-
-checkCertificate "pgadmin"
+checkStorageClass "postgres"
 
 # ------------------------------------------------------------
 echoSection "Preparing temp folder"
 
-createTempDir "pgadmin"
+createTempDir "postgres"
 
 # ------------------------------------------------------------
 echoSection "Preparing Helm chart values"
@@ -49,7 +46,7 @@ processTemplate chart-values.yaml
 # ------------------------------------------------------------
 echoSection "Creating namespace"
 
-defineNamespace ${PGADMIN_APP_NAME}
+defineNamespace ${POSTGRES_APP_NAME}
 
 # ------------------------------------------------------------
 echoSection "Creating PVC"
@@ -60,34 +57,16 @@ applyTemplate pvc.yaml
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install stable/pgadmin \
-    --name ${PGADMIN_APP_NAME} \
-    --namespace ${PGADMIN_APP_NAME} \
+helm install stable/postgresql \
+    --name ${POSTGRES_APP_NAME} \
+    --namespace ${POSTGRES_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
-    --values ${TMP_DIR}/chart-values.yaml
+    --values ${TMP_DIR}/chart-values.yaml \
+    --set postgresqlPassword=${POSTGRES_ADMIN_PASSWORD}
 
 # ------------------------------------------------------------
 
-if [[ "${PGADMIN_CERT_NEEDED}" == "Y" ]]
-then
-    echoSection "Installing a dedicated TLS certificate-request"
-
-    applyTemplate certificate.yaml
-else
-    # A cluster-level, wildcard cert needs to be replicated into the namespace
-    if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
-    then
-        applyTemplate cluster-fqn-tls-secret.yaml
-    fi
-fi
 
 # ------------------------------------------------------------
-echoSection "Installing the Ingress (with TLS by cert-manager)"
-
-applyTemplate ingress.yaml
-
-
-
-# ------------------------------------------------------------
-echoSection "PgAdmin has been installed on your cluster"
+echoSection "Postgres ${POSTGRES_VERSION} has been installed on your cluster"
 
