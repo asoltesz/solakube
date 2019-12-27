@@ -59,3 +59,6 @@ servers = {
     roles              = "--worker --etcd --controlplane"
   },
 }
+
+# Set it to "none" if no ingress controller should be deployed
+ingress_provider = "nginx"

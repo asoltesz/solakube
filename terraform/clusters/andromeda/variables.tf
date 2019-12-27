@@ -13,3 +13,4 @@ variable "etcd_s3_region" {}
 variable "servers" {}
 variable "ansible_playbook_path" {}
 variable "ansible_vault_password_path" {}
+variable "ingress_provider" {}

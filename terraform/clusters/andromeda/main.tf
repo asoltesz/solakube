@@ -22,11 +22,14 @@ module "rancher" {
   source = "github.com/vitobotta/terraform-rancher"
 
   cluster_name        = var.cluster_name
+
   etcd_s3_access_key  = var.etcd_s3_access_key
   etcd_s3_secret_key  = var.etcd_s3_secret_key
   etcd_s3_region      = var.etcd_s3_region
   etcd_s3_endpoint    = var.etcd_s3_endpoint
   etcd_s3_bucket_name = var.etcd_s3_bucket_name
+
+  ingress_provider = var.ingress_provider
 }
 
 
