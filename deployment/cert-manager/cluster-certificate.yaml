@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+    name: cluster-fqn-certificate
+spec:
+    secretName: ${CLUSTER_CERT_SECRET_NAME}
+    issuerRef:
+        name: letsencrypt-dns01-cloudflare
+    commonName: ${CLUSTER_FQN}
+    dnsNames:
+    - ${CLUSTER_FQN}
+    - '*.${CLUSTER_FQN}'
+    acme:
+        config:
+        -   dns01:
+                provider: cloudflare
+            domains:
+            - ${CLUSTER_FQN}
+            - '*.${CLUSTER_FQN}'

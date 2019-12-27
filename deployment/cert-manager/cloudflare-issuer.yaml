@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+    name: letsencrypt-dns01-cloudflare
+spec:
+    acme:
+        server: https://acme-v02.api.letsencrypt.org/directory
+        email: "${LETS_ENCRYPT_ACME_EMAIL}"
+        privateKeySecretRef:
+            name: letsencrypt-dns01-cloudflare
+        solvers:
+        - dns01:
+              cloudflare:
+                  email: ${CLOUDFLARE_EMAIL}
+                  apiKeySecretRef:
+                      name: cloudflare-api-key-secret
+                      key: api-key
