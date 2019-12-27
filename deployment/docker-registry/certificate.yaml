@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+    name: docker-registry-tls
+    labels:
+        app: docker-registry
+spec:
+    secretName: docker-registry-tls
+    issuerRef:
+        name: letsencrypt-http01
+        kind: ClusterIssuer
+    commonName: ${REGISTRY_FQN}
+    dnsNames:
+        - ${REGISTRY_FQN}
+    acme:
+        config:
+            - http01:
+                  ingressClass: nginx
+              domains:
+                  - ${REGISTRY_FQN}

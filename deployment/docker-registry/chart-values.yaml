@@ -1,0 +1,10 @@
+ingress:
+    enabled: false
+
+# This is only needed
+# tlsSecretName: docker-registry-tls
+
+persistence:
+    enabled: "true"
+    storageClass: ${REGISTRY_STORAGE_CLASS}
+    size: 10Gi
