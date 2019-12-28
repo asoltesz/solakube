@@ -10,8 +10,9 @@ One way to store them in the shell-configuration shell script belonging to the c
 
 An other way is to define these variables in the Terraform "secret" definer shell script that is placed in ~/.secrets and named according to the cluster name (e.g.: ~/.secrets/terraform-andromeda.sh). Before starting a SolaKube script (that requires one or more of the variables), the script can be loaded directly or via configure-andromeda.sh (e.g. with the command "source ../../configure-shell.sh" when being in the hetzner deployment subfolder). The .secrets folder is not intended to be under version control.
 
-
 The variables need to be defined with Bash export statements so they become visible as shell variables (e.g.: export HETZNER_API_TOKEN=dkljfsldkjf) after the script is sourced into the shell you work from.
+
+There is a sample variables file in the templates folder that can be used as a starting point. 
 
 # Common variables
 
