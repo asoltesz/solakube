@@ -21,7 +21,15 @@ function echoSection() {
 }
 
 #
-# Execution error handler. Can be set with 'trap errorHandler ERR'
+# Generic execution error handler. Can be set with 'trap errorHandler ERR'.
+#
+# Use it with "trap errorHandler ERR"
+#
+# Only use it with non-reusable scripts when you do not do any manual error
+# handling.
+#
+# Do no use it in scripts which may be executed as part of a longer process
+# (unless all scripts use this errorHandler)
 #
 errorHandler() {
 
