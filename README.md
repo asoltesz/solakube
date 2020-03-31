@@ -52,7 +52,7 @@ Applications
 
 The tools and their versions, this cluster building method is tested on:
  
-- Terraform 0.12.15
+- Terraform 0.12.24
 - Ansible 2.9.1
 - Rancher 2.3.2
 - Kubectl 1.15.5
