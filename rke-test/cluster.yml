@@ -1,0 +1,14 @@
+#
+# RKE version 1.0.6
+#
+
+
+kubernetes_version: v1.15.11-rancher1-2
+
+nodes:
+- address: 78.47.58.89 # If in the private net use the proper IP
+  user: deploy
+  role:
+  - controlplane
+  - etcd
+  - worker
