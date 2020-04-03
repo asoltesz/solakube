@@ -10,7 +10,7 @@ For the sake of compactness, the project is referenced as SolaKube.
  
 WARNING: This is a work in progress and shared only in the hope that it may come useful for others. See the [Issues](https://github.com/asoltesz/hetzner-k8s-builder/issues). Until it reaches 1.0, major structural changes may be introduced.
 
-The configuration describe my personal test cloud (named "andromeda"). If you want to utilize it, please read Vito's article and customize everything accordingly according to your own preferences, tokens...etc.
+The configuration describe my personal test cloud (named "andromeda"). If you want to utilize it, please read Vito's article and customize everything according to your own preferences, tokens...etc.
 
 # Cluster Features
 
