@@ -23,19 +23,19 @@ Use create_vault.sh and edit_vault.sh for easily make/change sensitive settings 
 
 ## Cluster creation
 
-In the scripts folder, execute ./apply-cluster.sh
+In the scripts folder, execute **./apply-cluster.sh**
 
 This executes Terraform with the Ansible machine provisioner.
 
 This will create the cluster and registers it with your Rancher installation.
 
-When Terraform finishes, wait until Rancher shows the cluster status as "Active" (as opposed to "Provisioning").
+When Terraform finishes, wait until Rancher shows the cluster status as **"Active"** (as opposed to "Provisioning").
 
 ## Download cluster config for kubectl 
 
-Download the cluster settings from Rancher and place them into ~/.kube/config.
+Download the cluster settings from Rancher and place them into **~/.kube/config**.
 
-You can use the 'download-cluster-config.sh' script for this. This automatically backs up the current config file in case later it is needed. Set the RANCHER_API_TOKEN, RANCHER_HOST, RANCHER_CLUSTER_ID [variables](variables.md) for the script.
+You can use the **download-cluster-config.sh** script for this. This automatically backs up the current config file in case later it is needed. Set the RANCHER_API_TOKEN, RANCHER_HOST, RANCHER_CLUSTER_ID [variables](variables.md) for the script in the shell.
 
 Check kubectl and the access to your cluster by executing "kubectl get nodes". This should show the virtual-machines/nodes you configured in terraform.tfvars when you configured the cluster.
 
@@ -43,13 +43,13 @@ Check kubectl and the access to your cluster by executing "kubectl get nodes". T
 
 Helm's server side component (Tiller) for being able to install applications via Helm charts from CLI, without going to the Rancher UI
 
-Execute deployment/helm-tiller.sh.
+Execute **helm-tiller.sh** script in the **deployment** folder.
 
 # Add basic cluster features
 
 ## Execute Hetzner feature deployment
 
-Execute deployment/hetzner/deploy.sh.
+Execute the **deploy.sh** script in the **deployment/hetzner** folder.
 
 Required [variables](variables.md) are HETZNER_FLOATING_IP, HETZNER_TOKEN for the script.
 
@@ -61,7 +61,7 @@ Cert-Manager is supported for automatically getting TLS certificates for applica
 
 Per-service certificate and shared/wildcard certificates are both supported via Let's Encrypt, see [the relevant docs page](certificate-management.md) for the explanation of the mechanisms and their configuration variables.
 
-Execute deployment/cert-manager/deploy.sh.
+Execute the **deploy.sh** script in the **deployment/cert-manager** folder.
 
 ## Replicator
 
@@ -69,7 +69,7 @@ If you use a wildcard/cluster-level certificate, you need to install Replicator 
 
 This is needed because Nginx-Ingress can only use TLS secrets defined in the same namespace as the ingress object itself.
 
-Execute deployment/replicator/deploy.sh.
+Execute the **deploy.sh** in the **deployment/replicator** folder.
 
 # Rook / Ceph
 

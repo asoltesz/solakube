@@ -4,9 +4,9 @@ This module of SolaKube installs Rook with Ceph on your cluster so that the avai
 
 Due to the fixed size of Hetzner virtual machines (e.g.: CX31, 8GB RAM, 80 GB SSD), without this, a lot of local storage would not be utilized on the machines. 
 
-The deployment/rook/deploy.sh script can be used to deploy Rook with Ceph.
+The **deployment/rook/deploy.sh** script can be used to deploy Rook with Ceph.
 
-After a successful deployment, wait until the 3 osd pods become Active in the "rook_ceph" namespace.
+After a successful deployment, wait until the 3 OSD pods become Active in the "rook_ceph" namespace.
 
 Applications/Services will automatically get persistent volumes assigned from Rook/Ceph if you set the service specific *_STORAGE_CLASS variable or the DEFAULT_STORAGE_CLASS variable to 'rook-ceph-block'.
 
