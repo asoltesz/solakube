@@ -40,24 +40,29 @@ echoSection "Waiting until the Toolbox starts up"
 
 sleep 5s
 
-kubectl get pod -l "app=rook-ceph-tools" \
-        --namespace rook-ceph
-
 # ------------------------------------------------------------
 echoSection "Verifying the installation and storage cluster"
 
-# TODO Implement verification with commands
+#
+# Getting a status about the Ceph cluster
+#
+kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') ceph status
 
-# Log into the first Ceph
-kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') bash
-
-# Run "ceph status" manually and check:
+# -------------------------------------
+# Check these on the status output:
 #
 # - Health must be 'HEALTH_OK'
-# - All mons should be in quorum (in the services section)
+# - All monitors (mons) should be in quorum (in the services section)
 # - A mgr should be active
-# - At least one OSD should be active
+# - At least one OSD should be active (normally at least as many as the nodes)
+# -------------------------------------
+
 #
+# Logging into the toolbox container shell to execute manual commands
+#
+kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') bash
+
+
 
 # ------------------------------------------------------------
 echoSection "Removing the toolbox"

@@ -8,7 +8,7 @@
 
 # Internal parameters
 
-ROOK_VERSION=1.1
+ROOK_VERSION=1.2
 
 # ------------------------------------------------------------
 source ../shared.sh
