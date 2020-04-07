@@ -8,7 +8,7 @@ Most of the scripts expect these as shell variables pre-defined before the scrip
 
 One way to store them in the shell-configuration shell script belonging to the cloud (for example configure-andromeda.sh) This file is under version control, so only do this if the private information stored in  the variables can be checked into the Git repo you intend to store your changes in.
 
-An other way is to define these variables in the Terraform "secret" definer shell script that is placed in ~/.secrets and named according to the cluster name (e.g.: ~/.secrets/terraform-andromeda.sh). Before starting a SolaKube script (that requires one or more of the variables), the script can be loaded directly or via configure-andromeda.sh (e.g. with the command "source ../../configure-shell.sh" when being in the hetzner deployment subfolder). The .secrets folder is not intended to be under version control.
+An other way is to define these variables in the Terraform "secret" definer shell script that is placed in ~/.solakube and named according to the cluster name (e.g.: ~/.solakube/andromeda/variables.sh). Before starting a SolaKube script (that requires one or more of the variables), the script can be loaded directly or via configure-andromeda.sh (e.g. with the command "source ../../configure-shell.sh" when being in the Hetzner deployment subfolder). This folder is not intended to be under version control.
 
 The variables need to be defined with Bash export statements so they become visible as shell variables (e.g.: export HETZNER_API_TOKEN=dkljfsldkjf) after the script is sourced into the shell you work from.
 

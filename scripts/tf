@@ -38,8 +38,8 @@ then
     exit 1
 fi
 
-echo "Loading secrets for the cluster from ~/.secrets"
-SECRET_FILE=~/.secrets/terraform-${CLUSTER}.sh
+echo "Loading secrets for the cluster from ~/.solakube"
+SECRET_FILE=~/.solakube/${CLUSTER}/variables.sh
 source ${SECRET_FILE}
 if [[ $? != 0 ]]
 then

@@ -14,7 +14,7 @@ etcd_s3_region      = "..."
 
 # Hetzner Cloud configuration
 ansible_playbook_path       = "../../../ansible/provision.yml"
-ansible_vault_password_path = "~/.secrets/ansible-vault-pass"
+ansible_vault_password_path = "~/.solakube/ansible-vault-pass"
 
 #
 # The definition of teh virtual machines forming the Kubernetes nodes

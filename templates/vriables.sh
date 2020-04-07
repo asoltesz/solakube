@@ -3,7 +3,7 @@
 # ==============================================================================
 # Template for variable values for SolaKube scripts
 #
-# This is to be placed in ~/.secrets after filled out
+# This is to be placed in ~/.solakube/${clusterName}/ after filled out
 #
 # For detailed variable documentation, see the docs/variables.md
 # ==============================================================================
