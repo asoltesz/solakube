@@ -1,0 +1,22 @@
+#
+# SolaKube for the Andromeda cluster
+#
+anc() {
+
+    # !!!!! Correct this to your own folder !!!!!!
+    export SK_PROJECT_ROOT=/path/to/where/solakube/is/checked/out
+
+    # Define script home here if it is not the default path
+    export SK_SCRIPT_HOME=${SK_PROJECT_ROOT}/scripts
+
+    cd ${SK_SCRIPT_HOME}
+
+    export SK_CLUSTER=andromeda
+
+    # Loading variables
+    . ~/.solakube/${SK_CLUSTER}/variables.sh
+
+    echo
+    echo "Your shell is now configured for the SolaKube/${SK_CLUSTER} project."
+    echo
+}
