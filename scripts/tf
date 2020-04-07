@@ -8,6 +8,10 @@ while [[ -h "${SOURCE}" ]]; do # resolve $SOURCE until the file is no longer a s
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
+if [[ "${SK_CLUSTER}" ]]
+then
+    CLUSTER="${SK_CLUSTER}"
+fi
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -31,6 +35,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 [[ -z "$CLUSTER" ]] && { echo "Please specify the name of the cluster with '--cluster'" ; exit 1; }
 
+# Entering the Terraform home folder for the cluster
 cd ${DIR}/../terraform/clusters/${CLUSTER}
 if [[ $? != 0 ]]
 then
@@ -38,7 +43,7 @@ then
     exit 1
 fi
 
-echo "Loading secrets for the cluster from ~/.solakube"
+# Loading secrets for the cluster from ~/.solakube
 SECRET_FILE=~/.solakube/${CLUSTER}/variables.sh
 source ${SECRET_FILE}
 if [[ $? != 0 ]]
@@ -47,6 +52,8 @@ then
     exit 1
 fi
 
+TF_COMMAND=${1}
+
 terraform "$@"
 if [[ $? != 0 ]]
 then
@@ -54,4 +61,7 @@ then
     exit 1
 fi
 
-echo "Terraform execution was SUCCESSFUL"
+if [[ "${TF_COMMAND}" != "output" ]]
+then
+    echo "Terraform execution was SUCCESSFUL"
+fi
