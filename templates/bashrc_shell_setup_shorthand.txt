@@ -1,4 +1,10 @@
 #
+# A shorthand command to setup a Bash shell for running SolaKube commands
+# with the Andromeda cloud
+#
+
+
+#
 # SolaKube for the Andromeda cluster
 #
 anc() {
@@ -7,14 +13,13 @@ anc() {
     export SK_PROJECT_ROOT=/path/to/where/solakube/is/checked/out
 
     # Define script home here if it is not the default path
-    export SK_SCRIPT_HOME=${SK_PROJECT_ROOT}/scripts
+    export SK_SCRIPT_HOME="${SK_PROJECT_ROOT}/scripts"
 
-    cd ${SK_SCRIPT_HOME}
+    cd "${SK_SCRIPT_HOME}"
 
-    export SK_CLUSTER=andromeda
+    export SK_CLUSTER="andromeda"
 
-    # Loading variables
-    . ~/.solakube/${SK_CLUSTER}/variables.sh
+    alias sk=${SK_SCRIPT_HOME}/sk.sh
 
     echo
     echo "Your shell is now configured for the SolaKube/${SK_CLUSTER} project."
