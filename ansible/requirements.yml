@@ -10,13 +10,13 @@
 - src: https://github.com/asoltesz/ansible-firewalld-role.git
   version: v0.5
 
-- src: https://github.com/vitobotta/ansible-hcloud-floating-ip-role.git
+- src: https://github.com/asoltesz/ansible-hcloud-floating-ip-role.git
   version: v0.5
 
-- src: https://github.com/vitobotta/ansible-postfix-role.git
+- src: https://github.com/asoltesz/ansible-postfix-role.git
   version: v0.5
 
-- src: https://github.com/vitobotta/ansible-users-role.git
+- src: https://github.com/asoltesz/ansible-users-role.git
   version: v0.5
 
 #- src: https://github.com/vitobotta/ansible-kernelcare-role.git
