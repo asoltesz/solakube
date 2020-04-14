@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+# Front-end / entry-point script for all SolaKube command scripts
+#
+# This is recommended to be aliased in .bashrc as "sk" or similar short
+# command name (see bashrc_tamplate.txt)
+#
+# Pre-loads the necessary variables (variables.sh) and shared libraries
+# and then hands off the execution to an actuall command script.
+# ==============================================================================
+
+
+# --------------------------------
+# Path of the current script
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "${SOURCE}" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ ${SOURCE} != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+# --------------------------------
+
+# Home of the scripts, if not yet set
+export SK_SCRIPTS_HOME="${DIR}"
+# Home of the deployment descriptors
+export SK_DEPLOYMENT_HOME="${DIR}/../deployment"
+
+# Loading the shared library
+source ${SK_SCRIPTS_HOME}/sk-shared.sh
+
+
+#
+# Checking basic settings
+#
+if [[ ! ${SK_CLUSTER} ]]
+then
+    echo "SK_CLUSTER not specified in the shell. Aborting."
+    exit 1
+fi
+
+
+# Loading variables
+. ~/.solakube/${SK_CLUSTER}/variables.sh
+
+
+# ------------------------------
+# Execute the sub-script
+# ------------------------------
+
+COMMAND=$1
+
+if [[ ! "${COMMAND}" ]]
+then
+    echo "Command not specified"
+    exit 1
+fi
+
+if [[ "${COMMAND}" != "SK_NO_COMMAND" ]]
+then
+
+    COMMAND_SCRIPT="${SK_PROJECT_HOME}/scripts/sk-${COMMAND}.sh"
+
+    if [[ ! -f "${COMMAND_SCRIPT}" ]]
+    then
+        # not a project-specific EM script, it must be a core EM script
+        COMMAND_SCRIPT="${SK_SCRIPTS_HOME}/sk-${COMMAND}.sh"
+    fi
+
+    if [[ ! -f "${COMMAND_SCRIPT}" ]]
+    then
+        echo "Command script not found: ${COMMAND_SCRIPT}"
+        exit 1
+    fi
+
+    shift
+
+    # Empty line so that command output is more visible
+    echo ""
+
+    . ${COMMAND_SCRIPT}
+
+    if [[ $? != 0 ]]
+    then
+        echo "ERROR in command script."
+        exit 1
+    else
+        echo "Done."
+    fi
+fi

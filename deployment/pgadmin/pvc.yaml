@@ -18,4 +18,4 @@ spec:
     storageClassName: ${PGADMIN_STORAGE_CLASS}
     resources:
         requests:
-            storage: "5Gi"
+            storage: "1Gi"
