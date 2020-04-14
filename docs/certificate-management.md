@@ -9,7 +9,7 @@ The LETS_ENCRIPT_ACME_EMAIL [variable](variables.md) is required for all issuers
 
 # Wildcard DNS record
 
-SolaKube doesn't support automated DNS record management yet (like ExternalDNS), so you either manually maintain your DNS records for each service (that allow traffic to find your cluster) or need to create a wildcard DNS entry/entries.
+SolaKube doesn't support automated DNS record management yet (like ExternalDNS), so you either manually maintain your DNS records for each service running on your cluster (that allow traffic to find your cluster) or need to create a wildcard DNS entry/entries.
 
 For example, the *.example.com DNS record may resolve all of your services (that are not specifically covered with a dedicated DNS entry).
 
@@ -35,17 +35,19 @@ Also an advantage that with http01 you don't necessarily need to have continuous
 
 # Wildcard certificate (cluster-level, CloudFlare dns01)
 
-SolaKube supports getting a wildcard certificate for your cluster so that there is no need to request separate certificate for each and every service. All services will use the same wildcard certificate.
+SolaKube supports getting a wildcard certificate for your cluster automatically, so that there is no need to request separate certificate for each and every service. All services may use the same wildcard certificate. 
 
 In this case, all services are named to be under the scope of the wildcard certificate. Say, the wildcard certificate is for *.example.com, a service may be accessible on pgadmin.example.com.
+
+Naturally, you can still supply your own certificate for select services if you want to, or use the http01 issuer to get a dedicated certificate for the service.
+
+Currently, only CloudFlare is supported directly for the necessary dns01 challenge. You may patch/modify the descriptors freely for your own DNS provider (it needs to be supported by Cert-Manager as well). Review the relevant Cert-Manager docs to customize the deployment descriptors according to your own DNS provider and see cloudflare-issuer.yaml and cluster-certificate.yaml as examples.
 
 To enable the use of the cluster/wildcard certificate mechanism:
 - set the CLUSTER_FQN [variable](variables.md) (e.g.: example.com or cloud.example.com)
 - set the LETS_ENCRYPT_DEPLOY_WC_CERT [variable](variables.md) to "Y"
 
-An advantage of this method is that Let's Encrypt limits are much-much harder to exhaust even in the experimentation period. One, single certificate is requested when the cluster is provisioned.
-
-IMORTANT: Currently, only CloudFlare is supported directly for the necessary dns01 challenge. You may patch/modify the descriptors freely for your own DNS provider (it needs to be supported by Cert-Manager as well)  
+An advantage of this method is that Let's Encrypt limits are much-much harder to exhaust even in the experimentation period. A single certificate is requested when the cluster is provisioned.
 
 NOTE: It is possible to use several wildcard certificates in parallel but SolaKube doesn't have built-in support for it. See the scripts and environment variables how you can manually deal with this.
 

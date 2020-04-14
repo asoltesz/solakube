@@ -19,7 +19,7 @@ anc() {
 
     export SK_CLUSTER="andromeda"
 
-    alias sk=${SK_SCRIPT_HOME}/sk.sh
+    alias sk=${SK_SCRIPT_HOME}/sk
 
     echo
     echo "Your shell is now configured for the SolaKube/${SK_CLUSTER} project."
