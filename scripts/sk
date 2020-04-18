@@ -53,7 +53,7 @@ COMMAND=$1
 
 if [[ ! "${COMMAND}" ]]
 then
-    echo "Command not specified"
+    echo "SolaKube command not specified"
     exit 1
 fi
 
