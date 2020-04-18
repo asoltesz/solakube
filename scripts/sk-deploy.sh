@@ -23,10 +23,10 @@ fi
 
 
 # Loading the deployment support shared library
-. ${SK_SCRIPTS_HOME}/deploy/deploy-shared.sh
+. ${SK_SCRIPT_HOME}/deploy/deploy-shared.sh
 
 # Deploy script storage folder
-export DEPLOY_SCRIPTS_DIR=${SK_SCRIPTS_HOME}/deploy/${DEPLOY_COMPONENT}
+export DEPLOY_SCRIPTS_DIR=${SK_SCRIPT_HOME}/deploy/${DEPLOY_COMPONENT}
 
 # Deployment descriptor storage folder
 export DEPLOYMENT_DIR=${SK_DEPLOYMENT_HOME}/${DEPLOY_COMPONENT}

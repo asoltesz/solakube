@@ -8,7 +8,7 @@
 # WARNING: This also destroys the Hetzner Floating IP and the "private network"
 #
 
-${SK_SCRIPTS_HOME}/sk-tf.sh destroy "$@"
+${SK_SCRIPT_HOME}/sk-tf.sh destroy "$@"
 
 if [[ $? == 0 ]]
 then

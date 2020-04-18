@@ -15,7 +15,7 @@ EXTENDED=$1
 echo "-------------------------------------------------------------------------"
 echo "Information about the ${SK_CLUSTER} cluster"
 echo "-------------------------------------------------------------------------"
-echo "Scripts folder (SK_SCRIPTS_HOME):               ${SK_SCRIPTS_HOME}"
+echo "Scripts folder (SK_SCRIPT_HOME):               ${SK_SCRIPT_HOME}"
 echo "-------------------------------------------------------------------------"
 
 

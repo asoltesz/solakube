@@ -7,11 +7,11 @@
 #
 
 
-${SK_SCRIPTS_HOME}/sk-tf.sh apply "$@"
+${SK_SCRIPT_HOME}/sk-tf.sh apply "$@"
 checkResultExit "Terraform apply"
 
 # The ID of the newly created cluster in your Rancher installation
-RANCHER_CLUSTER_ID="$(${SK_SCRIPTS_HOME}/sk-tf.sh output "rancher_cluster_id")"
+RANCHER_CLUSTER_ID="$(${SK_SCRIPT_HOME}/sk-tf.sh output "rancher_cluster_id")"
 
 if [[ $? != 0 ]]
 then
