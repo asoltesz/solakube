@@ -20,8 +20,12 @@ export RANCHER_API_TOKEN="token-xxx:xxx"
 # The FQN/IP of the host running the Rancher install (and the v3 API)
 export RANCHER_HOST="rancher.example.com"
 
-# Loading the Rancher cluster id (apply creates there)
-source ~/.solakube/andromeda/rancher_cluster_id.sh
+# Loading the Rancher cluster id (sk apply creates it there)
+CLID_FILE=~/.solakube/andromeda/rancher_cluster_id.sh
+if [[ -f ${CLID_FILE} ]]
+then
+    source ${CLID_FILE}
+fi
 
 # ------------------------------------------------------------------------------
 # Hetzer Cloud API access and other parameters
