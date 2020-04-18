@@ -7,3 +7,4 @@ terraform.tfstate.backup
 /terraform/external-modules/
 /rke-test/cluster.rkestate
 /rke-test/kube_config_cluster.yml
+.vagrant
