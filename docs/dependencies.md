@@ -2,13 +2,15 @@
 
 Before using SolaKube, you need to ensure that all necessary software is present that are needed for the cluster building processes.
  
+In case you only want to do a quick evaluation, you may want to use the SolaKube [Vagrant box](vagrant.md) instead of installing all required dependencies onto your machine.
+
 ## Software versions
 
 The tools and their versions, this cluster building method is tested on:
  
 - Terraform 0.12.24
 - Ansible 2.9.1
-- Rancher 2.3.6
+- Rancher Server 2.3.6
 - Kubectl 1.15.5
   - (always the major+minor version of the k8s cluster created by Rancher)
 - Helm 2.16.1
@@ -16,6 +18,8 @@ The tools and their versions, this cluster building method is tested on:
 As a one-time check, make sure that all necessary software components are available on your machine that are needed for executing the scripts and provisioning artifacts.
 
 Execute the **scripts/check_dependencies.sh** script and check versions on its output.
+
+NOTE: The [Vagrant box sources](https://github.com/asoltesz/solakube-vagrant) may serve as a guideline how to install & configure the dependencies on a Linux system (some of them are non-trivial).
  
 ## Rancher / RKE
  
