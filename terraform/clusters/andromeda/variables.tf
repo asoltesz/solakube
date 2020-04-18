@@ -1,13 +1,42 @@
+#
+# The name of the cluster (e.g: "andromeda").
+#
+# This will be the registration name of the cluster in the Rancher Server.
+#
 variable "cluster_name" {}
+
+#
+# The Hetzner Cloud API token that will be used for creating VMs, networks, floating IP, cloud volumes ...etc.
+#
 variable "hcloud_token" {}
+
+#
+# The path of the SSH private key to be used to login to VMs.
+#
+# The public key of this will be placed under the "deploy" user created on
+# all VMs in order to allow key based SSH logins.
+#
 variable "ssh_private_key" {}
+
+#
+# The public key belonging to the "ssh_private_key" key.
+#
 variable "ssh_public_key" {}
+
+#
+# The API URL of your Rancher Server that can be used to register new clusters...etc other operations.
+#
 variable "rancher_api_url" {}
+
+#
+# The API token generated on your Rancher Server that allows using the Rancher
+# REST API
+#
 variable "rancher_api_token" {}
 
 #
 # Whether the Rancher server is allowed to regularly backup the
-# etcd database of the cluster
+# etcd database of the newly created cluster.
 #
 variable "etcd_backup_enabled" {
   type = bool
@@ -68,23 +97,46 @@ variable enable_cluster_alerting {
 #
 # Server nodes that will be part of the Kubernetes cluster
 #
+# This is a map, in which the key/index is a running number starting with 1,
+# the value is a server record.
+#
 variable "servers" {
   type = map(
     object({
-      # Name of the node
+
+      # Name of the node (will be the hostname)
       name               = string,
-      # The private address of the node
+
+      # The private IP address of the node
+      #
+      # Should be in the 10.0.0.x subnet and the first IP should be 3 or above
+      #
       private_ip_address = string,
-      # Hetzner server type
+
+      #
+      # Hetzner server type as a code
+      #
+      # As of 2019-11-15, some of the relevant types:
+      #
+      # cx11 - 1 vCPU,  2 GB RAM,  20 GB SSD
+      # cx21 - 2 vCPU,  4 GB RAM,  40 GB SSD
+      # cx31 - 2 vCPU,  8 GB RAM,  80 GB SSD
+      # cx41 - 4 vCPU, 16 GB RAM, 160 GB SSD
+      #
       server_type        = string,
+
       # Hetzner base OS image
       image              = string,
+
       # Datacenter location
       location           = string,
+
       # Whether backups are needed for it
       backups            = bool,
+
       # Cloud-Init script reference (see user_data_scripts map)
       user_data_script   = string,
+
       # Rancher/K8s node roles (e.g.: "--worker --etcd --controlplane)
       roles              = string
     })
@@ -101,10 +153,28 @@ variable "kubernetes_version" {
   default = "v1.15.11-rancher1-2"
 }
 
-
+#
+# The path of the main Ansible playbook listing the Ansible roles to be executed
+# on the newly created virtual machines
+#
 variable "ansible_playbook_path" {}
+
+#
+# The path to the password file
+#
 variable "ansible_vault_password_path" {}
-variable "ingress_provider" {}
+
+#
+# The ingress provider to be installed automatically by RKE during the
+# initial provisioning of the new cluster
+#
+# Set it to "none" if no ingress controller should be deployed but in this case
+# you have to roll your own ingress controller installation
+#
+variable "ingress_provider" {
+  type = string
+  default = "nginx"
+}
 
 #
 # Whether the Rancher/RKE deployment should be run on the nodes

@@ -21,20 +21,12 @@ ansible_vault_password_path = "~/.solakube/ansible-vault-pass"
 
 #
 # The definition of teh virtual machines forming the Kubernetes nodes
-#
-# server_type: The type of the Hetzner Cloud virtual machine
-#
-# As of 2019-11-15, some of the relevant types:
-#
-# cx11 - 1 vCPU,  2 GB RAM,  20 GB SSD
-# cx21 - 2 vCPU,  4 GB RAM,  40 GB SSD
-# cx31 - 2 vCPU,  8 GB RAM,  80 GB SSD
-# cx41 - 4 vCPU, 16 GB RAM, 160 GB SSD
+# (see variables.tf for detailed docs)
 #
 servers = {
 
   1 = {
-    name               = "andromeda-master1-v2"
+    name               = "andromeda-master-1"
     private_ip_address = "10.0.0.3"
     server_type        = "cx21"
     image              = "centos-7"
@@ -45,7 +37,7 @@ servers = {
   },
 
   2 = {
-    name               = "andromeda-master2-v2"
+    name               = "andromeda-master-2"
     private_ip_address = "10.0.0.4"
     server_type        = "cx21"
     image              = "centos-7"
@@ -56,7 +48,7 @@ servers = {
   },
 
   3 = {
-    name               = "andromeda-master3-v2"
+    name               = "andromeda-master-3"
     private_ip_address = "10.0.0.5"
     server_type        = "cx21"
     image              = "centos-7"
@@ -67,5 +59,3 @@ servers = {
   },
 }
 
-# Set it to "none" if no ingress controller should be deployed
-ingress_provider = "nginx"

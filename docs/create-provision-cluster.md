@@ -8,7 +8,7 @@ Scripts - except "sk" - expect that you start them from their own folder.
 
 # Configure Terraform and Ansible
 
-Read [Vito's article](https://vitobotta.com/2019/10/14/kubernetes-hetzner-cloud-terraform-ansible-rancher/)), because I only discuss highlights here.
+See the [Configuration](configuration.md) page for the files and variables.
 
 Major params:
 - Hetzner Cloud token
@@ -18,10 +18,6 @@ Major params:
 Lesser params:
 - Whitelisted IPs (whitelisted_ips) 
 - Fail2Ban Ignored IPs (fail2ban_ignoredips)
-
-Use **create_vault.sh** and **edit_vault.sh** for easily make/change sensitive settings in the Ansible vault (tokens, passwords). These are only used for secrets that will be passed to Ansible.
-
-All other SolaKube settings are configured in ~/.solakube/${NAME_OF_YOUR_CLUSTER}/variables.sh (see [Variables](variables.md) and the [sample variables file](../templates/variables.sh) ). This is automatically loaded when the "sk" script is executed with any sub-commands.
 
 # Cluster creation and provisioning
 
@@ -75,6 +71,8 @@ Execute **sk deploy helm-tiller**.
 
 
 ## Hetzner-Cloud support
+
+Deploying components needed to integrate the new Kubernetes cluster with the Hetzner Cloud infrastructure (Floating IP, Cloud Volumes ...etc)
 
 Execute **sk deploy hetzner**.
 
