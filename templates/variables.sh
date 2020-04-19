@@ -87,6 +87,21 @@ fi
 
 
 # ------------------------------------------------------------------------------
+# Backblaze B2 support as S3 compatible storage (Minio gateway)
+# ------------------------------------------------------------------------------
+
+# Whether to deploy a BackBlaze B2 support
+export SK_DEPLOY_B2S3="Y"
+
+# The access key (application key) created for cluser access in your B2 account
+export B2S3_ACCESS_KEY="xxx"
+
+# The secret key belonging to the B2 access key
+export B2S3_SECRET_KEY="xxx"
+
+
+
+# ------------------------------------------------------------------------------
 # PostgreSQL RDBMS
 # ------------------------------------------------------------------------------
 

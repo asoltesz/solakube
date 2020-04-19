@@ -1,8 +1,14 @@
-# Applications
+# Applications / Components
 
 SolaKube supports the automated deployment for a limited set of applications.
 
 Manually, you can deploy applications with the Rancher UI (from its catalogs) or with Helm.
+
+# BackBlaze B2 support for S3-compatible storage
+
+In case you prefer B2, you can use it from your cluster services via Minio.
+
+See the [BackBlaze B2 page](backblaze-b2-s3-storage.md)
 
 # Postgres
 
