@@ -57,3 +57,21 @@ The "TF_VAR_" variable definitions define variables for the Terraform execution.
 SK_DEPLOY_XXX variables control which applications/components should be installed when the unified cluster-builder process runs.
 
 This is not intended to be under version control.
+
+# SSL key pair (id_rsa)
+
+The id_rsa key pair is needed because its public key that will be defined in the VMs and they allow you and SolaKube/Terraform/Ansible to SSH into the machines for provisioning.
+
+## Generating the keys
+
+If you don't have generated RSA keys yet, generate them with this command: 
+
+```
+rsa-keygen
+```
+
+Name the keys as "id_rsa" and "id_rsa.pub"
+
+If you accept the default paths, you will have them in the ~/.ssh folder, just where SolaKube expects them.
+
+If you save them to a different folder, please change the reference to them in all Terraform, Ansible and SolaKube configuration files that refer to "id_rsa".
