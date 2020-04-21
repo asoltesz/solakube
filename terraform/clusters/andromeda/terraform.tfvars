@@ -8,9 +8,6 @@ ssh_public_key  = "~/.ssh/id_rsa.pub"
 rancher_api_url     = "https://rancher.nostran.com/v3"
 
 etcd_backup_enabled = false
-etcd_s3_bucket_name = "..."
-etcd_s3_endpoint    = "..."
-etcd_s3_region      = "..."
 
 enable_cluster_monitoring = true
 enable_cluster_alerting = true

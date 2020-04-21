@@ -40,41 +40,62 @@ variable "rancher_api_token" {}
 #
 variable "etcd_backup_enabled" {
   type = bool
+  default = "false"
 }
 
 #
 # Access Key for the regular etcd backups (when stored in S3)
 #
+# Note: Cannot be empty even if backup is disabled, Rancher provisioning fails
+# without it.
+#
 variable "etcd_s3_access_key" {
   type = string
+  default = "..."
 }
 
 #
 # Secret Key for the regular etcd backups (when stored in S3)
 #
+# Note: Cannot be empty even if backup is disabled, Rancher provisioning fails
+# without it.
+#
 variable "etcd_s3_secret_key" {
   type = string
+  default = "..."
 }
 
 #
 # Name of the S3 Bucket for the regular etcd backups (when stored in S3)
 #
+# Note: Cannot be empty even if backup is disabled, Rancher provisioning fails
+# without it.
+#
 variable "etcd_s3_bucket_name" {
   type = string
+  default = "..."
 }
 
 #
 # The URL of the S3 endpoint for the regular etcd backups (when stored in S3)
 #
+# Note: Cannot be empty even if backup is disabled, Rancher provisioning fails
+# without it.
+#
 variable "etcd_s3_endpoint" {
   type = string
+  default = "..."
 }
 
 #
 # The S3 region name for the regular etcd backups (when stored in S3)
 #
+# Note: Cannot be empty even if backup is disabled, Rancher provisioning fails
+# without it.
+#
 variable "etcd_s3_region" {
   type = string
+  default = "..."
 }
 
 #
