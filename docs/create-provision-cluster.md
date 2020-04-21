@@ -120,6 +120,26 @@ See the [Applications page](applications.md) for more details
 
 None of the nodes should have the uninitialized taint on them (see issue #1).
  
+## VMs / Nodes properly distributed on physical machines
+
+On Hetzner cloud, virtual machines are not guaranteed to be perfectly distributed on separate virtual machines.
+
+However, the API seems to strive to do this (according to our [testing](https://github.com/asoltesz/solakube/issues/9) ).
+
+It is recommended that you check your nodes after creation so that you ensure that they are on separate physical machines.
+
+Checking the physical machine ith MyTraceRoute:
+
+~~~
+mtr <ip-address-of-the-vm>
+~~~ 
+
+The "<machine-number>.your-cloud.host" entry shows the physical machine. 
+
+All of your VMs should be on a different machine marked by the <machine-number>.
+  
+
+ 
 ## Further validation checks
 
 TBW
