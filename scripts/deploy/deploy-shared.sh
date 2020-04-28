@@ -313,14 +313,19 @@ switchNs() {
 # Creates a temp folder for the application deployment
 #
 # 1 - The name of the application to be deployed
+# 2 - Keep existing if present (Y/other) defaults to N
 #
 createTempDir() {
 
     local appName=$1
+    local keepIfPresent=$2
 
     TMP_DIR=/tmp/solakube/${appName}
 
-    rm -Rf ${TMP_DIR}
+    if [[ ${keepIfPresent} != "Y" ]]
+    then
+        rm -Rf ${TMP_DIR}
+    fi
 
     mkdir -p ${TMP_DIR}
 }

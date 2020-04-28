@@ -14,11 +14,15 @@ then
     exit 1
 fi
 
-OPERATION=$2
+shift
+
+OPERATION=$1
 
 if [[ ! "${OPERATION}" ]]
 then
     OPERATION="deploy"
+else
+    shift
 fi
 
 
@@ -39,5 +43,5 @@ then
 fi
 
 # Executing the deployer
-. ${DEPLOY_SCRIPTS_DIR}/${OPERATION}.sh
+. ${DEPLOY_SCRIPTS_DIR}/${OPERATION}.sh $@
 
