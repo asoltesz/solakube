@@ -21,7 +21,7 @@ checkAppName "b2s3"
 # ------------------------------------------------------------
 echoSection "Removing via Helm"
 
-helm del --purge ${B2S3_APP_NAME}
+deleteHelmRelease ${B2S3_APP_NAME}
 
 # ------------------------------------------------------------
 echoSection "Deleting namespace"

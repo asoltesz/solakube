@@ -23,7 +23,7 @@ checkAppName "pgadmin"
 # ------------------------------------------------------------
 echoSection "Removing via Helm"
 
-helm del --purge ${PGADMIN_APP_NAME}
+deleteHelmRelease ${PGADMIN_APP_NAME}
 
 # ------------------------------------------------------------
 echoSection "Deleting namespace"

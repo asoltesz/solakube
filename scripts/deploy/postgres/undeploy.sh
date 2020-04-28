@@ -12,15 +12,15 @@
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
-echoHeader "Deploying the PostgreSQL DBMS from your cluster "
+echoHeader "Undeploying the PostgreSQL DBMS from your cluster "
+
+checkAppName "postgres"
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
 # ------------------------------------------------------------
-deleteHelmRelease openldap
-
-deleteNamespace openldap
+deleteHelmRelease postgres
 
 # ------------------------------------------------------------
 echoSection "Deleting namespace"

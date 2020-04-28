@@ -18,18 +18,12 @@ echoHeader "Removing OpenLDAP from your cluster"
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
-if [[ ! "${OPENLDAP_APP_NAME}" ]]
-then
-    echo "Application name not defined: using 'openldap' "
-    OPENLDAP_APP_NAME="openldap"
-else
-    echo "Using application name: '"${OPENLDAP_APP_NAME}"' "
-fi
+checkAppName "openldap"
 
 # ------------------------------------------------------------
 echoSection "Removing via Helm"
 
-helm del --purge ${OPENLDAP_APP_NAME}
+deleteHelmRelease ${OPENLDAP_APP_NAME}
 
 # ------------------------------------------------------------
 echoSection "Deleting namespace"
