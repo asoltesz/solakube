@@ -504,3 +504,124 @@ waitSinglePodActive() {
     echo "Timeout passed (${timeout}). Stopping checking attempts. Check failed."
     return 1
 }
+
+
+#
+# Returns the ClusterIP of a service in a namespace
+#
+# 1 - service name
+# 2 - namespace
+#
+getClusterIP() {
+
+    local serviceName=$1
+    local namespace=$2
+
+    kubectl get service \
+        -o custom-columns=":spec.clusterIP" \
+        --no-headers=true \
+        --namespace=${namespace} \
+        --field-selector metadata.name=${serviceName}
+
+    if [[ $? != 0 ]]
+    then
+        return 1
+    fi
+
+}
+
+#
+# Executes a script with the Postgres client as the admin user (the 'postgres' user).
+#
+# 1 - path of the SQL script to be executed
+# 2 - The namespace in which the postgres pod runs
+#     (defaults to 'postgres')
+# 3 - The hostname on which the Postgres service is available
+#     (defaults to 'postgres-postgresql')
+# 4 - The database to connect to
+#     (defaults to 'postgres')
+#
+executePostgresAdminScript() {
+
+    local scriptPath=$1
+    local namespace=${2:-postgres}
+    local hostname=${3:-postgres-postgresql}
+    local db=${4:-postgres}
+
+    # Copy the create script into the postgres container
+
+#    kubectl run postgres-postgresql-client --rm --tty -i --restart='Never' --namespace postgres --image docker.io/bitnami/postgresql:11.6.0-debian-9-r0 --env="PGPASSWORD=${POSTGRES_PASSWORD}" --command -- psql --host postgres-postgresql -U postgres -d test-db -p 5432
+
+    local exists=$(kubectl get configmap postgres-script -n ${namespace} --no-headers)
+
+    if [[ ${exists} ]]
+    then
+        kubectl delete configmap postgres-script -n ${namespace}
+    fi
+
+    kubectl create configmap postgres-script \
+        --namespace ${namespace} \
+        --from-file=sql-script.sql=${scriptPath}
+
+    local overrides="$(cat <<-EOF
+        {
+            "spec": {
+                "containers": [
+                    {
+                        "stdin": true,
+                        "tty": true,
+                        "args": [
+                          "psql",
+                          "--host=${hostname}",
+                          "-U", "postgres",
+                          "-d", "${db}",
+                          "-p", "5432",
+                          "-f", "/script/sql-script.sql"
+                        ],
+                        "env": [
+                            {
+                                "name": "PGPASSWORD",
+                                "value": "${POSTGRES_ADMIN_PASSWORD}"
+                            }
+                        ],
+                        "name": "pg-client-cont",
+                        "image": "docker.io/bitnami/postgresql:11.6.0-debian-9-r0",
+                        "volumeMounts": [
+                            {
+                                "name": "postgres-script",
+                                "mountPath": "/script/sql-script.sql",
+                                "subPath": "sql-script.sql"
+                            }
+                        ]
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "postgres-script",
+                        "configMap": {
+                                "name": "postgres-script"
+                        }
+                    }
+                ]
+            }
+        }
+EOF
+)"
+    exists=$(kubectl get pod postgres-client -n ${namespace} --no-headers)
+
+    if [[ ${exists} ]]
+    then
+        kubectl delete pod postgres-client -n ${namespace}
+    fi
+
+    kubectl run postgres-client \
+        -i --rm --tty --restart='Never' \
+        --namespace ${namespace} \
+        --image="will-be-overridden" \
+        --overrides="${overrides}" \
+        --command \
+        -- psql --host ${hostname} -U postgres -d ${db} -p 5432
+
+}
+
+
