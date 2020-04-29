@@ -9,6 +9,62 @@
 # ==============================================================================
 
 
+# ------------------------------------------------------------------------------
+# Cluster attributes
+# ------------------------------------------------------------------------------
+
+# Loading the Rancher cluster id (sk apply creates it there)
+CC_FILE=~/.solakube/${SK_CLUSTER}/cluster_context.sh
+if [[ -f ${CC_FILE} ]]
+then
+    source ${CC_FILE}
+fi
+
+
+# ------------------------------------------------------------------------------
+# Components to install
+# ------------------------------------------------------------------------------
+
+# Whether to deploy Cert-Manager with SolaKube or not
+# WARNING: If cert-manager is not deployed, other deployers cannot use their
+# ingress deployments successfully and you will have to roll your own
+# cert management
+export SK_DEPLOY_CERT_MANAGER="Y"
+
+# Whether to deploy a Rook/Ceph storage cluster on the K8s cluster
+export SK_DEPLOY_ROOK_CEPH="Y"
+
+# Whether to deploy Backblaze B2 support as S3 storage on your cluster
+# (via a Minio gateway)
+export SK_DEPLOY_B2S3="Y"
+
+# Whether to deploy a PostgreSQL DBMS on your cluster
+# export SK_DEPLOY_POSTGRES="X"
+
+# Whether to deploy a pgAdmin on your cluster
+export SK_DEPLOY_PGADMIN="Y"
+
+# Whether to install the CrunchyData Postgres Operator
+export SK_DEPLOY_PGO="Y"
+
+# Whether to deploy the Docker Registry on your cluster
+# export SK_DEPLOY_DOCKER_REGISTRY="N"
+
+# Whether to install the OpenLDAP identity server
+# export SK_DEPLOY_OPENLDAP="N"
+
+
+# ------------------------------------------------------------------------------
+# Shared S3 storage access settings.
+# (if you want to use this for multiple purposes like (pg backups, etcd backups)
+# Note: BackBlaze-B2-as-S3 settings need not to be defined here.
+# ------------------------------------------------------------------------------
+
+# export S3_ENDPOINT="xxx"
+# export S3_ACCESS_KEY="xxx"
+# export S3_SECRET_KEY="xxx"
+# export S3_REGION="xxx"
+
 
 # ------------------------------------------------------------------------------
 # Rancher access and the ID of the new cluster
@@ -21,7 +77,7 @@ export RANCHER_API_TOKEN="token-xxx:xxx"
 export RANCHER_HOST="rancher.example.com"
 
 # Loading the Rancher cluster id (sk apply creates it there)
-CLID_FILE=~/.solakube/andromeda/rancher_cluster_id.sh
+CLID_FILE=~/.solakube/${SK_CLUSTER}/rancher_cluster_id.sh
 if [[ -f ${CLID_FILE} ]]
 then
     source ${CLID_FILE}
@@ -42,15 +98,12 @@ export HETZNER_FLOATING_IP="xxx.xxx.xxx.xxx"
 # Certificate management
 # ------------------------------------------------------------------------------
 
-# Whether to deploy Cert-Manager with SolaKube or not
-# WARNING: If cert-manager is not deployed, other deployers cannot use their
-# ingress deployments successfully and you will have to do all of them manually
-export SK_DEPLOY_CERT_MANAGER="Y"
 
 # The email submitted to Let's Encrypt when requesting certificates
 export LETS_ENCRYPT_ACME_EMAIL="xxx@example.com"
 
 # Whether the installer should deploy the Cert-Manager dns01 issuer
+# and request a wildcard-cartificate from Let's Encrypt
 export LETS_ENCRYPT_DEPLOY_WC_CERT="Y"
 
 # The name of the secret for the cluster-level, wildcard certificate.
@@ -58,6 +111,18 @@ export CLUSTER_CERT_SECRET_NAME="cluster-fqn-tls"
 
 # Whether per-service certificates (http01) are to be supported
 export LETS_ENCRYPT_DEPLOY_PS_CERTS="Y"
+
+# Making sure that if Cert-Manager is not installed, none of the
+# cert marker variables are true so other deployers can decide properly
+if [[ ${SK_DEPLOY_CERT_MANAGER} != "Y" ]]
+then
+    export LETS_ENCRYPT_DEPLOY_WC_CERT="N"
+    export LETS_ENCRYPT_DEPLOY_PS_CERTS="N"
+fi
+
+# The name of the secret for the cluster-level, wildcard certificate.
+export CLUSTER_CERT_SECRET_NAME="cluster-fqn-tls"
+
 
 # The domain FQN for the cluster
 export CLUSTER_FQN="andromeda.example.com"
@@ -73,9 +138,6 @@ export CLOUDFLARE_API_KEY="xxx"
 # Persistent Volumes, Rook
 # ------------------------------------------------------------------------------
 
-# Whether to deploy a Rook/Ceph storage cluster on the K8s cluster
-export SK_DEPLOY_ROOK_CEPH="Y"
-
 # The default storage class if not specified for an application
 export DEFAULT_STORAGE_CLASS="hcloud-volumes"
 
@@ -90,9 +152,6 @@ fi
 # Backblaze B2 support as S3 compatible storage (Minio gateway)
 # ------------------------------------------------------------------------------
 
-# Whether to deploy a BackBlaze B2 support
-export SK_DEPLOY_B2S3="Y"
-
 # The access key (application key) created for cluser access in your B2 account
 export B2S3_ACCESS_KEY="xxx"
 
@@ -105,9 +164,6 @@ export B2S3_SECRET_KEY="xxx"
 # PostgreSQL RDBMS
 # ------------------------------------------------------------------------------
 
-# Whether to deploy a PostgreSQL DBMS on your cluster
-export SK_DEPLOY_POSTGRES="Y"
-
 # PostgreSQL admin user (postgres) password
 export POSTGRES_ADMIN_PASSWORD="secret"
 
@@ -118,17 +174,14 @@ export POSTGRES_ADMIN_PASSWORD="secret"
 # pgAdmin
 # ------------------------------------------------------------------------------
 
-# Whether to deploy a pgAdmin on your cluster
-export SK_DEPLOY_PGADMIN="Y"
-
-# PgAdmin access FQN
-export PGADMIN_FQN="pgadmin.andromeda.example.com"
+# PgAdmin access FQN (derived if not specified)
+# export PGADMIN_FQN="pgadmin.andromeda.example.com"
 
 # PgAdmin admin email address (user created automatically)
 export PGADMIN_ADMIN_EMAIL="xxx@example.com"
 
 # PgAdmin admin password
-export PGADMIN_ADMIN_PASSWORD="secret"
+export PGADMIN_ADMIN_PASSWORD="xxx"
 
 # PgAdmin persistent volume storage class (only if default is not suitable)
 # export PGADMIN_STORAGE_CLASS=
@@ -138,13 +191,11 @@ export PGADMIN_ADMIN_PASSWORD="secret"
 # Private Docker Registry
 # ------------------------------------------------------------------------------
 
-# Whether to deploy the Docker Registry on your cluster
-export SK_DEPLOY_DOCKER_REGISTRY="Y"
+# Private Docker Registry external access FQN (derived if not specified)
+#export REGISTRY_FQN="docker-registry.andromeda.example.com"
 
-# Private Docker Registry external access FQN
-export REGISTRY_FQN="docker-registry.andromeda.example.com"
 # Password for the admin user
-export REGISTRY_ADMIN_PASSWORD="secret"
+export REGISTRY_ADMIN_PASSWORD="xxx"
 
 
 # ------------------------------------------------------------------------------
