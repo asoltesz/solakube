@@ -127,6 +127,11 @@ export CLUSTER_CERT_SECRET_NAME="cluster-fqn-tls"
 # The domain FQN for the cluster
 export CLUSTER_FQN="andromeda.example.com"
 
+if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
+then
+    export CLUSTER_FQN="andromeda.mk"
+fi
+
 # The Cloudflare administrator account email address (dns01 issuer)
 export CLOUDFLARE_EMAIL="xxx@example.com"
 
@@ -140,6 +145,11 @@ export CLOUDFLARE_API_KEY="xxx"
 
 # The default storage class if not specified for an application
 export DEFAULT_STORAGE_CLASS="hcloud-volumes"
+
+if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
+then
+    export DEFAULT_STORAGE_CLASS="standard"
+fi
 
 # Storage class if Rook/Ceph is installed and preferred
 if [[ "${SK_DEPLOY_ROOK_CEPH}" == "Y" ]]
