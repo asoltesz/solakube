@@ -63,11 +63,8 @@ Assuming your cluster FQN is example.com.
 
 Minio becomes accessible on a ClusterIP via http.
 
-To query it:
-~~~
-sk ns b2s3
-kubctl get service
-~~~
+The Minio S3 service becomes available on an internal hostname within the Kubernetes cluster (b2s3.b2s3.svc.cluster.local) on port 9000 over HTTP.
+
 
 Port 9000 can be used to access the service in the cluster IP. 
 

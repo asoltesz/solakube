@@ -11,10 +11,9 @@ metadata:
         app: ${B2S3_APP_NAME}
 spec:
     tls:
-        - secretName: ${P2S3_TLS_SECRET_NAME}
+        - secretName: ${B2S3_TLS_SECRET_NAME}
           hosts:
               - ${B2S3_FQN}
-
     rules:
         - host: ${B2S3_FQN}
           http:

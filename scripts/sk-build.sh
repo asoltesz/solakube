@@ -71,6 +71,15 @@ then
 fi
 
 #
+# Installing BackBlaze B2 support
+# ------------------
+if [[ "${SK_DEPLOY_B2S3}" == "Y" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk deploy b2s3
+    checkResultExit "Deploying BackBlaze B2 support to the cluster"
+fi
+
+#
 # Installing PostgreSQL DBMS
 # ------------------
 if [[ "${SK_DEPLOY_POSTGRES}" == "Y" ]]
