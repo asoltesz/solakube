@@ -216,13 +216,21 @@ checkCertificate() {
     local envVarName="${serviceNameUC}_FQN"
     local serviceFQN="${!envVarName}"
 
+    local envVarCertNeededName="${serviceNameUC}_CERT_NEEDED"
+
+    if [[ "${SK_CLUSTER_TYPE}" == "minikube" ]]
+    then
+        echo "Target cluster is a MiniKube testing instance. Cert is not needed."
+        # New certificate is not required
+        export ${envVarCertNeededName}="N"
+        return 0
+    fi
+
     if [[ ! "${serviceFQN}" ]]
     then
         echo "ERROR: CLUSTER_FQN not defined, cannot derive service FQN."
         return 1
     fi
-
-    local envVarCertNeededName="${serviceNameUC}_CERT_NEEDED"
 
     local envVarCertName="${serviceNameUC}_TLS_SECRET_NAME"
     local appCertName="${!envVarCertName}"
