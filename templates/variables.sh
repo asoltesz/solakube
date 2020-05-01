@@ -226,7 +226,26 @@ export REGISTRY_ADMIN_PASSWORD="xxx"
 # OpenLDAP
 # ------------------------------------------------------------------------------
 
-export SK_DEPLOY_OPENLDAP="Y"
+# No config params yet
+
+
+# ------------------------------------------------------------------------------
+# Nextcloud Groupware Server
+# ------------------------------------------------------------------------------
+
+#
+# The password for the 'admin' user of Nextcloud (the main administrative user).
+#
+export NEXTCLOUD_ADMIN_PASSWORD="xxx"
+
+#
+# The password for the 'nextcloud' DB user in Postgres that has permissions
+# for the data stored in the 'nextcloud' database which is the storage place
+# for all relational data of NextCloud
+#
+export NEXTCLOUD_DB_PASSWORD="xxx"
+
+
 
 
 

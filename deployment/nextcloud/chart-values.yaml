@@ -1,0 +1,74 @@
+# Overriding the Nextcloud Docker image version to a newer one
+image:
+    tag: 18.0.3-apache
+
+
+# We will supply our own ingress definition
+ingress:
+    enabled: false
+
+# Data is placed on a PV
+persistence:
+    enabled: true
+    existingClaim: ${NEXTCLOUD_APP_NAME}
+
+
+# Nextcloud main params
+nextcloud:
+    host: ${NEXTCLOUD_FQN}
+    username: admin
+    password: ${NEXTCLOUD_ADMIN_PASSWORD}
+    # Email sending for notifications
+    mail:
+        enabled: ${SMTP_ENABLED}
+        fromAddress: nextcloud@${CLUSTER_FQN}
+        domain: ${CLUSTER_FQN}
+        smtp:
+            host: ${SMTP_HOST}
+            secure: ssl
+            port: ${SMTP_PORT}
+            authtype: LOGIN
+            name: ${SMTP_USERNAME}
+            password: ${SMTP_PASSWORD}
+
+
+cronjob:
+    enabled: false
+
+
+#
+# The Postgres database created for Nextcloud
+#
+externalDatabase:
+    enabled: true
+    type: postgresql
+    host: ${POSTGRES_SERVICE_HOST}
+    user: nextcloud
+    password: ${NEXTCLOUD_DB_PASSWORD}
+    database: nextcloud
+
+
+# Internal SQLite db is only for light testing
+internalDatabase:
+    enabled: false
+
+# Readiness probe more generous (failureTreshold higher, period more often)
+# Only fails after 20 + (5*30) = 170s
+readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 30
+    successThreshold: 1
+
+# Liveness probes are delayed until the Readiness probe is guaranteed
+# to finish
+# NOTE: A startupProbe would be nice in the Helm chart
+livenessProbe:
+    enabled: true
+    initialDelaySeconds: 170
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
