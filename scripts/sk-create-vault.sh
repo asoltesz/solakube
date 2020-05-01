@@ -4,7 +4,7 @@
 # Creates an Ansible Vault for secrets handled by Ansible
 #
 
-cd ../ansible
+cd ${SK_SCRIPT_HOME}/../ansible
 
 export EDITOR=nano && \
 ansible-vault create group_vars/all/vault.yml

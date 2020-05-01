@@ -35,9 +35,9 @@ This is an encrypted file and may be placed under version control.
 
 The variables and structure is documented in templates/vault.yml
 
-Use **create_vault.sh** for creating an empty vault file (you need to remove the one coming with SolaKube/Andromeda). 
+Use **sk create-vault** for creating an empty vault file (you need to remove the one coming with SolaKube/Andromeda). 
 
-Use **edit_vault.sh** for easily make/change sensitive settings in the Ansible vault (tokens, passwords). These are only used for secrets that will be passed to Ansible.
+Use **sk edit-vault** for easily make/change sensitive settings in the Ansible vault (tokens, passwords). These are only used for secrets that will be passed to Ansible.
 
 It is shared among all clusters.
 

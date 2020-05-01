@@ -61,7 +61,7 @@ cp /vagrant/provision/vault-content.yaml group_vars/all/vault.yml
 ansible-vault encrypt group_vars/all/vault.yml
 ```
 
-You may edit the values in the vault with "~/solakube/scripts/edit-vault.sh"
+You may edit the values in the vault with "sk edit-vault"
 
 ## variables.sh
 
