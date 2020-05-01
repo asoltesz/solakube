@@ -55,6 +55,20 @@ export SK_DEPLOY_PGO="Y"
 
 
 # ------------------------------------------------------------------------------
+# Shared SMTP settings
+# Only SSL-based SMTP is supported
+# ------------------------------------------------------------------------------
+
+# Whether email sending via SMTP is allowed or not (for applications)
+# Do not comment this line out, application deployers need it
+export SMTP_ENABLED="false"
+export SMTP_HOST="xxx"
+export SMTP_PORT="xxx"
+export SMTP_USERNAME="xxx"
+export SMTP_PASSWORD="xxx"
+
+
+# ------------------------------------------------------------------------------
 # Shared S3 storage access settings.
 # (if you want to use this for multiple purposes like (pg backups, etcd backups)
 # Note: BackBlaze-B2-as-S3 settings need not to be defined here.
