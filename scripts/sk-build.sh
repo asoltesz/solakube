@@ -108,6 +108,15 @@ then
 fi
 
 #
+# Installing Nextcloud
+# ------------------
+if [[ "${SK_DEPLOY_NEXTCLOUD}" == "Y" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk deploy nextcloud
+    checkResultExit "Deploying NextCloud to the cluster"
+fi
+
+#
 # Installing OpenLDAP
 # ------------------
 if [[ "${SK_DEPLOY_OPENLDAP}" == "Y" ]]
