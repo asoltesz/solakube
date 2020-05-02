@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: ${WORDPRESS_APP_NAME}
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+        nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+        # certmanager.k8s.io/cluster-issuer: 'letsencrypt-http01'
+    labels:
+        app: ${WORDPRESS_APP_NAME}
+spec:
+    tls:
+        - secretName: ${WORDPRESS_TLS_SECRET_NAME}
+          hosts:
+              - ${WORDPRESS_FQN}
+    rules:
+        - host: ${WORDPRESS_FQN}
+          http:
+              paths:
+                  - path: /
+                    backend:
+                        serviceName: ${WORDPRESS_APP_NAME}
+                        servicePort: http

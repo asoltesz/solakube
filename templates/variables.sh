@@ -64,6 +64,9 @@ export SK_DEPLOY_PGO="Y"
 # Whether to install the OpenLDAP identity server
 # export SK_DEPLOY_OPENLDAP="N"
 
+# Whether to install the Wordpress CMS
+# export SK_DEPLOY_WORDPRESS="N"
+
 
 # ------------------------------------------------------------------------------
 # Shared SMTP settings
@@ -257,6 +260,22 @@ export NEXTCLOUD_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 export NEXTCLOUD_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 
+# ------------------------------------------------------------------------------
+# WordPress CMS
+# ------------------------------------------------------------------------------
+
+#
+# The password for the 'admin' user of Wordpress (the main administrative user).
+#
+export WORDPRESS_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
+export WORDPRESS_ADMIN_EMAIL="${SK_ADMIN_EMAIL}"
+
+#
+# The password for the 'wordpress' DB user in Postgres that has permissions
+# for the data stored in the 'nextcloud' database which is the storage place
+# for all relational data of NextCloud
+#
+export WORDPRESS_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 
 

@@ -1,0 +1,61 @@
+
+# Data is placed on a PV
+persistence:
+    enabled: true
+    existingClaim: ${WORDPRESS_APP_NAME}
+    size: 1Gi
+
+wordpressUsername: admin
+wordpressEmail: ${WORDPRESS_ADMIN_EMAIL}
+wordpressPassword: ${WORDPRESS_ADMIN_PASSWORD}
+
+
+smtpHost: ${SMTP_HOST}
+smtpPort: ${SMTP_PORT}
+smtpUser: ${SMTP_USERNAME}
+smtpPassword: ${SMTP_PASSWORD}
+smtpProtocol: ssl
+
+
+# Wordpress main params
+# We will supply our own ingress definition
+ingress:
+    enabled: false
+    hostname: ${WORDPRESS_FQN}
+
+
+#
+# The internal MariaDB of Wordpress.
+# (it doesn't run on Postgress or any other database type)
+#
+mariadb:
+    db:
+        name: wp
+        user: wp
+        password: ${WORDPRESS_DB_PASSWORD}
+    rootUser:
+        password: ${WORDPRESS_DB_PASSWORD}
+    master:
+        persistence:
+            size: 1Gi
+
+# Readiness probe more generous (failureTreshold higher, period more often)
+# Only fails after 20 + (5*30) = 170s
+readinessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 30
+    successThreshold: 1
+
+# Liveness probes are delayed until the Readiness probe is guaranteed
+# to finish
+# NOTE: A startupProbe would be nice in the Helm chart
+livenessProbe:
+    enabled: true
+    initialDelaySeconds: 170
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1

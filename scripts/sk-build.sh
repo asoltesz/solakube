@@ -124,3 +124,12 @@ then
     . ${SK_SCRIPT_HOME}/sk deploy openldap
     checkResultExit "Deploying OpenLDAP to the cluster"
 fi
+
+#
+# Installing WordPress
+# ------------------
+if [[ "${SK_DEPLOY_WORDPRESS}" == "Y" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk deploy wordpress
+    checkResultExit "Deploying Wordpress to the cluster"
+fi
