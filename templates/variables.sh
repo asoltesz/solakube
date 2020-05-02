@@ -20,6 +20,17 @@ then
     source ${CC_FILE}
 fi
 
+# The cluster context
+export SK_CLUSTER_CTX="${SK_CLUSTER}"
+if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
+then
+    export SK_CLUSTER_CTX="minikube"
+fi
+
+# General admin password
+export SK_ADMIN_PASSWORD="xxx"
+export SK_ADMIN_EMAIL="xxxxxxx@example.com"
+
 
 # ------------------------------------------------------------------------------
 # Components to install
@@ -114,7 +125,7 @@ export HETZNER_FLOATING_IP="xxx.xxx.xxx.xxx"
 
 
 # The email submitted to Let's Encrypt when requesting certificates
-export LETS_ENCRYPT_ACME_EMAIL="xxx@example.com"
+export LETS_ENCRYPT_ACME_EMAIL="${SK_ADMIN_EMAIL}"
 
 # Whether the installer should deploy the Cert-Manager dns01 issuer
 # and request a wildcard-cartificate from Let's Encrypt
@@ -147,7 +158,7 @@ then
 fi
 
 # The Cloudflare administrator account email address (dns01 issuer)
-export CLOUDFLARE_EMAIL="xxx@example.com"
+export CLOUDFLARE_EMAIL="${SK_ADMIN_EMAIL}"
 
 # The Cloudflare administrator account API key (dns01 issuer)
 export CLOUDFLARE_API_KEY="xxx"
@@ -188,8 +199,8 @@ export B2S3_SECRET_KEY="xxx"
 # PostgreSQL RDBMS
 # ------------------------------------------------------------------------------
 
-# PostgreSQL admin user (postgres) password
-export POSTGRES_ADMIN_PASSWORD="secret"
+# PostgreSQL admin user (DBA, typically called 'postgres') password
+export POSTGRES_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 # Postgres persistent volume storage class (only if default is not suitable)
 # export POSTGRES_STORAGE_CLASS=
@@ -202,10 +213,10 @@ export POSTGRES_ADMIN_PASSWORD="secret"
 # export PGADMIN_FQN="pgadmin.andromeda.example.com"
 
 # PgAdmin admin email address (user created automatically)
-export PGADMIN_ADMIN_EMAIL="xxx@example.com"
+export PGADMIN_ADMIN_EMAIL="${SK_ADMIN_EMAIL}"
 
 # PgAdmin admin password
-export PGADMIN_ADMIN_PASSWORD="xxx"
+export PGADMIN_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 # PgAdmin persistent volume storage class (only if default is not suitable)
 # export PGADMIN_STORAGE_CLASS=
@@ -219,7 +230,7 @@ export PGADMIN_ADMIN_PASSWORD="xxx"
 #export REGISTRY_FQN="docker-registry.andromeda.example.com"
 
 # Password for the admin user
-export REGISTRY_ADMIN_PASSWORD="xxx"
+export REGISTRY_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 
 # ------------------------------------------------------------------------------
@@ -236,14 +247,15 @@ export REGISTRY_ADMIN_PASSWORD="xxx"
 #
 # The password for the 'admin' user of Nextcloud (the main administrative user).
 #
-export NEXTCLOUD_ADMIN_PASSWORD="xxx"
+export NEXTCLOUD_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 #
 # The password for the 'nextcloud' DB user in Postgres that has permissions
 # for the data stored in the 'nextcloud' database which is the storage place
 # for all relational data of NextCloud
 #
-export NEXTCLOUD_DB_PASSWORD="xxx"
+export NEXTCLOUD_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
+
 
 
 
