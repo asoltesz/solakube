@@ -143,14 +143,14 @@ checkStorageClass() {
 
     if [[ ! "${!envVarName}" ]]
     then
-        echo "Storage class was not specifically defined for the application (${envVarName}) "
+        echo "Storage class was not specifically defined for: ${envVarName} "
 
         if [[ ! "${DEFAULT_STORAGE_CLASS}" ]]
         then
             echo "DEFAULT_STORAGE_CLASS var is not defined. Defaulting to 'hcloud-volumes'"
             export ${envVarName}="hcloud-volumes"
         else
-            echo "Switching to defined default storage class: '${DEFAULT_STORAGE_CLASS}'"
+            echo "Using default storage class: '${DEFAULT_STORAGE_CLASS}'"
             export ${envVarName}="${DEFAULT_STORAGE_CLASS}"
         fi
 
