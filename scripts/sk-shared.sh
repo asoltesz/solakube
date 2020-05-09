@@ -60,6 +60,24 @@ errorHandler() {
 }
 
 
+#
+# Conditional export of a value: only if not already defined
+#
+function cexport {
+
+    if [[ ! "${!1}" ]]
+    then
+        export ${1}="${2}";
+    fi
+}
+
+#
+# Normalizes a path (e.g.: /home/./a/.. => /home
+#
+function resolveDir
+{
+    echo "`eval "cd ${1};pwd;cd - > /dev/null"`"
+}
 
 
 checkRancherAccessParams() {
