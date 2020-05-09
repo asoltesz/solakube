@@ -351,6 +351,13 @@ processTemplate() {
     local templateFilePath=$1
     local templateFileName=$(basename ${templateFilePath})
 
+    if [[ ! -f "${templateFilePath}" ]]
+    then
+        echo "ERROR: Template file doesn't exist: ${templateFilePath}"
+        echo "Current folder: $(pwd)"
+        exit 1
+    fi
+
     if [[ ! "${TMP_DIR}" ]]
     then
         echo "ERROR: TMP_DIR env variable not defined."
