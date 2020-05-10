@@ -56,6 +56,11 @@ echoSection "Creating the 'rook-ceph-block' storage class"
 kubectl create -f storageclass.yaml \
     --namespace=rook-ceph
 
+# ------------------------------------------------------------
+echoSection "Creating the snapshotclass"
+
+kubectl create -f snapshotclass.yaml \
+    --namespace=rook-ceph
 
 # ------------------------------------------------------------
 echoSection "Rook/Ceph ${ROOK_VERSION} deployment descriptors have been installed to your cluster"
