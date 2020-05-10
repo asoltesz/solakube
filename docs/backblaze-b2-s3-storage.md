@@ -24,11 +24,11 @@ The b2s3 module installs the MinIO S3 in B2 gatewa mode. This requires comparati
 
 For a successful deployment, you need to create a BackBlaze B2 account, create an application key and define it for SolaKube.
  
-## B2S3_ACCESS_KEY
+## B2_ACCESS_KEY
 
 The access/application key that you created for the cluster in your B2 account. 
 
-## B2S3_SECRET_KEY
+## B2_SECRET_KEY
 
 The secret key/token belonging to the access key. 
 

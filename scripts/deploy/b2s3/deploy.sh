@@ -22,8 +22,8 @@ echoHeader "Installing BackBlaze B2 support on your cluster"
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
-paramValidation B2S3_ACCESS_KEY "the access key registered for the cluster in your B2 account"
-paramValidation B2S3_SECRET_KEY "the secret key registered for the cluster in your B2 account"
+paramValidation B2_ACCESS_KEY "the access key registered for the cluster in your B2 account"
+paramValidation B2_SECRET_KEY "the secret key registered for the cluster in your B2 account"
 
 checkAppName "b2s3"
 

@@ -10,8 +10,8 @@ b2gateway:
     enabled: true
     replicas: 2
 
-accessKey: ${B2S3_ACCESS_KEY}
-secretKey: ${B2S3_SECRET_KEY}
+accessKey: ${B2_ACCESS_KEY}
+secretKey: ${B2_SECRET_KEY}
 
 # Minio itself will not store data, only works as a gateway
 persistence:

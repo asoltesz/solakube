@@ -191,10 +191,10 @@ fi
 # ------------------------------------------------------------------------------
 
 # The access key (application key) created for cluser access in your B2 account
-export B2S3_ACCESS_KEY="xxx"
+export B2_ACCESS_KEY="xxx"
 
 # The secret key belonging to the B2 access key
-export B2S3_SECRET_KEY="xxx"
+export B2_SECRET_KEY="xxx"
 
 
 
