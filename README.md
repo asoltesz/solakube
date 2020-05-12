@@ -10,7 +10,7 @@ For the sake of compactness, the project is referenced as SolaKube.
  
 WARNING: This is a work in progress and shared only in the hope that it may come useful for others. See the [Issues](https://github.com/asoltesz/hetzner-k8s-builder/issues). Until it reaches 1.0, major structural changes may be introduced.
 
-The configuration describe my personal test cloud (named "andromeda"). If you want to utilize it, please read Vito's article and customize everything according to your own preferences, tokens...etc.
+The configuration describe my personal test cloud (named "andromeda"). If you want to use it as a starting point, please read Vito's article and customize everything according to your own preferences, tokens...etc.
 
 # Cluster features
 
@@ -19,8 +19,8 @@ The SolaKube deployed cluster will have the following features, in short:
 - Flexible cluster node structuring and roles
 - Automatic HTTPS certificates (per-service or wildcard) via Let's Encrypt 
 - Data persistence (Hetzner Volumes + Rook/Ceph)
-- Custom application/component deployments
-- Fully automated, reproducible cluster builds 
+- Simplified application/component deployments (Nextcloud, Postgres...etc)
+- Fully automated, reproducible cluster builds with application deployments
 
 For feature details, see the [Features page](docs/features.md)
 
