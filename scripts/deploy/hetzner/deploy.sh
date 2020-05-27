@@ -103,28 +103,6 @@ echo "Waiting 20 seconds so that fip-controller pods are created"
 
 sleep 20s
 
-#
-# For some reason, all 3 fip-controller pods get scheduled on the same node
-# by default which defeats the purpose and makes fip reassignment much slower
-# than it should be
-#
-# fip-controller pods should be distributed on 3 different nodes
-#
-# We try to redistribute by killing the default pods. This usually results at least
-# in a 2-node distribution in a 3-node set
-#
-echo "Killing all fip-controller pods to get a better node distribution"
-
-for podName in $(kubectl get pods --no-headers --namespace="fip-controller" | awk '{print $1}');
-do
-    # echo "Deleting pod: ${podName}"
-    kubectl delete pods ${podName} --namespace="fip-controller"
-    sleep 3
-done
-
-echo "Waiting for new fip-controller pods to stabilize"
-
-sleep 10s
 
 # ------------------------------------------------------------
 echoSection "Installing HETZNER storage/volume support"

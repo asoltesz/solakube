@@ -1,0 +1,18 @@
+#
+# Pod anti-affinity (preferred) for proper distribution of fip-controller
+#
+spec:
+    template:
+        spec:
+            affinity:
+                podAntiAffinity:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                    -   weight: 100
+                        podAffinityTerm:
+                            labelSelector:
+                                matchExpressions:
+                                -   key: app
+                                    operator: In
+                                    values:
+                                    - fip-controller
+                            topologyKey: "kubernetes.io/hostname"
