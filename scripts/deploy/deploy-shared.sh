@@ -131,32 +131,77 @@ checkAppName() {
 #
 # Checks the storage class variable of the application.
 #
+# The application storage class variable may contain one or more storage classes
+# in a comma separated list. The first storage class that is present in the
+# cluster will be selected.
+#
 # If not defined, it defines it with "default"
 #
-# 1 - The unix name of the application (e.g.: pgadmin). It will be made
-#     uppercase when the env variable name is calculated
+# 1 - The unix name of the application or usage-purpose (e.g.: pgadmin).
+#     It will be made uppercase when the env variable name is calculated
 #
+# 2 - The preferred list of storage classes
 #
 checkStorageClass() {
 
-    local envVarName="${1^^}_STORAGE_CLASS"
+    local appName=$1
+    local preferredClasses=$2
 
-    if [[ ! "${!envVarName}" ]]
+    local envVarName="${appName^^}_STORAGE_CLASS"
+
+    # Querying the storage classes available in the cluster
+    local classesInCluster=$(kubectl get sc)
+
+    # The classes requested by the application storage class variable
+    local classList="${!envVarName}"
+
+    if [[ "${classList}" ]]
     then
-        echo "Storage class was not specifically defined for: ${envVarName} "
-
-        if [[ ! "${DEFAULT_STORAGE_CLASS}" ]]
-        then
-            echo "DEFAULT_STORAGE_CLASS var is not defined. Defaulting to 'hcloud-volumes'"
-            export ${envVarName}="hcloud-volumes"
-        else
-            echo "Using default storage class: '${DEFAULT_STORAGE_CLASS}'"
-            export ${envVarName}="${DEFAULT_STORAGE_CLASS}"
-        fi
-
-    else
-        echo "Using pre-defined storage class: '"${!envVarName}"' "
+        echo "${appName}: Using application-configured storage class(es): '"${classList}"' "
     fi
+
+    if [[ ! "${classList}" ]] && [[ ${preferredClasses} ]]
+    then
+        classList="${preferredClasses}"
+        echo "${appName}: Using the preferred class(es): '${classList}'"
+    fi
+
+    # Using the global default (if set)
+    if [[ ! "${classList}" ]] && [[ ${DEFAULT_STORAGE_CLASS} ]]
+    then
+        classList="${DEFAULT_STORAGE_CLASS}"
+        echo "${appName}: Using the default storage class(es): ${classList}"
+    fi
+
+    # Using the built-in default set (all possible classes)
+    if [[ ! "${classList}" ]]
+    then
+        classList="rook-ceph,hcloud-volumes,openebs-hostpath,standard"
+        echo "${appName}: Defaulting to the complete list of supported classes: ${classList}"
+    fi
+
+    # The storage class to be used for the application
+    local storageClass
+
+    for class in ${classList//,/ }; do
+
+        local found="$( echo "${classList}" | grep ${class} )"
+
+        if [[ ${found} ]]
+        then
+            storageClass=${class}
+            break
+        fi
+    done
+
+    if [[ ! "${storageClass}" ]]
+    then
+        echo "FATAL: ${appName}: No suitable storage class could be found in the cluster"
+        exit 1
+    fi
+
+    echo "${appName}: selected storage class: ${storageClass}"
+    export ${envVarName}="${storageClass}"
 }
 
 #

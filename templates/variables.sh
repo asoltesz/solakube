@@ -172,19 +172,22 @@ export CLOUDFLARE_API_KEY="xxx"
 # ------------------------------------------------------------------------------
 
 # The default storage class if not specified for an application
-export DEFAULT_STORAGE_CLASS="hcloud-volumes"
-
-if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
-then
-    export DEFAULT_STORAGE_CLASS="standard"
-fi
+# We only use durable storage here, if you need openebs-hostpath, set it
+# specifically with the application
+export DEFAULT_STORAGE_CLASS="rook-ceph-block,hcloud-volumes,standard"
 
 # Storage class if Rook/Ceph is installed and preferred
 if [[ "${SK_DEPLOY_ROOK_CEPH}" == "Y" ]]
 then
-    export DEFAULT_STORAGE_CLASS="rook-ceph-block"
-fi
+    # By default, the Cloud-Init script creates the sda2 partition for Rook/Ceph
+    export ROOK_STORAGE_DEVICE="sda2"
 
+    if [[ ${SK_CLUSTER_TYPE} == "vagrant" ]]
+    then
+        # In the RKE Vagrant box, sdb is the storage volume
+        export ROOK_STORAGE_DEVICE="sdb"
+    fi
+fi
 
 # ------------------------------------------------------------------------------
 # Backblaze B2 support as S3 compatible storage (Minio gateway)
