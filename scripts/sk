@@ -28,7 +28,7 @@ export SK_SCRIPT_HOME="${DIR}"
 export SK_DEPLOYMENT_HOME="${DIR}/../deployment"
 
 # Loading the shared library
-source ${SK_SCRIPT_HOME}/sk-shared.sh
+. ${SK_SCRIPT_HOME}/sk-shared.sh
 
 
 #

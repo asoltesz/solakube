@@ -63,7 +63,8 @@ errorHandler() {
 #
 # Conditional export of a value: only if not already defined
 #
-function cexport {
+function cexport()
+{
 
     if [[ ! "${!1}" ]]
     then

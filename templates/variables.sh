@@ -14,13 +14,13 @@
 # ------------------------------------------------------------------------------
 
 # Loading the Rancher cluster id (sk apply creates it there)
-CC_FILE=~/.solakube/${SK_CLUSTER}/cluster_context.sh
+CC_FILE=~/.solakube/${SK_CLUSTER}/variables_cluster_context.sh
 if [[ -f ${CC_FILE} ]]
 then
     source ${CC_FILE}
 fi
 
-# The cluster context
+# The cluster context for Kubectl
 export SK_CLUSTER_CTX="${SK_CLUSTER}"
 if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
 then
