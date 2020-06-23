@@ -202,7 +202,25 @@ export B2_ACCESS_KEY="xxx"
 # The secret key belonging to the B2 access key
 export B2_SECRET_KEY="xxx"
 
+# ------------------------------------------------------------------------------
+# Backblaze B2 access as S3 compatible storage (Minio gateway)
+# ------------------------------------------------------------------------------
 
+# If the generic S3 endpoint parameters are not defined we auto-define them with
+# B2 access data
+if [[ "${SK_DEPLOY_B2S3}" == "Y" ]]
+then
+    cexport S3_ENDPOINT "${B2S3_ENDPOINT}"
+    cexport S3_ACCESS_KEY "${B2_ACCESS_KEY}"
+    cexport S3_SECRET_KEY "${B2_SECRET_KEY}"
+    cexport S3_REGION "${B2S3_REGION}"
+fi
+
+# The region to be used (doesn't matter what at the moment)
+export B2S3_REGION="default"
+
+# The BackBlaze endpoint URL as visible within the cluster
+export B2S3_ENDPOINT="http://b2s3.b2s3.svc.cluster.local:9000"
 
 # ------------------------------------------------------------------------------
 # PostgreSQL RDBMS
