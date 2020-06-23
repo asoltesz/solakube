@@ -12,12 +12,15 @@ shift
 minikube start \
     --kubernetes-version="v1.15.11" \
     --feature-gates="VolumeSnapshotDataSource=true" \
-    --vm-driver="docker" \
+    --driver="docker" \
     $@
+
 
 # When debugging is needed
 # --alsologtostderr -v=5
 
 # Deploy ingress
 minikube addons enable ingress
-minikube addons enable ingress-dns
+#minikube addons enable ingress-dns
+
+minikube dashboard
