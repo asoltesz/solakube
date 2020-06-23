@@ -52,6 +52,15 @@ fi
 checkResultExit "Deploying Helm's Tiller to the cluster"
 
 #
+# Installing the OpenEBS storage provisioner
+# ------------------
+if [[ "${SK_DEPLOY_OPENEBS}" == "Y" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk deploy openebs
+    checkResultExit "Deploying OpenEBS storage provisioner"
+fi
+
+#
 # Installing Cert-Manager
 # ------------------
 if [[ "${SK_DEPLOY_CERT_MANAGER}" == "Y" ]]

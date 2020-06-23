@@ -45,6 +45,9 @@ export SK_DEPLOY_CERT_MANAGER="Y"
 # Whether to deploy a Rook/Ceph storage cluster on the K8s cluster
 export SK_DEPLOY_ROOK_CEPH="Y"
 
+# Whether to deploy the OpenEBS storage provisioner
+export SK_DEPLOY_OPENEBS="Y"
+
 # Whether to deploy Backblaze B2 support as S3 storage on your cluster
 # (via a Minio gateway)
 export SK_DEPLOY_B2S3="Y"
