@@ -13,6 +13,15 @@ Via the SolaKube deployer, you typically combine it with Hetzner Cloud Volumes o
 With this solution, you need to roll your own backup/restore strategy.
 
 
+# Postgres with CrunchyData Postgres Operator
+
+For a production-grade Postgres setup, SolaKube supports the simplified deployment of the [CrunchyData Postgres Operator](https://github.com/CrunchyData/postgres-operator) 
+
+The operator supports streaming replication with proper fail-over, full/incremental backups, point-in-time recovery, multi-cluster DB user management...etc.
+
+See the details in the [CrunchyData Postgres Operator](postgres-crunchy.md) page. 
+
+
 # pgAdmin
 
 Whichever Postgres DBMS setup you implement, you will probably need to have a web administrative interface for your DBs. 

@@ -223,14 +223,72 @@ export B2S3_REGION="default"
 export B2S3_ENDPOINT="http://b2s3.b2s3.svc.cluster.local:9000"
 
 # ------------------------------------------------------------------------------
-# PostgreSQL RDBMS
+# PostgreSQL - Simple installation
 # ------------------------------------------------------------------------------
 
 # PostgreSQL admin user (DBA, typically called 'postgres') password
 export POSTGRES_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 
+# The namespace in which the Postgres service is installed
+# If an external service is used, create a namespace called postgres-client
+# to allow the pg client to run in it (for administrative pg commands)
+export POSTGRES_NAMESPACE="postgres"
+
+# The host name on which the Postgres service is available
+# In case of an in-cluster Postgres, this ends with a namespace as the domain
+export POSTGRES_SERVICE_HOST="postgres-postgresql.postgres"
+
 # Postgres persistent volume storage class (only if default is not suitable)
 # export POSTGRES_STORAGE_CLASS=
+
+
+# ------------------------------------------------------------------------------
+# PostgreSQL - Crunchy Postgres Operator (PGO)
+# ------------------------------------------------------------------------------
+
+# The password of the PGO 'admin' user
+export PGO_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+# The username of the admin user in the new cluster
+#export POSTGRES_ADMIN_USERNAME="hippo"
+# The password of the admin user in the new cluster
+#export POSTGRES_ADMIN_PASSWORD="${PGO_ADMIN_PASSWORD}"
+# The namespace in which the Postgres service is installed
+#export POSTGRES_NAMESPACE="pgo"
+# The internal host name on which the Postgres service is available
+#export POSTGRES_SERVICE_HOST="hippo.pgo"
+
+# The name of the targeted PG cluster (cluster identifier for PGO)
+#export PGO_CLUSTER_NAME="hippo"
+
+# The S3 bucket needs to be defined to activate s3 backups by pgBackRest
+export PGO_CLUSTER_S3_BUCKET="${SK_CLUSTER}-postgres-backup"
+
+# Number of standby database nodes
+# export PGO_CLUSTER_REPLICA_COUNT="0"
+
+# Postgres persistent volume storage class (only if default/calculated is not suitable)
+# export PGO_CLUSTER_PRIMARY_STORAGE_CLASS=
+# export PGO_CLUSTER_REPLICA_STORAGE_CLASS=
+# export PGO_CLUSTER_BACKUP_STORAGE_CLASS=
+# export PGO_CLUSTER_BACKREST_STORAGE_CLASS=
+# export PGO_CLUSTER_WAL_STORAGE_CLASS=
+
+# Where to store backups. Locally (local) , on S3-compatibles storage (s3)
+# or both (local,s3)
+# cexport PGO_CLUSTER_BACKUP_LOCATIONS "local,s3"
+# The number of full backups to retain
+# cexport PGO_CLUSTER_BACKUP_FULL_RETENTION "6"
+# The cron schedule for automatic FULL backups
+# cexport PGO_CLUSTER_BACKUP_FULL_SCHEDULE "* * * * *"
+# The cron schedule for automatic INCREMENTAL backups
+# cexport PGO_CLUSTER_BACKUP_INCR_SCHEDULE "* * * * *"
+# Where to store scheduled backups.
+# cexport PGO_CLUSTER_BACKUP_SCHEDULED_LOCATIONS "s3"
+
+# Extra cluster creation options, if needed
+# cexport PGO_CLUSTER_CREATE_EXTRA_OPTIONS ""
+
 
 # ------------------------------------------------------------------------------
 # pgAdmin

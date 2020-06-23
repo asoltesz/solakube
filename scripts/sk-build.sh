@@ -91,11 +91,21 @@ fi
 #
 # Installing PostgreSQL DBMS
 # ------------------
-if [[ "${SK_DEPLOY_POSTGRES}" == "Y" ]]
+if [[ "${SK_DEPLOY_POSTGRES_SIMPLE}" == "Y" ]]
 then
     . ${SK_SCRIPT_HOME}/sk deploy postgres
     checkResultExit "Deploying PostgreSQL to the cluster"
 fi
+
+#
+# Installing CrunchyData Postgres Operator + a managed PostgreSQL cluster
+# ------------------
+if [[ "${SK_DEPLOY_PGO}" == "Y" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk deploy pgo
+    checkResultExit "Deploying CrunchyData Postgres Operator to the cluster"
+fi
+
 
 #
 # Installing pgAdmin
