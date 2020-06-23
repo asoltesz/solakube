@@ -1,0 +1,49 @@
+#apiVersion: extensions/v1beta1
+#kind: Ingress
+#metadata:
+#    name: ${ROOK_CEPH_APP_NAME}
+#    annotations:
+#        kubernetes.io/ingress.class: nginx
+#        nginx.ingress.kubernetes.io/rewrite-target: /
+#        nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+#        # certmanager.k8s.io/cluster-issuer: 'letsencrypt-http01'
+#    labels:
+#        app: ${ROOK_CEPH_APP_NAME}
+#spec:
+#    tls:
+#    - secretName: ${ROOK_CEPH_TLS_SECRET_NAME}
+#      hosts:
+#      - ${ROOK_CEPH_FQN}
+#    rules:
+#    - host: ${ROOK_CEPH_FQN}
+#      http:
+#          paths:
+#          - path: /
+#            backend:
+#                serviceName: ${ROOK_CEPH_APP_NAME}
+#                servicePort: http
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: rook-ceph-mgr-dashboard
+    namespace: rook-ceph
+    annotations:
+        kubernetes.io/ingress.class: "nginx"
+        kubernetes.io/tls-acme: "true"
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        nginx.ingress.kubernetes.io/server-snippet: |
+            proxy_ssl_verify off;
+spec:
+    tls:
+    - hosts:
+      - rook-ceph.andromeda.mk
+      secretName: rook-ceph.andromeda.mk
+    rules:
+    - host: rook-ceph.andromeda.mk
+      http:
+          paths:
+          - path: /
+            backend:
+                serviceName: rook-ceph-mgr-dashboard
+                servicePort: https-dashboard

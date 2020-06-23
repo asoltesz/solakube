@@ -58,6 +58,6 @@ spec:
     #        config:
     #          osdsPerDevice: "5"
     devices:
-    - name: "sda2"
+    - name: "${ROOK_STORAGE_DEVICE}"
 #    directories:
 #    - path: /var/lib/rook

@@ -28,7 +28,7 @@ echoSection "Validating parameters"
 # ------------------------------------------------------------
 echoSection "Preparing temp folder"
 
-createTempDir "rook"
+createTempDir "rook-ceph"
 
 # ------------------------------------------------------------
 echoSection "Creating namespace"
@@ -44,10 +44,30 @@ kubectl apply -f common.yaml \
 kubectl apply -f operator.yaml \
     --namespace=rook-ceph
 
+kubectl apply -f toolbox.yaml \
+    --namespace=rook-ceph
+
 # ------------------------------------------------------------
 echoSection "Creating the Rook/Ceph storage cluster"
 
-kubectl create -f cluster.yaml \
+cexport ROOK_CLUSTER_TYPE "default"
+
+if [[ ${SK_CLUSTER_TYPE} != "hetzner" ]]
+then
+    # K8s Cluster type is not the default Hetzner
+
+    # On minikube and vagrant, only the testing cluster is supported
+    # (storage is in a folder, not on a device)
+    cexport ROOK_CLUSTER_TYPE "testing"
+fi
+
+CLUSTER_FILE="cluster-${ROOK_CLUSTER_TYPE}.yaml"
+
+echo "Cluster file defining the Ceph storage cluster: ${CLUSTER_FILE}"
+
+processTemplate "${CLUSTER_FILE}"
+
+kubectl apply -f ${TMP_DIR}/${CLUSTER_FILE} \
     --namespace=rook-ceph
 
 # ------------------------------------------------------------
@@ -56,10 +76,14 @@ echoSection "Creating the 'rook-ceph-block' storage class"
 kubectl create -f storageclass.yaml \
     --namespace=rook-ceph
 
+
 # ------------------------------------------------------------
 echoSection "Creating the snapshotclass"
 
-kubectl create -f snapshotclass.yaml \
+echo "Waiting for Snapshot API to activate"
+sleep 120
+
+kubectl apply -f snapshotclass.yaml \
     --namespace=rook-ceph
 
 # ------------------------------------------------------------
