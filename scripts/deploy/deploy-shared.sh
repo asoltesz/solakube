@@ -263,9 +263,9 @@ checkCertificate() {
 
     local envVarCertNeededName="${serviceNameUC}_CERT_NEEDED"
 
-    if [[ "${SK_CLUSTER_TYPE}" == "minikube" ]]
+    if [[ "${SK_CLUSTER_TYPE}" == "minikube" ]] || [[ "${SK_CLUSTER_TYPE}" == "vagrant" ]]
     then
-        echo "Target cluster is a MiniKube testing instance. Cert is not needed."
+        echo "Target cluster is a testing instance (${SK_CLUSTER_TYPE}). Cert is not needed."
         # New certificate is not required
         export ${envVarCertNeededName}="N"
         return 0
