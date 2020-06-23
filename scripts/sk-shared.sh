@@ -112,3 +112,71 @@ checkRancherAccessParams() {
 
     return 0
 }
+
+#
+# Calculates the S3 parameters for a certain application/purpose from
+# the default and Backblaze B2 parameters.
+#
+# Defines the S3 access parameters in environment variables prefixed with
+# the purpose.
+#
+# Defined variables:
+# - <purpose>_ENDPOINT
+# - <purpose>_ACCESS_KEY
+# - <purpose>_SECRET_KEY
+#
+# The bucket is typically defined separately anyways.
+#
+# 1 - The purpose of the s3 access. Always upper case.
+#     E.g.: "PGO_S3"
+#     This will be the prefix for defining the new variables
+#
+# 1 - The source of the s3 access. Always upper case.
+#     E.g.: "B2"
+#     This may contain multiple sources separated with commas, sorted according
+#     to preference (first, that has _ENDPOINT defined wins)
+#
+defineS3AccessParams() {
+
+    local purpose=$1
+    local sources=$2
+
+    if [[ ! ${purpose} ]]
+    then
+        echo "ERROR: Purpose is not specified for S3 access variable definition"
+        return 1
+    fi
+
+    if [[ ! ${sources} ]]
+    then
+        # The shared default S3 settings
+        sources="S3,B2S3"
+    fi
+
+    for source in ${sources//,/ }; do
+
+
+        local var
+        var="${source}_ENDPOINT"
+
+        if [[ ! ${!var} ]]
+        then
+            continue
+        fi
+
+        echo "Exporting ${source} S3 parameters for ${purpose}"
+
+        cexport ${purpose}_ENDPOINT "${!var}"
+
+        var="${source}_ACCESS_KEY"
+        cexport ${purpose}_ACCESS_KEY "${!var}"
+
+        var="${source}_SECRET_KEY"
+        cexport ${purpose}_SECRET_KEY "${!var}"
+
+        var="${source}_REGION"
+        cexport ${purpose}_REGION "${!var}"
+
+    done
+
+}

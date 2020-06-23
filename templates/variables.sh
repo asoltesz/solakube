@@ -190,7 +190,7 @@ then
 fi
 
 # ------------------------------------------------------------------------------
-# Backblaze B2 support as S3 compatible storage (Minio gateway)
+# Backblaze B2 storage access parameters
 # ------------------------------------------------------------------------------
 
 # The access key (application key) created for cluser access in your B2 account
