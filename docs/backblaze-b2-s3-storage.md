@@ -1,8 +1,11 @@
 # BackBlaze B2 as S3 storage
 
-The "b2s3" deployer module of SolaKube can deploy [Minio](https://min.io) in B2 gateway mode so that cluster services (and potentially external services) can use your B2 account for storage.
+The "b2s3" deployer module of SolaKube can deploy [Minio](https://min.io) in B2 gateway mode so that cluster services (and potentially external services) can use your B2 account for storage via the S3 protocol.
 
 NOTE: This storage is not to be confused with Hetzner Cloud Volumes and Rook distributed storage since it is way-way slower and cannot be used to create/bind Persistent Volumes from it.  
+
+NOTE-2: It is now possible to use B2 via a more "native" S3 interface. In this case you don't need B2S3 (Minio) and you configure it as normal S3 storage. As of 2020-MAY-11, this is in beta, so I would recommend waiting for a couple of months for it to stabilize. 
+
 
 # Why B2 
 
