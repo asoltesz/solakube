@@ -77,14 +77,6 @@ kubectl create -f storageclass.yaml \
     --namespace=rook-ceph
 
 
-# ------------------------------------------------------------
-echoSection "Creating the snapshotclass"
-
-echo "Waiting for Snapshot API to activate"
-sleep 120
-
-kubectl apply -f snapshotclass.yaml \
-    --namespace=rook-ceph
 
 # ------------------------------------------------------------
 echoSection "Rook/Ceph ${ROOK_VERSION} deployment descriptors have been installed to your cluster"
