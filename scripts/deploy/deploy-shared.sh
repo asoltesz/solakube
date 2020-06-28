@@ -176,7 +176,7 @@ checkStorageClass() {
     # Using the built-in default set (all possible classes)
     if [[ ! "${classList}" ]]
     then
-        classList="rook-ceph,hcloud-volumes,openebs-hostpath,standard"
+        classList="rook-ceph-block,hcloud-volumes,openebs-hostpath,standard"
         echo "${appName}: Defaulting to the complete list of supported classes: ${classList}"
     fi
 
@@ -185,7 +185,7 @@ checkStorageClass() {
 
     for class in ${classList//,/ }; do
 
-        local found="$( echo "${classList}" | grep ${class} )"
+        local found="$( echo "${classesInCluster}" | grep ${class} )"
 
         if [[ ${found} ]]
         then
