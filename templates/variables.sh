@@ -88,7 +88,7 @@ export SMTP_PASSWORD="xxx"
 # ------------------------------------------------------------------------------
 # Shared S3 storage access settings.
 # (if you want to use this for multiple purposes like (pg backups, etcd backups)
-# Note: BackBlaze-B2-as-S3 settings need not to be defined here.
+# In case you use B2S3, these will be auto-defined for you
 # ------------------------------------------------------------------------------
 
 # export S3_ENDPOINT="xxx"
