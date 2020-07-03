@@ -113,3 +113,15 @@ rm docserver.tar.gz
 After this, go to the Applications section of the Nextcloud UI and enable the Community Document Server application.
 
 Also, install the 'ONLYOFFICE' application (the UI parts).
+
+# Notes
+
+## Uploading big files
+
+By default the NextCloud Docker container is configured for accepting files up to 512 MB. The Kubernetes Ingress is also configured for this size by SolaKube
+
+The Nextcloud clients can upload files much bigger than this, since they upload in much smaller chunks.
+
+In case you need to upload huge files via the web inteface:
+- check the [Nextcloud Documentation for Uploading Big Files](https://docs.nextcloud.com/server/18/admin_manual/configuration_files/big_file_upload_configuration.html?highlight=big%20files)
+- modify the ingress definition to allow bigger uploads

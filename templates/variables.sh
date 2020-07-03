@@ -67,6 +67,9 @@ export SK_DEPLOY_PGO="Y"
 # Whether to install the OpenLDAP identity server
 # export SK_DEPLOY_OPENLDAP="N"
 
+# Whether to install the Nextcloud Groupware
+export SK_DEPLOY_NEXTCLOUD="Y"
+
 # Whether to install the Wordpress CMS
 # export SK_DEPLOY_WORDPRESS="N"
 

@@ -92,6 +92,32 @@ echoSection "Installing the Ingress (with TLS by cert-manager)"
 applyTemplate ingress.yaml
 
 
+# ------------------------------------------------------------
+echoSection "Patching Nextcloud server config to allow client authorizatin"
+
+echo "Waiting for all objects to register with the API"
+sleep 5
+
+echo "Waiting for all pods to become Ready"
+waitAllPodsActive nextcloud 600 5
+
+echo
+echo "Patching the NextCloud config for HTTPS"
+echo
+
+# Without this, Nextcloud clients cannot authenticate for synchronization
+
+echo "sed -i \"s/);/\\\\'overwriteprotocol\\\\' => \\\\'https\\\\', );/g\" config/config.php" > /tmp/cmd.sh
+chmod +x /tmp/cmd.sh
+copyFileToPod "app.kubernetes.io/name=nextcloud" "nextcloud" /tmp/cmd.sh /tmp/cmd.sh
+
+# Executing the uploaded command script
+execInPod "app.kubernetes.io/name=nextcloud" "nextcloud" "bash /tmp/cmd.sh"
+
+echo "Patching done"
+echo "Waiting for 60s for Nextart to reload configuration"
+sleep 60
+echo "Now, you should be able to connect to Nextcloud with the official clients as well."
 
 # ------------------------------------------------------------
 echoSection "NextCloud has been installed on your cluster"

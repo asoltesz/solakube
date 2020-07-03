@@ -7,6 +7,9 @@ metadata:
         nginx.ingress.kubernetes.io/rewrite-target: /
         nginx.ingress.kubernetes.io/ssl-redirect: 'true'
         # certmanager.k8s.io/cluster-issuer: 'letsencrypt-http01'
+
+        # Allowing the NextCloud client to upload bigger chunks than usual
+        nginx.ingress.kubernetes.io/proxy-body-size: 512m
     labels:
         app: ${NEXTCLOUD_APP_NAME}
 spec:
