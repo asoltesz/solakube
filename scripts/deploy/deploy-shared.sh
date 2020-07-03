@@ -654,6 +654,75 @@ getClusterIP() {
 }
 
 #
+# Executes a command in a pod identified by a selector
+#
+# 1 - pod selector. E.g.: "name=pgo-client"
+# 2 - namespace
+# 3 - the command to run
+#
+execInPod() {
+
+    local selector=$1
+    local namespace=$2
+    local command=$3
+
+    # Querying the PGO client CLI pod
+    local podName=$(kubectl get pods \
+                      --selector=${selector} \
+                      --output=jsonpath={.items..metadata.name} \
+                      --namespace ${namespace} \
+                      --no-headers
+                    )
+
+    if [[ ! ${podName} ]]
+    then
+        echo "ERROR: pod not found with selector: ${selector}"
+        exit 1
+    fi
+
+    # Executing the command
+    kubectl exec -it ${podName} -n ${namespace} -- ${command}
+
+    return $?
+}
+
+
+#
+# Uploads a file to a pod identified by a selector
+#
+# 1 - pod selector. E.g.: "name=pgo-client"
+# 2 - namespace
+# 3 - the local path of the file
+# 4 - the path of the file within the pod
+#
+copyFileToPod() {
+
+    local selector=$1
+    local namespace=$2
+    local localPath=$3
+    local podPath=$4
+
+    # Querying the PGO client CLI pod
+    local podName=$(kubectl get pods \
+                      --selector=${selector} \
+                      --output=jsonpath={.items..metadata.name} \
+                      --namespace=${namespace} \
+                      --no-headers
+                    )
+
+    if [[ ! ${podName} ]]
+    then
+        echo "ERROR: pod not found with selector: ${selector}"
+        exit 1
+    fi
+
+    kubectl cp ${localPath} ${podName}:${podPath} -n ${namespace}
+
+    return $?
+}
+
+
+#
 # Executes a script with the Postgres client as the admin user (the 'postgres' user).
 #
 # 1 - path of the SQL script to be executed
