@@ -171,15 +171,22 @@ export CLOUDFLARE_API_KEY="xxx"
 
 
 # ------------------------------------------------------------------------------
-# Persistent Volumes, Rook
+# Persistent Volume storage class default
 # ------------------------------------------------------------------------------
 
-# The default storage class if not specified for an application
+# The default storage class for applications that have no specific storage
+# class configured.
+# This is a list of storage classes. The first class available in the K8s
+# cluster will be auto-selected.
 # We only use durable storage here, if you need openebs-hostpath, set it
 # specifically with the application
 export DEFAULT_STORAGE_CLASS="rook-ceph-block,hcloud-volumes,standard"
 
-# Storage class if Rook/Ceph is installed and preferred
+
+# ------------------------------------------------------------------------------
+# Rook/Ceph
+# ------------------------------------------------------------------------------
+
 if [[ "${SK_DEPLOY_ROOK_CEPH}" == "Y" ]]
 then
     # By default, the Cloud-Init script creates the sda2 partition for Rook/Ceph
