@@ -78,7 +78,7 @@ waitAllPodsActive cert-manager 600 5
 
 # There are no readiness probes on cert-manager deployments so we need to wait
 # further
-sleep 30
+sleep 60
 
 echo "Create a ClusterIssuer to test the webhook works okay"
 
@@ -90,7 +90,7 @@ echo "Check the status of the newly created certificate"
 # You may need to wait a few seconds before cert-manager processes the
 # certificate request
 
-sleep 10s
+sleep 20s
 
 kubectl describe certificate -n cert-manager-test \
    | grep "Certificate is up to date and has not expired"
