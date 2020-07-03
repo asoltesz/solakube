@@ -6,11 +6,9 @@ SolaKube supports the deployment of Postgres on your cluster as a service and th
 
 # Postgres (simple version)
 
-A simple, one-node Postgres installation with the Bitnami images can be done with the "postgres" deployer module. This can be extended for your needs but it is meant to be as an entry-level solution.
+A simple, one-node Postgres installation with the Bitnami images can be done with the "postgres-simple" deployer module. This can be extended for your needs but it is meant to be as an entry-level solution with limitations.
 
-Via the SolaKube deployer, you typically combine it with Hetzner Cloud Volumes or the Rook storage cluster so you should get a minimally acceptable fault tolerance since the DB itself is stored on distributed/HA storage and the Postgres pod itself gets rescheduled if the node fails under it.
-
-With this solution, you need to roll your own backup/restore strategy.
+See the [Postgres-Simple deployer page](postgres-simple.md). 
 
 
 # Postgres with CrunchyData Postgres Operator
