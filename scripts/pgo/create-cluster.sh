@@ -80,8 +80,7 @@ if [[ ${S3_CA_FILE} ]]
 then
     echo "Deploying S3 CA cert chain"
 
-    kubectl delete secret s3-cert-chain \
-    --namespace="pgo"
+    deleteKubeObject "secret" "s3-cert-chain" "pgo"
 
     kubectl create secret generic s3-cert-chain \
      --from-file="aws-s3-ca.crt=${S3_CA_FILE}" \

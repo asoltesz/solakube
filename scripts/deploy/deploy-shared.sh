@@ -673,14 +673,7 @@ executePostgresAdminScript() {
 
     # Copy the create script into the postgres container
 
-#    kubectl run postgres-postgresql-client --rm --tty -i --restart='Never' --namespace postgres --image docker.io/bitnami/postgresql:11.6.0-debian-9-r0 --env="PGPASSWORD=${POSTGRES_PASSWORD}" --command -- psql --host postgres-postgresql -U postgres -d test-db -p 5432
-
-    local exists=$(kubectl get configmap postgres-script -n ${namespace} --no-headers)
-
-    if [[ ${exists} ]]
-    then
-        kubectl delete configmap postgres-script -n ${namespace}
-    fi
+    deleteKubeObject "configmap" "postgres-script" "${namespace}"
 
     kubectl create configmap postgres-script \
         --namespace ${namespace} \
@@ -730,12 +723,7 @@ executePostgresAdminScript() {
         }
 EOF
 )"
-    exists=$(kubectl get pod postgres-client -n ${namespace} --no-headers)
-
-    if [[ ${exists} ]]
-    then
-        kubectl delete pod postgres-client -n ${namespace}
-    fi
+    deleteKubeObject "pod" "postgres-client" "${namespace}"
 
     kubectl run postgres-client \
         -i --rm --tty --restart='Never' \
@@ -745,6 +733,34 @@ EOF
         --command \
         -- psql --host ${hostname} -U postgres -d ${db} -p 5432
 
+}
+
+#
+# Deletes a K8s object if it is present.
+#
+# It will not throw an error if the object is not present.
+#
+# 1 - object type
+# 2 - object name
+# 3 - namespace
+#
+deleteKubeObject() {
+
+    local objectType=$1
+    local objectName=$2
+    local namespace=$3
+
+    local result=$(kubectl get ${objectType} \
+        --field-selector=metadata.name=${objectName} --no-headers=true \
+        --namespace=${namespace})
+
+    if [[ ! ${result} ]]
+    then
+        return 0
+    fi
+
+    kubectl delete ${objectType} ${objectName} --namespace=${namespace}
+    return $?
 }
 
 
