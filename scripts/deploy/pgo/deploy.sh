@@ -142,11 +142,10 @@ kubectl set env deployment/pgo-client \
 
 # ------------------------------------------------------------
 echoSection "Waiting for the PGO installation to stabilize"
-sleep 60
+sleep 10
 
 waitAllPodsActive pgo 600 5
 
-sleep 60
 
 # ------------------------------------------------------------
 

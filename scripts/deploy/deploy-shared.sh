@@ -480,13 +480,77 @@ deleteHelmRelease() {
 }
 
 #
-# Waits until all pods become Active in a namespace
+# Waits until all pods become Ready (Active) in a namespace
+#
+# Make sure that all necessary K8s objects are already created and visible
+# via the API before calling this.
 #
 # 1 - namespace
 # 2 - maximum timeout in seconds (defaults to 600 seconds / 10 minutes)
 # 3 - check interval in seconds (defaults to 5 seconds)
 #
 waitAllPodsActive() {
+
+    local namespace=$1
+    local timeout=${2:-600}
+    local checkInterval=${3:-5}
+
+    local startTime=$(date +%s)
+    local limit=$(( ${startTime} + ${timeout} ))
+
+    echo "Checking pods in namespace '${namespace}' to become all Ready"
+
+    local now=$(date +%s)
+
+    local jsonPath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'
+
+    while (( ${now} < ${limit} ))
+    do
+        # Check which nodes are NOT ready
+
+        local result=$(kubectl get pods -o jsonpath="${jsonPath}" \
+                          --namespace=${namespace} | grep "Ready=False")
+
+        if [[ ! "${result}" ]]
+        then
+            echo "All pods are 'Ready' (time in waiting: $(( ${now} - ${startTime} ))s)"
+
+            # Remove this after no anomalies has been encountered
+            kubectl get pods --namespace=${namespace}
+
+            return 0
+        fi
+
+        echo "waiting ${checkInterval}s ..."
+        sleep ${checkInterval}s
+        now=$(date +%s)
+    done
+
+    echo "Timeout passed (${timeout}). Stopping checking attempts. Check failed."
+
+    local result=$(kubectl get pods -o jsonpath="${jsonPath}" \
+                      --namespace=${namespace} | grep "Ready=False")
+
+    echo "Pods that are NOT ready:"
+    echo "${result}"
+
+    return 1
+}
+
+#
+# Waits until all pods start in a namespace.
+#
+# This does not wait until they are ready, only until they have been created
+# and are running.
+#
+# Make sure that all necessary K8s objects are already created and visible
+# via the API before calling this.
+#
+# 1 - namespace
+# 2 - maximum timeout in seconds (defaults to 600 seconds / 10 minutes)
+# 3 - check interval in seconds (defaults to 5 seconds)
+#
+waitAllPodsRunning() {
 
     local namespace=$1
     local timeout=${2:-600}
@@ -521,7 +585,6 @@ waitAllPodsActive() {
     echo "Timeout passed (${timeout}). Stopping checking attempts. Check failed."
     return 1
 }
-
 
 
 #
