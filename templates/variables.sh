@@ -73,6 +73,8 @@ export SK_DEPLOY_NEXTCLOUD="Y"
 # Whether to install the Wordpress CMS
 # export SK_DEPLOY_WORDPRESS="N"
 
+# Whether to deploy the Stash backup/restore operator
+# export SK_DEPLOY_STASH="Y"
 
 # ------------------------------------------------------------------------------
 # Shared SMTP settings
@@ -231,6 +233,33 @@ export B2S3_REGION="default"
 
 # The BackBlaze endpoint URL as visible within the cluster
 export B2S3_ENDPOINT="http://b2s3.b2s3.svc.cluster.local:9000"
+
+
+# ------------------------------------------------------------------------------
+# Stash backup/restore service
+# ------------------------------------------------------------------------------
+
+# The password to use for the encryption of the backup files placed
+# in cloud storage
+export STASH_ENCRYPT_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+# The default storage backups for all backup profiles that doesn't specify
+# a dedicated bucket for themselves
+export STASH_REPO_DEFAULT_BUCKET_NAME="andromeda-stash-backups"
+
+#
+# The default snapshot class to be used when taking a snapshot of a persistent
+# volume. Optional, it defaults to Rook/Cephs rbd snapshotter
+#
+# export STASH_SNAPSHOT_CLASS="csi-rbdplugin-snapclass"
+
+# Overriding the default S3 access parameters for Stash backups
+#export STASH_S3_ENDPOINT=xxx
+#export STASH_S3_ACCESS_KEY=xxx
+#export STASH_S3_SECRET_KEY=xxx
+#export STASH_S3_REGION=xxx
+
+
 
 # ------------------------------------------------------------------------------
 # PostgreSQL - Simple installation

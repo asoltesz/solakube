@@ -205,6 +205,39 @@ checkStorageClass() {
 }
 
 #
+# Checks if deploying the backup profiles is requested by the SK administrator.
+#
+# Wheter the SK_DEPLOY_${applicationName}_BACKUP variable is set to "Y" or not.
+#
+# 1 - The unix name of the application (e.g.: pgadmin). It will be made
+#     uppercase when the env variable name is calculated
+#
+checkBackupDeploymentNeeded() {
+
+    local appName=${1}
+    local envVarName="SK_DEPLOY_${appName^^}_BACKUP"
+
+    if [[ "${!envVarName}" != "Y" ]]
+    then
+        echo "Backup is not requested for ${appName}"
+        return 0
+    fi
+
+    echo "Backup is requested for ${appName}"
+
+    # Testing if Stash is deployed at all
+
+    if [[ ! "${SK_DEPLOY_STASH}" ]]
+    then
+        echo "Stash is not marked for deployment."
+        return 0
+    fi
+
+    return 1
+}
+
+
+#
 # Checks the if the FQN is set for the service/application with the environment
 # variable ${APP_NAME}_FQN environment variable.
 #
