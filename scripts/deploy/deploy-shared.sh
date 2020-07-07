@@ -213,11 +213,16 @@ checkStorageClass() {
 #
 # If not defined and cannot be derived either, it fails with an error.
 #
+# 1 - servicename (e.g.: nextcloud)
+# 2 - instance name (e.g.: nextcloud2). Defaults to the servicename if not
+#     specified
 #
 checkFQN() {
 
     local serviceName=${1}
     local serviceNameUC=${serviceName^^}
+
+    local instanceName=${2:-"${serviceName}"}
 
     local envVarName="${serviceNameUC}_FQN"
 
@@ -230,7 +235,7 @@ checkFQN() {
             echo "ERROR: CLUSTER_FQN not defined, cannot derive service FQN."
             return 1
         else
-            export ${envVarName}="${serviceName}.${CLUSTER_FQN}"
+            export ${envVarName}="${instanceName}.${CLUSTER_FQN}"
         fi
 
     else
@@ -252,7 +257,6 @@ checkFQN() {
 # 1 - The unix name of the application (e.g.: pgadmin). It will be made
 #     uppercase when the env variable name is calculated
 #
-#
 checkCertificate() {
 
     local serviceName=${1}
@@ -273,7 +277,7 @@ checkCertificate() {
 
     if [[ ! "${serviceFQN}" ]]
     then
-        echo "ERROR: CLUSTER_FQN not defined, cannot derive service FQN."
+        echo "ERROR: FQN not defined for ${serviceName},"
         return 1
     fi
 
