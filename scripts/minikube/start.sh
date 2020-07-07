@@ -21,6 +21,7 @@ minikube start \
 
 # Deploy ingress
 minikube addons enable ingress
+minikube addons enable metrics-server
 #minikube addons enable ingress-dns
 
 minikube dashboard
