@@ -18,4 +18,4 @@ spec:
     storageClassName: ${NEXTCLOUD_STORAGE_CLASS}
     resources:
         requests:
-            storage: "1Gi"
+            storage: "${NEXTCLOUD_PVC_SIZE}"

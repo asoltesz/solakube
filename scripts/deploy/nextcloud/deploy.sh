@@ -21,18 +21,21 @@ HELM_CHART_VERSION=1.9.3
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
-echoHeader "Deploying the NextCloud Groupware Server "
+checkAppName "nextcloud"
+
+echoHeader "Deploying the NextCloud Groupware Server (${NEXTCLOUD_APP_NAME})"
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
-checkAppName "nextcloud"
-
 checkStorageClass "nextcloud"
 
-checkFQN "nextcloud"
+checkFQN "nextcloud" "${NEXTCLOUD_APP_NAME}"
 
 checkCertificate "nextcloud"
+
+# Defaulting to 1 GB PVC size, if not set
+cexport NEXTCLOUD_PVC_SIZE "10Gi"
 
 # ------------------------------------------------------------
 echoSection "Preparing temp folder"
@@ -99,7 +102,7 @@ echo "Waiting for all objects to register with the API"
 sleep 5
 
 echo "Waiting for all pods to become Ready"
-waitAllPodsActive nextcloud 600 5
+waitAllPodsActive ${NEXTCLOUD_APP_NAME} 600 5
 
 echo
 echo "Patching the NextCloud config for HTTPS"
@@ -109,13 +112,13 @@ echo
 
 echo "sed -i \"s/);/\\\\'overwriteprotocol\\\\' => \\\\'https\\\\', );/g\" config/config.php" > /tmp/cmd.sh
 chmod +x /tmp/cmd.sh
-copyFileToPod "app.kubernetes.io/name=nextcloud" "nextcloud" /tmp/cmd.sh /tmp/cmd.sh
+copyFileToPod "app.kubernetes.io/name=nextcloud" "${NEXTCLOUD_APP_NAME}" /tmp/cmd.sh /tmp/cmd.sh
 
 # Executing the uploaded command script
-execInPod "app.kubernetes.io/name=nextcloud" "nextcloud" "bash /tmp/cmd.sh"
+execInPod "app.kubernetes.io/name=nextcloud" "${NEXTCLOUD_APP_NAME}" "bash /tmp/cmd.sh"
 
 echo "Patching done"
-echo "Waiting for 60s for Nextart to reload configuration"
+echo "Waiting for 60s for NextCloud to reload configuration"
 sleep 60
 echo "Now, you should be able to connect to Nextcloud with the official clients as well."
 

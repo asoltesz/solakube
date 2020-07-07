@@ -43,9 +43,9 @@ externalDatabase:
     enabled: true
     type: postgresql
     host: ${POSTGRES_SERVICE_HOST}
-    user: nextcloud
+    user: ${NEXTCLOUD_APP_NAME}
     password: ${NEXTCLOUD_DB_PASSWORD}
-    database: nextcloud
+    database: ${NEXTCLOUD_APP_NAME}
 
 
 # Internal SQLite db is only for light testing

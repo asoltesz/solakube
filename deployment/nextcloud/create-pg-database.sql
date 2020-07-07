@@ -7,16 +7,16 @@
 
 \echo ''
 \echo '------------------'
-\echo 'Creating the NextCloud database in the PostgreSQL db cluster'
+\echo 'Creating the NextCloud database (${NEXTCLOUD_APP_NAME}) in the PostgreSQL db cluster'
 \echo '------------------'
 \echo ''
 
-CREATE USER nextcloud PASSWORD '${NEXTCLOUD_DB_PASSWORD}';
-CREATE DATABASE nextcloud;
+CREATE USER ${NEXTCLOUD_APP_NAME} PASSWORD '${NEXTCLOUD_DB_PASSWORD}';
+CREATE DATABASE ${NEXTCLOUD_APP_NAME};
 
-\connect nextcloud;
+\connect ${NEXTCLOUD_APP_NAME};
 
-GRANT ALL PRIVILEGES ON DATABASE nextcloud TO nextcloud;
+GRANT ALL PRIVILEGES ON DATABASE ${NEXTCLOUD_APP_NAME} TO ${NEXTCLOUD_APP_NAME};
 
 \echo '------------------'
 \echo ''

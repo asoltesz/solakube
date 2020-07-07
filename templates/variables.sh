@@ -360,6 +360,8 @@ export NEXTCLOUD_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 #
 export NEXTCLOUD_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
 
+# The size of the persistent storage for the application
+# export NEXTCLOUD_PVC_SIZE="10Gi"
 
 # ------------------------------------------------------------------------------
 # WordPress CMS

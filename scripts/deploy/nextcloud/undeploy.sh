@@ -14,13 +14,17 @@
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
-echoHeader "Removing NextCloud from your cluster "
+echoHeader "Removing NextCloud (${NEXTCLOUD_APP_NAME}) from your cluster "
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
 checkAppName "nextcloud"
 
+# ------------------------------------------------------------
+echoSection "Preparing temp folder"
+
+createTempDir "nextcloud"
 
 # ------------------------------------------------------------
 echoSection "Removing via Helm"
@@ -35,9 +39,10 @@ deleteNamespace ${NEXTCLOUD_APP_NAME}
 # ------------------------------------------------------------
 echoSection "Dropping the Postgres database of NextCloud"
 
-executePostgresAdminScript drop-pg-database.sql ${POSTGRES_NAMESPACE} ${POSTGRES_SERVICE_HOST}
+processTemplate drop-pg-database.sql
+
+executePostgresAdminScript ${TMP_DIR}/drop-pg-database.sql ${POSTGRES_NAMESPACE} ${POSTGRES_SERVICE_HOST}
 
 
 # ------------------------------------------------------------
 echoSection "NextCloud has been removed from your cluster"
-

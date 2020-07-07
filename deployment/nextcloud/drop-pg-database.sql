@@ -7,12 +7,12 @@
 
 \echo ''
 \echo '------------------'
-\echo 'Dropping the NextCloud database in the PostgreSQL db cluster'
+\echo 'Dropping the NextCloud database (${NEXTCLOUD_APP_NAME}) in the PostgreSQL db cluster'
 \echo '------------------'
 \echo ''
 
-DROP DATABASE nextcloud;
-DROP USER nextcloud;
+DROP DATABASE ${NEXTCLOUD_APP_NAME};
+DROP USER ${NEXTCLOUD_APP_NAME};
 
 \echo '------------------'
 \echo ''
