@@ -116,7 +116,7 @@ spec:
             cpu: "250m"
             memory: "512Mi"
           requests:
-            cpu: "100"
+            cpu: "100m"
             memory: "512Mi"
     # The above example requests/limits can also be added to the mon and osd components
         mon:
