@@ -47,10 +47,10 @@ echoSection "Preparing Helm chart values"
 
 processTemplate chart-values.yaml
 
-processTemplate create-pg-database.sql
-
 # ------------------------------------------------------------
 echoSection "Creating the Postgres database for NextCloud"
+
+processTemplate create-pg-database.sql
 
 executePostgresAdminScript ${TMP_DIR}/create-pg-database.sql ${POSTGRES_NAMESPACE} ${POSTGRES_SERVICE_HOST}
 
