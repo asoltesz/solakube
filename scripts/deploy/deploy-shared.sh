@@ -83,7 +83,7 @@ defineNamespace() {
 }
 
 #
-# Adds a namespace to the cluster if it exist
+# Deletes a namespace from the cluster if it exist
 #
 # $1 - Name of the namespace
 #
@@ -91,11 +91,11 @@ deleteNamespace() {
 
     local namespace=$1
 
-    local description="$(kubectl describe namespace ${namespace})"
+    local description="$(kubectl describe namespace ${namespace} 2> /dev/null)"
 
     if [[ ! "${description}" ]]
     then
-        # namespace doesn't exists
+        echo "${namespace} namespace doesn't exists in the cluster."
         return
     fi
 
@@ -119,7 +119,7 @@ checkAppName() {
 
     if [[ ! "${!envVarName}" ]]
     then
-        echo "App name override was not defined (${envVarName}): using '${appName}' "
+        echo "Defaulting (${envVarName}) to '${appName}' "
         export ${envVarName}="${appName}"
     else
         echo "Using pre-defined app name: '"${!envVarName}"' "
@@ -593,10 +593,6 @@ waitAllPodsActive() {
         if [[ ! "${result}" ]]
         then
             echo "All pods are 'Ready' (time in waiting: $(( ${now} - ${startTime} ))s)"
-
-            # Remove this after no anomalies has been encountered
-            kubectl get pods --namespace=${namespace}
-
             return 0
         fi
 
@@ -649,10 +645,6 @@ waitAllPodsRunning() {
         if [[ ! "${result}" ]]
         then
             echo "All pods are 'Running' (time in waiting: $(( ${now} - ${startTime} ))s)"
-
-            # Remove this after no anomalies has been encountered
-            kubectl get pods --namespace=${namespace}
-
             return 0
         fi
 
