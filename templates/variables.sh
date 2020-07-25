@@ -404,8 +404,8 @@ export WORDPRESS_ADMIN_EMAIL="${SK_ADMIN_EMAIL}"
 
 #
 # The password for the 'wordpress' DB user in Postgres that has permissions
-# for the data stored in the 'nextcloud' database which is the storage place
-# for all relational data of NextCloud
+# for the data stored in the 'wordpress' database which is the storage place
+# for all relational data of Wordpress
 #
 export WORDPRESS_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
 
