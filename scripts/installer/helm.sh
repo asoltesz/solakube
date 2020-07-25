@@ -25,7 +25,8 @@ function checkResult() {
 # ------------------------------------------------------------
 # Parametrization
 
-HELM_VERSION=2.16.1
+HELM_VERSION=3.2.4
+#HELM_VERSION=2.16.1
 
 # ------------------------------------------------------------
 # Installation
@@ -62,6 +63,10 @@ hr
 sudo mv linux-amd64/helm /usr/local/bin/helm
 
 checkResult "Installation of the binary"
+
+echo "Adding the stable repo"
+
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 
 
 echo

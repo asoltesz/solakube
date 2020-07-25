@@ -46,8 +46,7 @@ defineNamespace ${OPENEBS_APP_NAME}
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install stable/openebs \
-    --name ${OPENEBS_APP_NAME} \
+helm install ${OPENEBS_APP_NAME} stable/openebs \
     --namespace ${OPENEBS_APP_NAME} \
     --version=${HELM_CHART_VERSION}
 #    --values ${TMP_DIR}/chart-values.yaml

@@ -86,11 +86,11 @@ helm repo update
 
 echo "Deploying Velero to the cluster with Helm"
 
-helm install vmware-tanzu/velero \
-    --name ${VELERO_APP_NAME} \
+helm install ${VELERO_APP_NAME} vmware-tanzu/velero \
     --namespace ${VELERO_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
-    --values ${TMP_DIR}/chart-values.yaml
+    --values ${TMP_DIR}/chart-values.yaml \
+    --wait
 
 # ------------------------------------------------------------
 echoSection "Velero has been installed on your cluster"

@@ -58,8 +58,7 @@ applyTemplate pvc.yaml
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install stable/pgadmin \
-    --name ${PGADMIN_APP_NAME} \
+helm install ${PGADMIN_APP_NAME} stable/pgadmin \
     --namespace ${PGADMIN_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml

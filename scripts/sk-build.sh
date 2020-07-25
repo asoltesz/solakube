@@ -46,12 +46,6 @@ then
 fi
 
 #
-# Installing Helm's Tiller
-# ------------------
-. ${SK_SCRIPT_HOME}/sk deploy helm-tiller
-checkResultExit "Deploying Helm's Tiller to the cluster"
-
-#
 # Installing the OpenEBS storage provisioner
 # ------------------
 if [[ "${SK_DEPLOY_OPENEBS}" == "Y" ]]

@@ -34,7 +34,7 @@ checkFQN "nextcloud" "${NEXTCLOUD_APP_NAME}"
 
 checkCertificate "nextcloud"
 
-# Defaulting to 1 GB PVC size, if not set
+# Defaulting to 10 GB PVC size, if not set
 cexport NEXTCLOUD_PVC_SIZE "10Gi"
 
 # ------------------------------------------------------------
@@ -68,8 +68,7 @@ applyTemplate pvc.yaml
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install stable/nextcloud \
-    --name ${NEXTCLOUD_APP_NAME} \
+helm install ${NEXTCLOUD_APP_NAME} stable/nextcloud \
     --namespace ${NEXTCLOUD_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml

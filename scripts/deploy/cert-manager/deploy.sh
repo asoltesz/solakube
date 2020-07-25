@@ -58,12 +58,8 @@ defineNamespace cert-manager
 echo "Add the Jetstack Helm repository"
 helm repo add jetstack https://charts.jetstack.io
 
-echo "Update your local Helm chart repository cache"
-helm repo update
-
 echo "Install the cert-manager Helm chart"
-helm install jetstack/cert-manager \
-  --name cert-manager \
+helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --version v${CERT_MAN_CHART_VERSION}
 

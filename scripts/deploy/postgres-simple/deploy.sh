@@ -56,8 +56,7 @@ applyTemplate pvc.yaml
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install stable/postgresql \
-    --name ${POSTGRES_APP_NAME} \
+helm install ${POSTGRES_APP_NAME} stable/postgresql \
     --namespace ${POSTGRES_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml \

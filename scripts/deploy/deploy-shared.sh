@@ -535,7 +535,7 @@ deleteHelmRelease() {
 
     echo "Uninstalling ${releaseName} with Helm"
 
-    local releaseInfo=$(helm ls --all ${releaseName})
+    local releaseInfo=$(helm get all ${releaseName} 2> /dev/null)
     if [[ $? != 0 ]]
     then
         echo "Error when checking the release with Helm"
@@ -548,7 +548,7 @@ deleteHelmRelease() {
         return 0
     fi
 
-    helm delete --purge ${releaseName}
+    helm uninstall ${releaseName}
     if [[ $? != 0 ]]
     then
         echo "Error when deleting the release with Helm"

@@ -13,7 +13,8 @@
 
 # Internal parameters
 
-HELM_CHART_VERSION=1.2.3
+HELM_CHART_VERSION="1.2.4"
+OPENLDAP_VERSION="2.4.48"
 
 # ------------------------------------------------------------
 
@@ -25,6 +26,8 @@ echoHeader "Installing OpenLDAP on your cluster"
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
+
+cexport OPENLDAP_PVC_SIZE "1Gi"
 
 checkAppName "openldap"
 
@@ -53,9 +56,8 @@ defineNamespace ${OPENLDAP_APP_NAME}
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install stable/openldap \
-    --name ${OPENLDAP_APP_NAME} \
-    --namespace ${OPENLDAP_APP_NAME} \
+helm install ${OPENLDAP_APP_NAME} stable/openldap \
+    --namespace=${OPENLDAP_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml
 

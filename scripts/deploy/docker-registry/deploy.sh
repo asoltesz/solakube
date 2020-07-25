@@ -58,8 +58,7 @@ defineNamespace docker-registry
 # ------------------------------------------------------------
 echoSection "Installing Docker-Registry (without ingress)"
 
-helm install stable/docker-registry \
-    --name docker-registry \
+helm install ${REGISTRY_APP_NAME} stable/docker-registry \
     --namespace docker-registry \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml \

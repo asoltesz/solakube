@@ -53,8 +53,7 @@ defineNamespace ${B2S3_APP_NAME}
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install stable/minio \
-    --name ${B2S3_APP_NAME} \
+helm install ${B2S3_APP_NAME} stable/minio \
     --namespace ${B2S3_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml

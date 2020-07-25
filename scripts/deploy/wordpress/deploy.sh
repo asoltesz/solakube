@@ -61,8 +61,7 @@ echoSection "Installing application with Helm chart (without ingress)"
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
-helm install bitnami/wordpress \
-    --name ${WORDPRESS_APP_NAME} \
+helm install ${WORDPRESS_APP_NAME} bitnami/wordpress \
     --namespace ${WORDPRESS_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml
