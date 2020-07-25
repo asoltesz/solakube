@@ -350,6 +350,9 @@ export PGADMIN_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 # PgAdmin persistent volume storage class (only if default is not suitable)
 # export PGADMIN_STORAGE_CLASS=
 
+# Whether the built-in backup profile (Velero) can be deployed
+export PGADMIN_BACKUP_ENABLED="Y"
+
 
 # ------------------------------------------------------------------------------
 # Private Docker Registry
