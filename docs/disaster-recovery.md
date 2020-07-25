@@ -1,16 +1,18 @@
 # Disaster Recovery
 
-SolaKube integrates Stash as the base Disaster Recovery (DR) solution for typical filesystem based data.
+SolaKube integrates Velero as the base Disaster Recovery (DR) solution.
 
-The Postgres (and databases in general) has special needs in terms of disaster recovery, so it is not in the scope of the Stash based DR system (see below).
+The Postgres (and databases in general) has special needs in terms of disaster recovery, so it is not in the scope of the Velero based DR system (see below).
 
-# Stash
+# Velero
 
-Stash is primarily an operator for Restic but it also has support for local Kubernetes VolumeSnapshots.
+Velero has support for saving: 
+- Kubernetes object descriptors
+- files stored in persistent Volumes (PVCs) with Restic or K8s snapshots
 
-It currently doesn't have support for consistent filesystem backups, so your workloads need to be stopped for backup or must be able to tolerate filesystem backups that are potentially captured over a longer period of time (as opposed to point-in-time filesystem snapshots).
+It currently doesn't have support for consistent, online filesystem backups with Restic, so your workloads need to be stopped for backup or must be able to tolerate filesystem backups that are potentially captured over a longer period of time (as opposed to point-in-time filesystem snapshots).
 
-See details in the [Stash Backups](stash-backups.md) page.
+See details in the [Velero Backups](velero-backups.md) page.
 
 # Postgres (simple)
 

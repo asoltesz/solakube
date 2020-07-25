@@ -205,36 +205,78 @@ checkStorageClass() {
 }
 
 #
-# Checks if deploying the backup profiles is requested by the SK administrator.
+# Tells if the backup system is available on the cluster or not.
 #
-# Wheter the SK_DEPLOY_${applicationName}_BACKUP variable is set to "Y" or not.
+# Application deployers can use this to check if the application's default
+# backup profile can be deployed at all.
 #
-# 1 - The unix name of the application (e.g.: pgadmin). It will be made
-#     uppercase when the env variable name is calculated
-#
-checkBackupDeploymentNeeded() {
+function isBackupSystemAvailable() {
 
-    local appName=${1}
-    local envVarName="SK_DEPLOY_${appName^^}_BACKUP"
+    # Checking the Velero namespace in the cluster
+    local description="$(kubectl describe namespace "velero" 2> /dev/null)"
 
-    if [[ "${!envVarName}" != "Y" ]]
+    if [[ ! "${description}" ]]
     then
-        echo "Backup is not requested for ${appName}"
-        return 0
+        echo "Velero namespace is not present"
+        return
     fi
 
-    echo "Backup is requested for ${appName}"
+    # Checking the Velero CLI client
+    local version="$(velero version 2> /dev/null)"
 
-    # Testing if Stash is deployed at all
-
-    if [[ ! "${SK_DEPLOY_STASH}" ]]
+    if [[ ! "${version}" ]]
     then
-        echo "Stash is not marked for deployment."
-        return 0
+        echo "Velero client CLI is not available"
+        return
     fi
 
-    return 1
+    echo "true"
 }
+
+
+
+
+#
+# Whether we should deploy a backup profile for an application or not.
+#
+# If the VELERO_APP_BACKUPS_ENABLED is not "Y" (the default), it returns false.
+#
+# If the backup system is not available, it returns false.
+#
+# If the <APPLICATION_NAME>_BACKUP_ENABLED is not "Y" (the default), it returns false.
+#
+# 1 - The name of the application
+#
+function shouldDeployBackupProfile() {
+
+    local application=$1
+
+    if [[ ${VELERO_APP_BACKUPS_ENABLED:-"Y"} != "Y" ]]
+    then
+        echo "Velero application backups are disabled globally"
+        return
+    fi
+
+    local backupSystemAvailable="$(isBackupSystemAvailable)"
+    if [[ "${backupSystemAvailable}" != "true" ]]
+    then
+        echo "Backup system is not available: ${backupSystemAvailable}"
+        return
+    fi
+
+    local envVarName="${application}_BACKUP_ENABLED"
+    local BACKUP_ENABLED=${!envVarName}
+
+    if [[ ${BACKUP_ENABLED:-"Y"} != "Y" ]]
+    then
+        echo "Default backup is disabled for the application"
+        return
+    fi
+
+    echo "true"
+}
+
+
 
 
 #

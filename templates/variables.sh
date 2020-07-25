@@ -48,6 +48,9 @@ export SK_DEPLOY_ROOK_CEPH="Y"
 # Whether to deploy the OpenEBS storage provisioner
 export SK_DEPLOY_OPENEBS="Y"
 
+# Whether to deploy the Velero backup/restore operator
+export SK_DEPLOY_VELERO="Y"
+
 # Whether to deploy Backblaze B2 support as S3 storage on your cluster
 # (via a Minio gateway)
 export SK_DEPLOY_B2S3="Y"
@@ -234,29 +237,27 @@ export B2S3_ENDPOINT="http://b2s3.b2s3.svc.cluster.local:9000"
 
 
 # ------------------------------------------------------------------------------
-# Stash backup/restore service
+# Velero backup/restore service
 # ------------------------------------------------------------------------------
 
-# The password to use for the encryption of the backup files placed
-# in cloud storage
-export STASH_ENCRYPT_PASSWORD="${SK_ADMIN_PASSWORD}"
+# Whether Velero is allowed to use snapshots for backing up volumes
+# If not, Restic will be used to backup volumes (not point-in-time snapshot)
+# Defaults to false
+# export VELERO_SNAPSHOTS_ENABLED="false"
 
-# The default storage backups for all backup profiles that doesn't specify
-# a dedicated bucket for themselves
-export STASH_REPO_DEFAULT_BUCKET_NAME="andromeda-stash-backups"
+# Whether it is generally allowed to deploy Velero based application backup
+# profiles when an application is deployed (and has a profile defined for it)
+# export VELERO_APP_BACKUPS_ENABLED="Y"
 
-#
-# The default snapshot class to be used when taking a snapshot of a persistent
-# volume. Optional, it defaults to Rook/Cephs rbd snapshotter
-#
-# export STASH_SNAPSHOT_CLASS="csi-rbdplugin-snapclass"
+# Overriding the default S3 access parameters for Velero backups
+#export VELERO_S3_ENDPOINT=xxx
+#export VELERO_S3_ACCESS_KEY=xxx
+#export VELERO_S3_SECRET_KEY=xxx
+#export VELERO_S3_REGION=xxx
 
-# Overriding the default S3 access parameters for Stash backups
-#export STASH_S3_ENDPOINT=xxx
-#export STASH_S3_ACCESS_KEY=xxx
-#export STASH_S3_SECRET_KEY=xxx
-#export STASH_S3_REGION=xxx
-
+# The name of the storage bucket to store the backups of the application in.
+# If not defined, the default Velero backup bucket will be used
+export VELERO_S3_BUCKET_NAME="andromeda-velero-backups"
 
 
 # ------------------------------------------------------------------------------
