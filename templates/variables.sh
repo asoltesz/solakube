@@ -76,9 +76,6 @@ export SK_DEPLOY_NEXTCLOUD="Y"
 # Whether to install the Wordpress CMS
 # export SK_DEPLOY_WORDPRESS="N"
 
-# Whether to deploy the Stash backup/restore operator
-# export SK_DEPLOY_STASH="Y"
-
 # ------------------------------------------------------------------------------
 # Shared SMTP settings
 # Only SSL-based SMTP is supported
