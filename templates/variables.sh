@@ -391,6 +391,9 @@ export NEXTCLOUD_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
 # The size of the persistent storage for the application
 # export NEXTCLOUD_PVC_SIZE="10Gi"
 
+# Whether the built-in backup profile (Velero) can be deployed
+export NEXTCLOUD_BACKUP_ENABLED="Y"
+
 # ------------------------------------------------------------------------------
 # WordPress CMS
 # ------------------------------------------------------------------------------

@@ -1,0 +1,5 @@
+spec:
+    template:
+        metadata:
+            annotations:
+                backup.velero.io/backup-volumes: "nextcloud-data"

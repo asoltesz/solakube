@@ -125,3 +125,11 @@ echo "Now, you should be able to connect to Nextcloud with the official clients 
 # ------------------------------------------------------------
 echoSection "NextCloud has been installed on your cluster"
 
+DEPLOY_BCK_PROFILE="$(shouldDeployBackupProfile ${NEXTCLOUD_APP_NAME})"
+
+if [[ "${DEPLOY_BCK_PROFILE}" == "true" ]]
+then
+    . ${DEPLOY_SCRIPTS_DIR}/backup-config.sh
+else
+    echo "Built-in backup profile is not deployed: ${DEPLOY_BCK_PROFILE}"
+fi
