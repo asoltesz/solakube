@@ -82,7 +82,6 @@ echoSection "Installing application with Helm chart (without ingress)"
 echo "Adding/Updating Helm chart repo"
 
 helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
-helm repo update
 
 echo "Deploying Velero to the cluster with Helm"
 
