@@ -96,7 +96,7 @@ export SMTP_PASSWORD="xxx"
 # In case you use B2S3, these will be auto-defined for you
 # ------------------------------------------------------------------------------
 
-# export S3_ENDPOINT="xxx"
+# export S3_ENDPOINT="https://xxx"
 # export S3_ACCESS_KEY="xxx"
 # export S3_SECRET_KEY="xxx"
 # export S3_REGION="xxx"
