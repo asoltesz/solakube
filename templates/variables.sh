@@ -70,6 +70,9 @@ export SK_DEPLOY_PGO="Y"
 # Whether to install the OpenLDAP identity server
 # export SK_DEPLOY_OPENLDAP="N"
 
+# Whether to install the Gitea Development Teamwork Server
+export SK_DEPLOY_GITEA="Y"
+
 # Whether to install the Nextcloud Groupware
 export SK_DEPLOY_NEXTCLOUD="Y"
 
@@ -370,6 +373,34 @@ export REGISTRY_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 # ------------------------------------------------------------------------------
 
 # No config params yet
+
+
+# ------------------------------------------------------------------------------
+# Gitea Git/Code-Review/CI Server (SW Development Server)
+# ------------------------------------------------------------------------------
+
+#
+# The password for the 'admin' user of Gitea (the main administrative user).
+#
+export GITEA_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+#
+# The email address for the 'gitea' user of Gitea (the main administrative user).
+#
+export GITEA_ADMIN_EMAIL="${SK_ADMIN_EMAIL}"
+
+#
+# The password for the 'gitea' DB user in Postgres that has permissions
+# for the data stored in the 'gitea' database which is the storage place
+# for all relational data of Gitea
+#
+export GITEA_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+# The size of the persistent storage for the application
+# export GITEA_PVC_SIZE="3Gi"
+
+# Whether the built-in backup profile (Velero) can be deployed
+export GITEA_BACKUP_ENABLED="Y"
 
 
 # ------------------------------------------------------------------------------

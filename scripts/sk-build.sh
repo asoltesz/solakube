@@ -146,3 +146,12 @@ then
     . ${SK_SCRIPT_HOME}/sk deploy wordpress
     checkResultExit "Deploying Wordpress to the cluster"
 fi
+
+#
+# Installing Gitea
+# ------------------
+if [[ "${SK_DEPLOY_GITEA}" == "Y" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk deploy gitea
+    checkResultExit "Deploying Gitea to the cluster"
+fi
