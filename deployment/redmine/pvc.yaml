@@ -1,0 +1,21 @@
+#
+# The current stable Helm template misses the proper "storageClass" attribute
+# and it is not possible to properly override the "...alpha..." storageclass
+# attribute, so we prepare the PVC in advance
+#
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: ${REDMINE_APP_NAME}
+    labels:
+        app.kubernetes.io/name: ${REDMINE_APP_NAME}
+        app.kubernetes.io/instance: ${REDMINE_APP_NAME}
+    annotations:
+        volume.beta.kubernetes.io/storage-class: ${REDMINE_STORAGE_CLASS}
+spec:
+    accessModes:
+    - "ReadWriteOnce"
+    storageClassName: ${REDMINE_STORAGE_CLASS}
+    resources:
+        requests:
+            storage: "${REDMINE_PVC_SIZE}"

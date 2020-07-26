@@ -73,6 +73,9 @@ export SK_DEPLOY_PGO="Y"
 # Whether to install the Gitea Development Teamwork Server
 export SK_DEPLOY_GITEA="Y"
 
+# Whether to install the Redmine Issue/Project Management Server
+# export SK_DEPLOY_REDMINE="Y"
+
 # Whether to install the Nextcloud Groupware
 export SK_DEPLOY_NEXTCLOUD="Y"
 
@@ -401,6 +404,34 @@ export GITEA_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 # Whether the built-in backup profile (Velero) can be deployed
 export GITEA_BACKUP_ENABLED="Y"
+
+
+# ------------------------------------------------------------------------------
+# Redmine Issue/Project Management
+# ------------------------------------------------------------------------------
+
+#
+# The password for the 'admin' user of Redmine (the main administrative user).
+#
+export REDMINE_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+#
+# The email address for the 'admin' user of Redmine (the main administrative user).
+#
+export REDMINE_ADMIN_EMAIL="${SK_ADMIN_EMAIL}"
+
+#
+# The password for the 'admin' DB user in Postgres that has permissions
+# for the data stored in the 'redmine' database which is the storage place
+# for all relational data of Redmine
+#
+export REDMINE_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+# The size of the persistent storage for the application
+# export REDMINE_PVC_SIZE="3Gi"
+
+# Whether the built-in backup profile (Velero) can be deployed
+export REDMINE_BACKUP_ENABLED="Y"
 
 
 # ------------------------------------------------------------------------------
