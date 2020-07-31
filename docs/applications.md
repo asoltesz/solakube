@@ -4,6 +4,17 @@ SolaKube supports the automated deployment for a limited set of applications.
 
 Manually, you can deploy applications with the Rancher UI (from its catalogs) or with Helm.
 
+SolaKube installers do a more complex/complete installation for the supported applications than a simple Helm chart can. 
+
+These include:
+- Ingress that handles the cluster-level wildcard certificate or a dedicated certificate managed by Cert-Manager
+- Auto-creating a database for the application in the cluster-level Postgres DB service (PGO or Postgres-Simple DB clusters)
+- Auto-selection of the most appropriate storage class for the application's persistent data
+- Backup/restore profile with Velero
+- Auto-creation of the admin user in the application
+- Reasonable defaults for less-well-tuned Helm charts
+- Application specific fine-tuning (e.g.: sync-client HTTPS settings for Nextcloud) 
+
 # BackBlaze B2 support for S3-compatible storage
 
 In case you prefer B2, you can use it from your cluster services via Minio.
