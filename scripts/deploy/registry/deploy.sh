@@ -92,3 +92,11 @@ applyTemplate ingress.yaml
 echoSection "Docker-registry has been installed on your cluster"
 
 
+DEPLOY_BCK_PROFILE="$(shouldDeployBackupProfile ${REGISTRY_APP_NAME})"
+
+if [[ "${DEPLOY_BCK_PROFILE}" == "true" ]]
+then
+    . ${DEPLOY_SCRIPTS_DIR}/backup-config.sh
+else
+    echo "Built-in backup profile is not deployed: ${DEPLOY_BCK_PROFILE}"
+fi
