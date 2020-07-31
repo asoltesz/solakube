@@ -96,6 +96,10 @@ This is needed because Nginx-Ingress can only use TLS secrets defined in the sam
 
 Execute **sk deploy replicator**.
 
+# Private Docker/Helm registries
+
+See the [Registries](registries.md) page.
+
 # Rook / Ceph
 
 To utilize the storage directly attached to your Hetzner VMs (in addition to Hetzner Cloud Volumes), you may want to deploy Rook with Ceph. 
