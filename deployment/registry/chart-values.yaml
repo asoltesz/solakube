@@ -7,4 +7,12 @@ ingress:
 persistence:
     enabled: "true"
     storageClass: ${REGISTRY_STORAGE_CLASS}
-    size: 10Gi
+    size: ${REGISTRY_PVC_SIZE}
+    deleteEnabled: true
+
+resources:
+    requests:
+        memory: 256Mi
+        cpu: 100m
+    limits:
+        memory: 256Mi

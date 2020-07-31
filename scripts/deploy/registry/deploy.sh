@@ -36,6 +36,9 @@ checkFQN "registry"
 
 checkCertificate "registry"
 
+# The registry is typically larger because all images on the cluster
+# should be stored in it
+cexport REGISTRY_PVC_SIZE "10Gi"
 
 # ------------------------------------------------------------
 echoSection "Preparing temp folder"
@@ -43,23 +46,27 @@ echoSection "Preparing temp folder"
 createTempDir "registry"
 
 # ------------------------------------------------------------
+echoSection "Creating namespace"
+
+defineNamespace registry
+
+# ------------------------------------------------------------
+echoSection "Deploying reg-tool"
+
+applyTemplate reg-tool.yaml
+
+# ------------------------------------------------------------
 echoSection "Preparing chart values"
 
 processTemplate chart-values.yaml
 
-
 docker run --rm -ti xmartlabs/htpasswd admin ${REGISTRY_ADMIN_PASSWORD} > ${TMP_DIR}/htpasswd
-
-# ------------------------------------------------------------
-echoSection "Creating namespace"
-
-defineNamespace docker-registry
 
 # ------------------------------------------------------------
 echoSection "Installing Docker-Registry (without ingress)"
 
 helm install ${REGISTRY_APP_NAME} stable/docker-registry \
-    --namespace docker-registry \
+    --namespace ${REGISTRY_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml \
     --set secrets.htpasswd="$(cat ${TMP_DIR}/htpasswd)"

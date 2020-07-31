@@ -1,0 +1,26 @@
+#
+# Deploys the Registry Tool (byrnedo/reg-tool)
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: reg-tool
+    labels:
+        app: reg-tool
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: reg-tool
+    template:
+        metadata:
+            labels:
+                app: reg-tool
+        spec:
+            containers:
+            - name: reg-tool
+              image: byrnedo/reg-tool:latest
+              # Just spin & wait forever
+              command: [ "/bin/bash", "-c", "--" ]
+              args: [ "while true; do sleep 30; done;" ]

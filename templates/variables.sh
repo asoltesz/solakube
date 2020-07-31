@@ -364,13 +364,22 @@ export PGADMIN_BACKUP_ENABLED="Y"
 
 
 # ------------------------------------------------------------------------------
-# Private Docker Registry
+# Private Docker Registry (by Docker)
 # ------------------------------------------------------------------------------
 
 # Private Docker Registry external access FQN (derived if not specified)
 #export REGISTRY_FQN="docker-registry.andromeda.example.com"
 
-# Password for the admin user
+# The registry will need a fair amount of space, so class preference is changed
+export REGISTRY_STORAGE_CLASS="hcloud-volumes,openebs-hostpath,rook-ceph-block,standard"
+
+# The volume size for storing the Docker images
+#export REGISTRY_PVC_SIZE="20Gi"
+
+# Whether the built-in backup profile (Velero) can be deployed (by default Y)
+export REGISTRY_BACKUP_ENABLED="Y"
+
+# Password for the 'admin' user of the registry
 export REGISTRY_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 

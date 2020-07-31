@@ -10,6 +10,7 @@ metadata:
         certmanager.k8s.io/cluster-issuer: 'letsencrypt-http01'
     labels:
         app: docker-registry
+        instance: ${REGISTRY_APP_NAME}
 spec:
     tls:
         - secretName: docker-registry-tls
@@ -22,5 +23,5 @@ spec:
               paths:
                   - path: /
                     backend:
-                        serviceName: docker-registry
+                        serviceName: ${REGISTRY_APP_NAME}-docker-registry
                         servicePort: 5000
