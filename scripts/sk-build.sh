@@ -37,6 +37,15 @@ checkResultExit "Deploying Hetzner-cloud support components"
 #
 
 #
+# Installing the Velero Disaster Recovery tool
+# ------------------
+if [[ "${SK_DEPLOY_VELERO}" == "Y" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk deploy velero
+    checkResultExit "Deploying the Velero Disaster Recovery tool to the cluster"
+fi
+
+#
 # Installing the Rook/Ceph storage cluster
 # ------------------
 if [[ "${SK_DEPLOY_ROOK_CEPH}" == "Y" ]]
