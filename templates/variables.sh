@@ -51,6 +51,9 @@ export SK_DEPLOY_OPENEBS="Y"
 # Whether to deploy the Velero backup/restore operator
 export SK_DEPLOY_VELERO="Y"
 
+# Whether to deploy the JFrog Container Registry
+export SK_DEPLOY_JCR="Y"
+
 # Whether to deploy Backblaze B2 support as S3 storage on your cluster
 # (via a Minio gateway)
 export SK_DEPLOY_B2S3="Y"
@@ -369,6 +372,34 @@ export PGADMIN_BACKUP_ENABLED="Y"
 
 # Password for the admin user
 export REGISTRY_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+
+# ------------------------------------------------------------------------------
+# JFrog Container Registry
+# ------------------------------------------------------------------------------
+
+#
+# The password for the 'admin' user of Jcr (the main administrative user).
+#
+export JCR_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+#
+# The email address for the 'admin' user of Jcr (the main administrative user).
+#
+export JCR_ADMIN_EMAIL="${SK_ADMIN_EMAIL}"
+
+#
+# The password for the 'admin' DB user in Postgres that has permissions
+# for the data stored in the 'jcr' database which is the storage place
+# for all relational data of Jcr
+#
+export JCR_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+# The size of the persistent storage for the application
+# export JCR_PVC_SIZE="3Gi"
+
+# Whether the built-in backup profile (Velero) can be deployed
+export JCR_BACKUP_ENABLED="Y"
 
 
 # ------------------------------------------------------------------------------

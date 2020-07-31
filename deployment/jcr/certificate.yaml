@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+    name: ${JCR_APP_NAME}
+spec:
+    secretName: ${JCR_APP_NAME}-tls
+    issuerRef:
+        name: letsencrypt-http01
+        kind: ClusterIssuer
+    commonName: ${JCR_FQN}
+    dnsNames:
+        - ${JCR_FQN}
+    acme:
+        config:
+            - http01:
+                  ingressClass: nginx
+              domains:
+                  - ${JCR_FQN}

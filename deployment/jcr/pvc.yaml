@@ -1,0 +1,16 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: ${JCR_APP_NAME}
+    labels:
+        app.kubernetes.io/name: ${JCR_APP_NAME}
+        app.kubernetes.io/instance: ${JCR_APP_NAME}
+    annotations:
+        volume.beta.kubernetes.io/storage-class: ${JCR_STORAGE_CLASS}
+spec:
+    accessModes:
+    - "ReadWriteOnce"
+    storageClassName: ${JCR_STORAGE_CLASS}
+    resources:
+        requests:
+            storage: "${JCR_PVC_SIZE}"

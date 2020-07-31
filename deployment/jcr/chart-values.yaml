@@ -1,0 +1,46 @@
+artifactory:
+    artifactory:
+        #resources:
+
+        # Ensure that the JVM knows about the heap limitations
+#        javaOpts:
+#          - "XX:+UnlockExperimentalVMOptions"
+#          - "XX:+UseCGroupMemoryLimitForHeap"
+
+        annotations:
+            backup.velero.io/backup-volumes: "artifactory-volume"
+
+        persistence:
+            existingClaim: ${JCR_APP_NAME}
+
+        admin:
+            ip: "*"
+            username: "admin"
+            password: "${JCR_ADMIN_PASSWORD}"
+
+    # We use our own ingress but need the proxying
+    nginx:
+        enabled: true
+
+    # We use external postgres service
+    postgresql:
+        enabled: false
+
+    database:
+        type: postgresql
+        driver: org.postgresql.Driver
+        url: jdbc:postgresql://${POSTGRES_SERVICE_HOST}:5432/${JCR_APP_NAME}
+        user: ${JCR_APP_NAME}
+        password: ${JCR_DB_PASSWORD}
+
+#    annotations:
+#        backup.velero.io/backup-volumes: "artifactory-volume"
+
+#    persistence:
+#        existingClaim: ${JCR_APP_NAME}
+
+# We use external postgres service
+postgresql:
+    enabled: false
+
+
