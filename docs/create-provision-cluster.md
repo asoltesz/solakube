@@ -106,6 +106,12 @@ See the relevant [Rook](rook.md) and [Persistent Volumes](persistent-volumes.md)
 
 Important: The storage cluster starts up fairly slow and the script doesn't wait for the complete initialization. Make sure you do before deploying persistent workloads.
 
+# Disaster Recovery, Velero
+
+Optionally, you may install the Velero Disaster Recovery tool that allows regularly backing up your application namespaces and restore them in case of a disaster situation.
+
+See details in the [Disaster Recovery](disaster-recovery.md) and the [Velero](velero-backups.md) pages. 
+
 # Further steps
 
 After these steps, your cluster should be available for application workloads.
