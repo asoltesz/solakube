@@ -8,3 +8,6 @@ persistence:
 
 adminPassword: ${OPENLDAP_ADMIN_PASSWORD}
 configPassword: ${OPENLDAP_ADMIN_PASSWORD}
+
+podAnnotations:
+    backup.velero.io/backup-volumes: "data"

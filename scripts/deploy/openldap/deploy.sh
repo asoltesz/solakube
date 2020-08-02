@@ -2,8 +2,7 @@
 
 # ==============================================================================
 #
-# Installs the appropriate Ingress and cert-manager Certificate descriptor
-# for HTTPS access of oPENLDAP
+# Installs the OpenLDAP on the cluster.
 #
 # WARNING: Assumes that a cert-manager ClusterIssuer named "letsencrypt-http01"
 # is already deployed on the cluster (it will define the Certificate to be
@@ -84,5 +83,14 @@ echo "Waiting for the installation to stabilize"
 waitAllPodsActive openldap 600 5
 
 # ------------------------------------------------------------
-echoSection "OPENLDAP has been installed on your cluster"
+echoSection "OpenLDAP has been installed on your cluster"
 
+
+DEPLOY_BCK_PROFILE="$(shouldDeployBackupProfile ${OPENLDAP_APP_NAME})"
+
+if [[ "${DEPLOY_BCK_PROFILE}" == "true" ]]
+then
+    . ${DEPLOY_SCRIPTS_DIR}/backup-config.sh
+else
+    echo "Built-in backup profile is not deployed: ${DEPLOY_BCK_PROFILE}"
+fi
