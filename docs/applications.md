@@ -27,6 +27,14 @@ SolaKube supports the deployment of Postgres onto your cluster and simplifies da
 
 See the [Postgres page for details](postgres.md). 
 
+# Redmine (Task / Issue / Project Management)
+
+Redmine is a lightweight issue and project management software.
+
+Features in detail on the [Redmine project website](https://redmine.org).
+
+SolaKube support in the [deployer docs page](redmine.md)
+
 # Your own application/components deployments
 
 You may create your own SolaKube deployers that does automated deployments for your specific needs from Helm charts and/or plain Kubernetes deployment descriptors. 

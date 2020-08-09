@@ -1,6 +1,11 @@
 # Redmine
 
-Redmine is a lightweight, flexible projec and issue management software popular with software development teams.
+Redmine is a lightweight issue management software that can be used for many purposes, including these:
+- General Task Management (Project hierarchies, Task hierarchies)
+- Software Development issue management (bugs, features, SCM connections...etc)
+- Documentation & Knowledge base (wikis)
+
+Features in detail on the [Redmine project website](https://redmine.org).
 
 Supported version: 4.1.1
 
@@ -92,7 +97,7 @@ The 'admin' user can administer/configure your Redmine instance.
 
 ## Requested resources 
 
-The requested resources are as follows:
+The requested resources are as follows (in chart-values.yaml):
 
 ~~~
 resources:
@@ -103,5 +108,5 @@ resources:
 ~~~
 Raise these resources in case you need it.
 
-Limits are not defined.
+Limits are not defined by default.
 
