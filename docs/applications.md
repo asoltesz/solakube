@@ -27,6 +27,14 @@ SolaKube supports the deployment of Postgres onto your cluster and simplifies da
 
 See the [Postgres page for details](postgres.md). 
 
+# NextCloud (groupware + online office)
+
+NextCloud is an open-source groupware server (files, contacts, calendars, chat) that also provides you with the ability for online, collaborative office document editing.  
+
+Features in detail on the [Nextcloud website](https://nextcloud.com/).
+
+SolaKube support in the [deployer docs page](nextcloud.md)
+
 # Redmine (Task / Issue / Project Management)
 
 Redmine is a lightweight issue and project management software.

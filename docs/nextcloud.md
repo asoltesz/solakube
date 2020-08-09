@@ -1,5 +1,7 @@
 # NextCloud Groupware Server
 
+NextCloud is a groupware server (files, contacts, calendars, chat) that also provides you with the ability for online, collaborative office document editing.  
+
 SolaKube supports the simplified deployment of NextCloud on your cluster with automatic creation of a Postgres database for it.
 
 NextCloud is currently the most fully-featured OSS groupware server that you can run on your own infrastructure and has proper integrations not only with Android clients but Linux desktops as well.
