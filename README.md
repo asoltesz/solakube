@@ -17,12 +17,18 @@ The configuration describe my personal test cloud (named "andromeda"). If you wa
 The SolaKube deployed cluster will have the following features, in short:
 - Highly available via Hetzner Floating IP and Nginx-Ingress
 - Flexible cluster node structuring and roles
-- Automatic HTTPS certificates (per-service or wildcard) via Let's Encrypt 
-- Data persistence (Hetzner Volumes + Rook/Ceph)
-- Simplified application/component deployments (Nextcloud, Postgres...etc)
-- Fully automated, reproducible cluster builds with application deployments
+- Automatic HTTPS certificates (per-service or wildcard) via [Let's Encrypt](docs/certificate-management.md) 
+- [Data persistence](docs/persistent-volumes.md) (Hetzner Volumes + [Rook/Ceph](docs/rook.md))
+- Fully automated, reproducible cluster builds with infrastructure component + application deployments
+- Built in [disaster recovery](docs/disaster-recovery.md) tooling (Velero + application backup profiles)
+- Simplified deployments for
+  - infrastructure components (e.g.: [Postgres as a service](docs/postgres.md), [Velero](docs/velero-backups.md))
+  - popular applications ([Nextcloud](docs/nextcloud.md), [Redmine](docs/redmine.md), Wordpress...etc)
+  - developer tools (e.g.: [Gitea](docs/gitea.md), [Jenkins](docs/jenkins.md))
 
 For feature details, see the [Features page](docs/features.md)
+
+For details about the directly supported infrastructure components & applications, see the [Applications & Components page](docs/applications.md)
 
 # Requirements, Dependencies
  

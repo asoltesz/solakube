@@ -27,6 +27,14 @@ Storage & persistence
 - Databases like PostgreSQL and other workloads requiring persistence can be readily deployed on the new cluster.
 - More in [Persistent Volumes](persistent-volumes.md)
 
+[Disaster Recovery](disaster-recovery.md)
+- [Velero](velero-backups.md) deployment as the main DR tool
+- Default application backup profiles for supported applications
+
+[Postgres-As-A-Service](postgres.md)
+- A [simple Postgres deployment](postgres-simple.md) for prototyping, development
+- [CrunchyData Postgres Operator](postgres-pgo.md) for deploying highly available, scalable, performant Postgres clusters on your K8s cluster.  
+
 Cluster Management
 - The newly provisioned cluster is registered into your Rancher instance, so RBAC, Monitoring, Catalog, Etcd backups and other management features are available for it.
 
@@ -34,6 +42,6 @@ Cluster Management
 
 After the cluster is fully provisioned, you can immediately start manually installing applications from Rancher's Catalogs via the Rancher UI or with Helm.
 
-SolaKube also supports the deployment of a small set of popular applications/components manually or automatically, as part of the cluster deployment process. 
+SolaKube also supports the deployment of a small set of [popular applications/components](applications.md) manually or automatically, as part of the cluster deployment process. 
 
-More details on the [Applications page](applications.md).
+More details on the [Applications & Components page](applications.md).
