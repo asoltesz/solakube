@@ -15,19 +15,23 @@ These include:
 - Reasonable defaults for less-well-tuned Helm charts
 - Application specific fine-tuning (e.g.: sync-client HTTPS settings for Nextcloud) 
 
-# BackBlaze B2 support for S3-compatible storage
+# Components
+
+## BackBlaze B2 support for S3-compatible storage
 
 In case you prefer B2, you can use it from your cluster services via Minio.
 
 See the [BackBlaze B2 page](backblaze-b2-s3-storage.md)
 
-# Postgres Database Service
+## Postgres Database Service
 
 SolaKube supports the deployment of Postgres onto your cluster and simplifies database/user creation for applications needing a database.  
 
 See the [Postgres page for details](postgres.md). 
 
-# NextCloud (groupware + online office)
+# Applications
+
+## NextCloud (groupware + online office)
 
 NextCloud is an open-source groupware server (files, contacts, calendars, chat) that also provides you with the ability for online, collaborative office document editing.  
 
@@ -35,7 +39,7 @@ Features in detail on the [Nextcloud website](https://nextcloud.com/).
 
 SolaKube support in the [deployer docs page](nextcloud.md)
 
-# Redmine (Task / Issue / Project Management)
+## Redmine (Task / Issue / Project Management)
 
 Redmine is a lightweight issue and project management software.
 
