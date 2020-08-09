@@ -79,6 +79,9 @@ export SK_DEPLOY_GITEA="Y"
 # Whether to install the Redmine Issue/Project Management Server
 # export SK_DEPLOY_REDMINE="Y"
 
+# Whether to install the Jenkins CI/CD server
+export SK_DEPLOY_JENKINS="Y"
+
 # Whether to install the Nextcloud Groupware
 export SK_DEPLOY_NEXTCLOUD="Y"
 
@@ -362,7 +365,6 @@ export PGADMIN_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 # Whether the built-in backup profile (Velero) can be deployed
 export PGADMIN_BACKUP_ENABLED="Y"
 
-
 # ------------------------------------------------------------------------------
 # Private Docker Registry (by Docker)
 # ------------------------------------------------------------------------------
@@ -495,6 +497,53 @@ export NEXTCLOUD_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 # Whether the built-in backup profile (Velero) can be deployed
 export NEXTCLOUD_BACKUP_ENABLED="Y"
+
+# ------------------------------------------------------------------------------
+# Jenkins CI/CD Server
+# ------------------------------------------------------------------------------
+
+#
+# The password for the 'admin' user of Jenkins (the main administrative user).
+#
+export JENKINS_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+# The email address of the 'admin' user of Jenkins (the main administrative user).
+export JENKINS_ADMIN_EMAIL="${SK_ADMIN_EMAIL}"
+
+# The size of the persistent storage for the application
+# export JENKINS_PVC_SIZE="5Gi"
+
+# The short-name/id of the main Git repo host you will typically check-out
+# sources with Jenkins (e.g.: "github" or "internal-gitlab"
+export JENKINS_MAIN_GIT_ID="company-repo"
+
+# The base URL of the repos on the main repo host
+# E.g.: https://github.com
+export JENKINS_MAIN_GIT_BASE_URL="https://our-company-repo.com"
+
+# The username for the main Git repo host that can be used for Jenkins
+# to check out sources for build jobs
+export JENKINS_MAIN_GIT_USERNAME="xxxxx"
+
+# The password belonging to the username for the main Git repo host
+export JENKINS_MAIN_GIT_PASSWORD="xxxxx"
+
+#
+# The repo path of a test Git repo that can be used for creating a sample
+# job for validating the Jenkins installation.
+# This will be attached to the main Git repo (JENKINS_MAIN_GIT_BASE_URL)
+# to form a full repo URL.
+#
+# E.g.: my-app/sources.git
+#
+# If this is provided, a sample Job will be deployed into Jenkins that
+# checks out this repository with the main git credentials.
+#
+# export JENKINS_MAIN_GIT_TEST_REPO_PATH="group/my-test-project.git"
+
+# Whether the built-in backup profile (Velero) can be deployed
+# export JENKINS_BACKUP_ENABLED="Y"
+
 
 # ------------------------------------------------------------------------------
 # WordPress CMS

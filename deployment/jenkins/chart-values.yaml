@@ -1,0 +1,48 @@
+
+# The CI/CD coordinator pod
+master:
+    # We do not use changeable tags like "lts" and "latest"
+    tag: 2.235.3-lts
+
+    adminUser: "admin"
+    adminPassword: ${JENKINS_ADMIN_PASSWORD}
+
+    resources:
+        requests:
+            cpu: "100m"
+            memory: "256Mi"
+        limits:
+            cpu: "2000m"
+            memory: "512Mi"
+
+    # Forcing Jenkins into the container memory allocation
+    javaOpts: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+
+    podAnnotations:
+        backup.velero.io/backup-volumes: "jenkins-home"
+
+    # Readiness probe starts earlier, tests more often and waits a bit more
+    healthProbes: true
+    healthProbeReadinessInitialDelay: 30
+    healthProbeReadinessPeriodSeconds: 5
+    healthProbeReadinessFailureThreshold: 15
+    healthProbesReadinessTimeout: 5
+
+    additionalPlugins:
+    - job-dsl:1.77
+
+    jenkinsUrl: https://${JENKINS_FQN}
+    jenkinsAdminEmail: ${JENKINS_ADMIN_EMAIL}
+
+    JCasC:
+        enabled: true
+
+# Agent
+agent:
+    idleMinutes: 10
+
+    # Pod templates in a separate file since most likely need editing
+    # podTemplates:
+
+persistence:
+    existingClaim: ${JENKINS_APP_NAME}
