@@ -1,6 +1,14 @@
 # Gitea
 
-Gitea is a lightweight GitHub clone, ideal for smaller development teams.
+Gitea is a lightweight GitHub clone for managing Git repositories, pull-requests, code-reviews and providing developers with limited wikis and issue management.
+
+Ideal for smaller development teams.
+
+Its main purpose is Git repo management which can used for both code development and configuration version control.
+
+The issues management side of Gitea is fairly limited (like GitHub) when compared to Redmine, JIRA or other full-blown issue managers. Thus, suitable only if the issues are mostly code-related and there is no need for complex task organization.   
+
+Wiki functionality is also fairly basic so it is suitable only for simple documentation. For more-complex editing and document/knowledge management, Redmine may be a better choice.
 
 Supported version: 1.12.2
 

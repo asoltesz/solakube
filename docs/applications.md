@@ -29,6 +29,16 @@ SolaKube supports the deployment of Postgres onto your cluster and simplifies da
 
 See the [Postgres page for details](postgres.md). 
 
+# Developer Tools
+
+## Gitea (Git Repo Manager)
+
+Gitea is a lightweight GitHub clone for managing Git repositories, pull-requests, code-reviews and providing developers with limited wikis and issue management.
+
+Features in detail on the [Gitea project website](https://gitea.io).
+
+SolaKube support in the [deployer docs page](gitea.md)
+
 # Applications
 
 ## NextCloud (groupware + online office)
