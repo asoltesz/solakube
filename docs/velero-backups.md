@@ -238,7 +238,7 @@ For example, in case of a 'secondary' backup profile:
 Deploying a secondary filesystem backup profile:
 
 ~~~
-sk velero backup pgadmin secondary
+sk velero backup schedule pgadmin secondary
 ~~~
 
 
@@ -271,7 +271,7 @@ kubectl describe pod/nextcloud-XXXXXXX-XXXXX \
 Back up an application (only those PVCs are backed up with Restic which are specifically annotated via their pod)
 
 ~~~
-sk velero nextcloud backup default execute 
+sk velero backup execute nextcloud 
 ~~~
 
 Check the backup results according to the instructions on screen
@@ -300,7 +300,7 @@ kubectl delete namespace nextcloud
 
 Restore the manual backup you took before destroying the Nextcloud namespace.
 ~~~
-sk velero nextcloud restore default "--from-backup=nextcloud-default-20200724-2333"
+sk velero restore nextcloud default "--from-backup=nextcloud-default-20200724-2333"
 ~~~
 
 ## Check the application

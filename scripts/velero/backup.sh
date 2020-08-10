@@ -11,6 +11,8 @@
 # 1 - Command to execute ("execute" or "schedule")
 #     - "execute" - A backup is executed immediately
 #     - "schedule" - A periodic backup is scheduled for the future
+# 2 - The application to work with (e.g: "nextcloud")
+# 3 - The profile to be used (e.g.: "default")
 #
 # Expects the following variables set in the shell:
 # - APPLICATION
@@ -36,6 +38,23 @@ if [[ ${OPERATION} != "execute" ]] && [[ ${OPERATION} != "schedule" ]]
 then
     echo "ERROR: Illegal Velero backup operation: ${OPERATION}"
     exit 1
+fi
+
+APPLICATION=$2
+
+if [[ ! "${APPLICATION}" ]]
+then
+    echo "ERROR: Application/component not specified (e.g.: 'nextcloud'). Aborting."
+    exit 1
+fi
+
+PROFILE=$3
+
+if [[ ! "${PROFILE}" ]]
+then
+    PROFILE="default"
+else
+    shift
 fi
 
 echoHeader "Velero backup ${OPERATION} for ${APPLICATION}"

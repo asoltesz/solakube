@@ -4,7 +4,9 @@
 #
 # Restores a filesystem backup from the backup repository
 #
-# 1 - The backup selector options for Velero
+# 1 - The application to work with (e.g: "nextcloud")
+# 2 - The profile to be used (e.g.: "default")
+# 3 - The backup selector options for Velero
 #     If not specified, the last backup of the daily schedule of the
 #     profile will be targeted
 #
@@ -19,7 +21,25 @@
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
-BACKUP_SELECTOR=$1
+APPLICATION=$1
+
+if [[ ! "${APPLICATION}" ]]
+then
+    echo "ERROR: Application/component not specified (e.g.: 'nextcloud'). Aborting."
+    exit 1
+fi
+
+PROFILE=$2
+
+if [[ ! "${PROFILE}" ]]
+then
+    PROFILE="default"
+else
+    shift
+fi
+
+
+BACKUP_SELECTOR=$3
 
 echoHeader "Velero: Restoring with the '${PROFILE}' profile for ${APPLICATION}"
 
