@@ -180,3 +180,67 @@ defineS3AccessParams() {
     done
 
 }
+
+#
+# Resolves the SolaKube resource file or folder based on the SK_ROOTS
+# variable (a script, deployment file...etc).
+#
+# Checks SK_ROOTS in order a checks if the specified path exists relative to
+# one of the roots. Echos the first full path that was valid.
+#
+# Returns false (non-0 return code) if it cannot resolve the file/folder at all.
+#
+# 1 - The path of the resource file relative to one of the root folders
+#     listed in SK_ROOTS
+#
+function resolvePathOnRoots() {
+
+    local relPath=$1
+
+    local root
+
+    for root in ${SK_ROOTS//:/ }
+    do
+        local fullPath="${root}/${relPath}"
+
+        if [[ -f "${fullPath}" ]] || [[ -d "${fullPath}" ]]
+        then
+            echo "${fullPath}"
+            return
+        fi
+    done
+
+    false
+}
+
+
+
+#
+# Normalizes a single config variable by creating a new, shorter variable name
+# by taking off the prefix and - optionally - adding back a new, shorter prefix.
+#
+# For example. We have a variable named as NEXTCLOUD_BACKUP_SCHEDULE_DAILY but
+# we would like to have a shorter version named BACKUP_SCHEDULE_DAILY.
+# By setting the "NEXTCLOUD" prefix, the value of the old/long variable will be
+# set into the shorter named variable.
+#
+# 1 - short variable name (e.g.: BACKUP_SCHEDULE_DAILY)
+# 2 - prefix (e.g.: NEXTCLOUD)
+# 3 - new prefix prepended to the short variable ame (optional)
+#
+function normalizeVariable {
+
+    local varName=$1
+    local prefix=$2
+    local newPrefix=$3
+
+    local var="${prefix}_${varName}"
+
+    # echo "Normalizing: $var (${!var})"
+
+    [[ ! -z ${newPrefix} ]] && varName="${newPrefix}_${varName}"
+
+    export ${varName}=${!var}
+    # echo "Exported: $varName (${!varName})"
+}
+

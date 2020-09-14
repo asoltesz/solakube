@@ -30,8 +30,7 @@ fi
 . ${SK_SCRIPT_HOME}/deploy/deploy-shared.sh
 
 # Deploy script storage folder
-export DEPLOY_SCRIPTS_DIR=${SK_SCRIPT_HOME}/deploy/${DEPLOY_COMPONENT}
-
+export DEPLOY_SCRIPTS_DIR=$(resolvePathOnRoots "scripts/deploy/${DEPLOY_COMPONENT}")
 # Deploy script storage folder
 if [[ ! -d "${DEPLOY_SCRIPTS_DIR}" ]]
 then
@@ -39,8 +38,8 @@ then
     exit 1
 fi
 
-# Deployment descriptor storage folder
-export DEPLOYMENT_DIR=${SK_DEPLOYMENT_HOME}/${DEPLOY_COMPONENT}
+# Deployment descriptor storage folder for this specific deployment
+export DEPLOYMENT_DIR=$(resolvePathOnRoots "deployment/${DEPLOY_COMPONENT}")
 
 # Stepping into the deployment descriptor folder of the component for
 # simple KubeCtl executions

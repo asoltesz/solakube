@@ -19,9 +19,9 @@ shift
 . ${SK_SCRIPT_HOME}/deploy/deploy-shared.sh
 
 # Velero script storage folder
-export REGISTRY_SCRIPTS_DIR=${SK_SCRIPT_HOME}/registry
+export REGISTRY_SCRIPTS_DIR="$(resolvePathOnRoots "scripts/registry")"
 
-export REGISTRY_DEPLOYMENT_DIR=${SK_DEPLOYMENT_HOME}/registry
+export REGISTRY_DEPLOYMENT_DIR="$(resolvePathOnRoots "deployment/registry")"
 
 cd "${REGISTRY_DEPLOYMENT_DIR}"
 

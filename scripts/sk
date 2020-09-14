@@ -14,7 +14,7 @@
 # --------------------------------
 # Path of the current script
 SOURCE="${BASH_SOURCE[0]}"
-while [ -h "${SOURCE}" ]; do # resolve $SOURCE until the file is no longer a symlink
+while [[ -h "${SOURCE}" ]]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
   SOURCE="$(readlink "$SOURCE")"
   [[ ${SOURCE} != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
@@ -24,8 +24,6 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 # Home of the scripts, if not yet set
 export SK_SCRIPT_HOME="${DIR}"
-# Home of the deployment descriptors
-export SK_DEPLOYMENT_HOME="${DIR}/../deployment"
 
 # Loading the shared library
 . ${SK_SCRIPT_HOME}/sk-shared.sh
@@ -44,6 +42,17 @@ fi
 # Loading variables
 . ~/.solakube/${SK_CLUSTER}/variables.sh
 
+# If the SK_ROOTS has not been set, we construct it
+if [[ -z "${SK_ROOTS}" ]]
+then
+    export SK_ROOTS="$(realpath "${SK_SCRIPT_HOME}/..")"
+
+    if [[ -d "${SK_PROJECT_HOME}" ]]
+    then
+        export SK_ROOTS="${SK_ROOTS},${SK_PROJECT_HOME}"
+    fi
+fi
+
 
 # ------------------------------
 # Execute the sub-script
@@ -60,7 +69,7 @@ fi
 if [[ "${COMMAND}" != "SK_NO_COMMAND" ]]
 then
 
-    COMMAND_SCRIPT="${SK_PROJECT_HOME}/scripts/sk-${COMMAND}.sh"
+    COMMAND_SCRIPT="$(resolvePathOnRoots "scripts/sk-${COMMAND}.sh")"
 
     if [[ ! -f "${COMMAND_SCRIPT}" ]]
     then
