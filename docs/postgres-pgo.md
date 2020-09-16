@@ -1,6 +1,6 @@
 # CrunchyData Postgres Operator
 
-For quick and simple Postgres installations, the 'postgres' deployer can be used but that is limited in capabilities (see [the postgres deployer page](postgres.md) for details). 
+For quick and simple Postgres installations, the 'postgres-simple' deployer can be used but that is limited in capabilities (see [the postgres deployer page](postgres.md) for details). 
 
 For higher-end Postgres setups, SolaKube supports the deployment of the [CrunchyData Postgres Operator](https://github.com/CrunchyData/postgres-operator) (PGO in short), which is the subject of this documentation page. 
 
@@ -40,6 +40,7 @@ PGO allows for the easy creation of several PG clusters within your K8S cluster.
 
 Each PG clusters may have separate resource allocation and storage settings. 
 E.g.: 
+
 - a production cluster may be created with fast, local disks, big resource allocation and proper backups (local + S3 bucket)
 - a staging (pre-prod) cluster can be created with similar resources than the production but with no backups
 - a developer cluster may be created with slower storage, limited resources and no backups
@@ -47,7 +48,7 @@ E.g.:
 
 Optionally, you may place each PG clusters into their own K8S namespace or keep all of them in the same namespace. NOTE: SolaKube places all of the clusters in the same namespace called "pgo" (which also hosts the operator itself).
 
-NOTE: SolaKube commands always target a single cluster (PGO_CLUSTER_NAME var) 
+NOTE: SolaKube commands always target a single Postgres/PGO cluster (defined by the PGO_CLUSTER variable) 
 
 ## Multi-cluster user management
 
@@ -73,11 +74,11 @@ SK tries to use sensible defaults, assuming a non-trivial, production setup and 
 
 pgBackrest is always deployed to allow healing failed primaries and standbys. WAL files are always stored, in sync with the full backups saved into the pgBackrest storage spaces.
 
-SK backup support only target physical backups with pgBackrest so you cannot upgrade/migrate between Postgres version via these backups. However, logical backups can be taken by using the PGO client directly (see the PGO documentation).
+SK's backup support only targets physical backups with pgBackrest so you cannot upgrade/migrate between Postgres version via these backups. However, logical backups can be taken by using the PGO client directly (see the PGO documentation).
 
 Unless specifically disabled, SK will deploy scheduling for automatic, periodic full backups for the first day of every month. 
 
-Incremental backups will only be scheduled if you provide the schedule for it (see Configuration). Since WAL files following the full backups are always stored, you only need incremental backups if there are too many writes to your database, so that WAL file replay would take too much time in case of a disaster right before the next full backup.
+Incremental backups will only be scheduled if you provide the schedule for it (see Configuration). Since WAL files following the full backups are always stored, you only need incremental backups if your disaster recovery time limit requires them. For example, when there is high write activity on the database, so that a month-long WAL file-replay would take too much time (in case of a disaster right before the next full/monthly backup).
 
 If OpenEBS is available on your cluster (can be deployed with sk), SolaKube will default to using local disks for maximum database performance (see Storage Configuration).
 
@@ -85,51 +86,89 @@ If OpenEBS is available on your cluster (can be deployed with sk), SolaKube will
 
 The following variables need to be defined in variables.sh. 
 
-SolaKube commands helps managing a single PG cluster at a time (identified by PGO_CLUSTER_NAME).
+SolaKube commands helps managing a single PG cluster at a time (identified by PGO_CLUSTER).
 
-## PGO_CREATE_CLUSTER
+## PGO-global variables
+
+### PGO_CREATE_CLUSTER
 
 (Y)es or (N)o.
 
 Defaults to (Y).
 
-Whether it is allowed to automatically create the configured Postgres DB cluster after the operator has been deployed to the K8s cluster.
+Whether it is allowed to automatically create the configured, default Postgres DB cluster after the operator has been deployed to the K8s cluster.
 
-It can be set to (N)o if you want to manually create the cluster. In this case, only the operator will be deployed.
+It can be set to (N)o if you want to manually create the first Postgres DB cluster. In this case, only the operator itself will be deployed.
 
-## PGO_CLUSTER_NAME
+### PGO_CURRENT_CLUSTER
 
-The name of the Postgres cluster SolaKube should target.
+The name of the currently selected cluster definition for SolaKube scripts.
 
-If not provided, it defaults to "hippo" (as in the examples of PGO).
+If a PGO-related SolaKube command doesn't get a specific cluster name as a parameter, this will be used instead.
 
-## PGO_ADMIN_PASSWORD
+If not set, defaults to **"default"**.
+
+In case, it is "default", the simple/shorter SolaKube variables will be used to describe the DB cluster for PGO. (for example: **PGO_CLUSTER_ADMIN_USERNAME**).
+
+In case it is a non-default DB cluster (e.g. "nextcloud"), then the longer, fully-qualified SolaKube DB cluster variable names will be used. For example: **NEXTCLOUD_PGO_CLUSTER_ADMIN_USERNAME**) 
+
+### PGO_ADMIN_PASSWORD
 
 The password for the root PGO administrator user that can create new Postgres clusters, delete them, can start manual backups, restores...etc.
 
 Optional, defaults to: SK_ADMIN_PASSWORD
 
-## POSTGRES_ADMIN_USERNAME
+## DB-cluster-specific variables 
 
-Admin username for the targeted Postgres cluster.
+All configuration variables that has with PGO_CLUSTER_ or <clustername>_PGO_CLUSTER_ are cluster specific.
+
+Cluster specific variables can be defined in two form:
+
+- Variable for the default DB cluster. These are shorter, since the variable name omits the name of the DB cluster. E.g.: PGO_CLUSTER_ADMIN_USERNAME.
+- Variable for a non-default cluster. E.g.: PGO_WORDPRESS_CLUSTER_ADMIN_NAME
+
+
+All variables (e.g.: PGO_CREATE_CLUSTER) are PGO-global and can be defined only once.
+
+### PGO_CLUSTER_NAME
+
+The name of the Postgres cluster within PGO.
+
+Typically, it is the same as PGO_CURRENT_CLUSTER since it is highly recommended using the same cluster names within SolaKube as they are named within PGO.
+
+Nevertheless, it is possible to use a different cluster name within PGO as in SolaKube via this variable. 
+
+If not provided, it defaults to "default".
+
+### PGO_CLUSTER_APP_USERNAME
+
+Application (non-dba) username for the Postgres cluster.
+
+Defaults to the name of the PGO cluster (PGO_CLUSTER_NAME).
 
 A user with this name will be created in the newly created Postgres db cluster.
 
-Other SolaKuba deployers - that need to automatically create/provision a database within the cluster - will also need this to be configured in variables.sh (e.g.: Nextcloud).
+### PGO_CLUSTER_APP_PASSWORD
 
-## POSTGRES_ADMIN_PASSWORD
+Password for the default application (non-dba) user in the postgres cluster.
 
-Admin password for the targeted Postgres cluster.
+Optional, defaults to the SK_ADMIN_PASSWORD base variable.
 
-If the admin username is 'postgres', this will be auto-generated and cannot be set. In this case look it up from the console log or reset it with the "pgo update user ..." command (see CrunchyData documentation for exact syntax)
+### PGO_CLUSTER_ADMIN_PASSWORD
 
-## POSTGRES_SERVICE_HOST
+Admin password for the targeted Postgres cluster (for the postgres user).
 
-The hostname, on which the targeted PG cluster is visible for services that need a database (e.g.: Nextcloud.
+Optional, defaults to the SK_ADMIN_PASSWORD base variable.
 
-By Kubernetes rules, this is <clustername>.<namespace>, so in case of hippo, it is "hippo.pgo" (SolaKube uses the "pgo" namespace for clusters). 
+### PGO_CLUSTER_SERVICE_HOST
 
-## S3 access parameters
+The hostname, on which the targeted PG cluster is visible for in-cluster services that need a database (e.g.: Nextcloud).
+
+By Kubernetes rules, this is <clustername>.<namespace>, so in case of hippo, it is "hippo.pgo" (SolaKube uses the "pgo" namespace for clusters).
+
+Optional, defaults to <PGO_CLUSTER_NAME>.pgo
+
+### S3 access parameters
 
 If you want to be able to backup your cluster to an offsite S3-compatible storage location, you need to provide your S3 access parameters.
 
@@ -141,7 +180,7 @@ The PGO_CLUSTER_S3_REPO_PATH specifies the folder of the backups within the S3 c
 /backrestrepo/hippo-backrest-shared-repo
 ~~~ 
 
-## S3 certificates
+#### S3 certificates
 
 PGO/pgBackrest requires that you provide the full public certificate chain for the S3 service.
 
@@ -151,7 +190,7 @@ Place all of them in the following file:
 ~/.solakube/${SK_CLUSTER}/s3-cert-chain.pem
 ~~~
 
-You can get the certificate chain from your provider with the openssh client tools:
+You can get the certificate chain from your provider with the OpenSSH client tools:
 
 ~~~
 openssl s_client -connect s3.eu-central-1.wasabisys.com:443 2>/dev/null </dev/null |  sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'
@@ -165,79 +204,76 @@ openssl s_client -connect s3.eu-central-1.wasabisys.com:443
 
 You manually need to export the root certificates in PEM and include them in the file. I use the Firefox gui for this since that includes all current root certificates the S3 services usually refer to.
 
-## Resource allocations
+### Resource allocations
 
 You will need enough CPU and memory allocated for your Postgres pods in order to allow them serving the load you subject them to.
 
 SolaKube does not try to set the requests/limits for pgBackrest and other components, use PGO_CLUSTER_CREATE_EXTRA_OPTIONS to supply these if needed. 
  
-### PGO_CLUSTER_MEMORY
+#### PGO_CLUSTER_MEMORY
 
 The minimum memory allocation requested for the Postgres pods (in Kubernetes memory units).
 
 Kubernetes will always reserve this amount of memory on the node, and the PG pod will not be able to schedule on a node if there is not at least this amount available.
  
-### PGO_CLUSTER_MEMORY_LIMIT
+#### PGO_CLUSTER_MEMORY_LIMIT
 
 The maximum memory allocation possible for the Postgres pods (in Kubernetes memory units).
 
 Optional, no default.
 
+If not defined, the Postgres pod may use as much memory on the node as available.
+
+In production Kubernetes workloads, it is recommended that memory limits are set.
+
 Kubernetes may kill the postgres pod if it consumes more than this amount of memory.
   
-### PGO_CLUSTER_CPU
+#### PGO_CLUSTER_CPU
 
 The minimum CPU allocation requested for the Postgres pods.
 
 Kubernetes will always reserve this amount of CPU on the node, and the PG pod will not be able to schedule on a node if there is not at least this amount available.
  
-### PGO_CLUSTER_CPU_LIMIT
+#### PGO_CLUSTER_CPU_LIMIT
 
 The maximum CPU allocation possible for the Postgres pods.
 
 Optional, no default.
 
-
-### PGO_CLUSTER_MEMORY_LIMIT
-
-The minimum memory allocation requested for the cluster in Kubernetes memory units.
-
-Defaults to: 256Mi
-
-Kubernetes will always reserve this amount of memory on the node for the node, and the PG node will not be able to schedule on a node if there is not at least this amount available.
+In production Kubernetes workloads, it is recommended that cpu limits are set.
 
 
-## (A)synchronous replication configuration
+### (A)synchronous replication configuration
 
-This concerns the way how streaming replication works between the database nodes of the cluster.
+This concerns the way how streaming replication works between the database nodes of a PG cluster.
 
 Streaming replication is the fastest way to put your Postgres-managed data into a safe place (into one or more standby databases) but even that has two levels of safety.  
 
 With synchronous replication the primary database node will not finish a transaction until it is replicated to at least one standbys. This is the safest, but slowest solution and requires the standby databases to be as fast as the primary.
 
-In case of async replication, the cluster primary node can work faster but the chance of loosing data is higher since the primary can finish a transaction before it is replicated to a standby. In this case your standby nodes can be slower but on average they must be able to keep up with the primary.
+In case of async replication, the cluster primary node can work faster but the chance of loosing data is higher since the primary can finish a transaction before it is replicated to a standby. In this case your standby nodes can be slower but on average they must still be able to keep up with the primary.
 
 In contrast with streaming replication, WAL file archiving are much slower since they take 1-2 minutes to reach the safety of the pgbackrest backup repository (although the level of safety can be higher in case of an offsite S3 location).
 
 The default with SolaKube is async, but the operator default setting can be changed in the [inventory.ini](../deployment/pgo/inventory.ini) of PGO before deploying the operator (the "sync_replication" key).
 
-Also, you can use the PGO_CLUSTER_CREATE_EXTRA_OPTIONS to supply the "--sync-replication" extra option when creating a cluster to put it in sync mode.
+Also, you can use the PGO_CLUSTER_CREATE_EXTRA_OPTIONS to supply the "--sync-replication" extra option when creating a cluster to put it in synchronous replication mode.
 
-## PGO_CLUSTER_REPLICA_COUNT
+### PGO_CLUSTER_REPLICA_COUNT
 
 The number of database nodes in the PG cluster.
 
 Defaults to 0 (a single primary, no standby replicas).
 
-## PGO_CLUSTER_CREATE_EXTRA_OPTIONS
+### PGO_CLUSTER_CREATE_EXTRA_OPTIONS
 
 Extra options for the ["pgo create cluster"](https://access.crunchydata.com/documentation/postgres-operator/4.3.2/pgo-client/reference/pgo_create_cluster/) command not covered by any of the PGO_CLUSTER_ variables of SolaKube.
 
 This can be utilized if the SolaKube/PGO create mechanism is mostly OK but you want to include some extra options.
 
-## Backup parameters
+### Backup parameters
 
-### PGO_CLUSTER_BACKUP_LOCATIONS
+#### PGO_CLUSTER_BACKUP_LOCATIONS
 
 The backup locations for scheduled/manual database backups and the continuous WAL file archiving.
 
@@ -245,13 +281,13 @@ It can be "s3", "local,s3" or "local".
 
 If you provide the S3 bucket name (see S3 access parameters), it will auto-default to "local,s3", otherwise, defaults to "local".
 
-#### s3
+##### s3
 
 Backups will only be stored in S3. 
 
 A local pgBacrest repo will still be created for node healing (WAL files) and scale-out but cannot hold backups.
 
-#### local,s3
+##### local,s3
 
 Backups can be stored in both s3 and the local pgBackrest repository
 
@@ -259,15 +295,15 @@ Manually started backups can specify both as backup target, so different backups
 
 Both repositories will contain the WAL files as soon as can be shipped to them from the primary.
 
-#### local 
+##### local 
 
 Backups will only be stored in the local, in-cluster pgBackrest repositories.
 
 In this case, there is no offsite backup, so if the whole K8s cluster or only the critical data PVCs are lost, you cannot recover from the disaster.
 
-Only suitable if your pgBackrest repository storage class ensures the availability needed for your Disaster Recovery requirements (see Storage Configuration). 
+Only suitable if your pgBackrest repository storage class ensures the availability needed for your Disaster Recovery requirements (see Storage Configuration). Should only be used with durable storage (e.g.: Hetzner Cloud Volumes which stores all data on 3 machines). 
 
-### PGO_CLUSTER_BACKUP_SCHEDULED_LOCATIONS
+#### PGO_CLUSTER_BACKUP_SCHEDULED_LOCATIONS
 
 The storage locations of scheduled backups.
 
@@ -275,15 +311,15 @@ Accepts the same values as the generic config (PGO_CLUSTER_BACKUP_LOCATIONS).
 
 Can only be a target that is also included in PGO_CLUSTER_BACKUP_LOCATIONS, otherwise scheduled backups will fail.
 
-### PGO_CLUSTER_BACKUP_FULL_SCHEDULE
+#### PGO_CLUSTER_BACKUP_FULL_SCHEDULE
 
 The cron schedule of the full backups.
 
-If not specified in variables.sh, full backups will not be scheduled.
+If not specified, full backups will not be scheduled.
 
 If the schedule script is started manually, it defaults to "0 0 1 * *" (on the first day of each month, at 00:00)
 
-### PGO_CLUSTER_BACKUP_FULL_RETENTION
+#### PGO_CLUSTER_BACKUP_FULL_RETENTION
 
 The number of full backups to retain 
     
@@ -291,7 +327,7 @@ Defaults to 6.
 
 Together with the default schedule, this results in a full backup retention for 6 months. (unless manual backups are made, which will shorten it)
 
-### PGO_CLUSTER_BACKUP_INCR_SCHEDULE 
+#### PGO_CLUSTER_BACKUP_INCR_SCHEDULE 
 
 The cron schedule for incremental backups.
 
@@ -299,7 +335,7 @@ It has no default.
 
 If not specified, incremental backups will not be scheduled and only full backups + WAL will be used for recoveries (this may take longer than with incremental backups if a lot of WALs have been collected since the last full backup).
 
-## Storage configuration
+### Storage configuration
 
 A PGO-managed Postgres cluster uses Kubernetes Persistent Volume Claims (PVCs) to allocate storage for various components.
 
@@ -358,6 +394,7 @@ This should:
 
 - Deploy the PGO operator on the cluster
 - Create the default/first Postgres DB cluster with all of its components (if not disabled)
+- Create the local pdBackrest repository within the cluster
 - Create the pdBackrest repository in your S3 bucket (if S3 is configured))
 - Create an initial, full backup, starts streaming the WAL files
 - Schedules the automatic full backups (if schedule is provided)
@@ -387,6 +424,12 @@ sk pgo create-cluster
 ~~~
 
 NOTE: You can create several PG clusters by modifying the PGO_CLUSTER_NAME variable, optionally changing the config parameters, and re-executing the command. 
+
+The create-cluster command also accepts the SolaKube name of the DB cluster like this:
+
+~~~
+sk pgo create-cluster hippo
+~~~
 
 ## Testing the cluster
 
@@ -430,6 +473,8 @@ sk pgo backup "local" "incr"
 sk pgo backup "" "full" 1200
 ~~~
 
+If you have multiple PG clusters, ensure the PGO_CURRENT_CLUSTER is set appropriately.
+
 In more complex cases, start a PGO client shell (see earlier) and execute a manually constructed pgo backup command.
 
 ## Restoring a PG cluster from backups
@@ -451,13 +496,17 @@ With the following SolaKube command:
 sk pgo create-cluster hippo Y 
 ~~~
 
-The S3 access parameters need to be configured for the cluster (see configuration).
+In this case "hippo" is the name of the cluster in SolaKube.
+
+The S3 access parameters need to be configured for the DB cluster (see configuration).
 
 After the successful recovery, you need to manually promote the cluster from standby state (read-only) to working (read/write):
 
 ~~~
 pgo update cluster hippo --promote-standby
 ~~~ 
+In this case "hippo" is the name of the cluster in PGO.
+
 
 ### When the DB cluster is not completely lost
 
@@ -482,6 +531,8 @@ sk pgo restore s3 "2020-06-07 19:20:00.000000-02"
 # (default tracking stops at 10 minutes)
 sk pgo restore local "2020-06-07 19:20:00.000000-02" 1800
 ~~~
+
+If you have multiple PG clusters, ensure the PGO_CURRENT_CLUSTER is set appropriately.
 
 # Miscellaneous
 

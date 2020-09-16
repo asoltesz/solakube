@@ -94,7 +94,7 @@ fi
 #
 # Installing PostgreSQL DBMS
 # ------------------
-if [[ "${SK_DEPLOY_POSTGRES_SIMPLE}" == "Y" ]]
+if [[ "${SK_DEPLOY_PGS}" == "Y" ]]
 then
     . ${SK_SCRIPT_HOME}/sk deploy postgres-simple
     checkResultExit "Deploying PostgreSQL to the cluster"

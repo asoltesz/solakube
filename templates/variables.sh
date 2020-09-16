@@ -270,29 +270,26 @@ export VELERO_S3_BUCKET_NAME="andromeda-velero-backups"
 
 
 # ------------------------------------------------------------------------------
-# PostgreSQL - Simple installation
+# PostgreSQL - Simple installation (PGS)
 # ------------------------------------------------------------------------------
 
-if [[ ${SK_DEPLOY_POSTGRES_SIMPLE} == "Y" ]]
-then
-    # The username of the admin user in the new cluster
-    export POSTGRES_ADMIN_USERNAME="postgres"
+# The username of the admin user in the new cluster
+export PGS_ADMIN_USERNAME="postgres"
 
-    # PostgreSQL admin user (DBA, typically called 'postgres') password
-    export POSTGRES_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
+# PostgreSQL admin user (DBA, typically called 'postgres') password
+export PGS_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 
-    # The namespace in which the Postgres service is installed
-    # If an external service is used, create a namespace called postgres-client
-    # to allow the pg client to run in it (for administrative pg commands)
-    export POSTGRES_NAMESPACE="postgres"
+# The namespace in which the Postgres service is installed
+# If an external service is used, create a namespace called postgres-client
+# to allow the pg client to run in it (for administrative pg commands)
+export PGS_NAMESPACE="pgs"
 
-    # The host name on which the Postgres service is available
-    # In case of an in-cluster Postgres, this ends with a namespace as the domain
-    export POSTGRES_SERVICE_HOST="postgres-postgresql.postgres"
+# The host name on which the Postgres service is available
+# In case of an in-cluster Postgres, this ends with a namespace as the domain
+export PGS_SERVICE_HOST="pgs-postgresql.pgs"
 
-    # Postgres persistent volume storage class (only if default is not suitable)
-    # export POSTGRES_STORAGE_CLASS=
-fi
+# Postgres persistent volume storage class (only if default is not suitable)
+# export PGS_STORAGE_CLASS=
 
 
 # ------------------------------------------------------------------------------
@@ -305,17 +302,20 @@ export PGO_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 if [[ ${SK_DEPLOY_PGO} == "Y" ]]
 then
     # The username of the admin user in the new cluster
-    export POSTGRES_ADMIN_USERNAME="hippo"
+    export POSTGRES_ADMIN_USERNAME="default"
     # The password of the admin user in the new cluster
     export POSTGRES_ADMIN_PASSWORD="${PGO_ADMIN_PASSWORD}"
     # The namespace in which the Postgres service is installed
     export POSTGRES_NAMESPACE="pgo"
     # The internal host name on which the Postgres service is available
-    export POSTGRES_SERVICE_HOST="hippo.pgo"
+    export POSTGRES_SERVICE_HOST="default.pgo"
 fi
 
-# The name of the targeted PG cluster (cluster identifier for PGO)
-export PGO_CLUSTER_NAME="hippo"
+# The currently selected PG cluster for SolaKube scripts
+export PGO_CURRENT_CLUSTER_NAME="default"
+
+# The name of the PG cluster in PGO (cluster identifier for PGO)
+export PGO_CLUSTER_NAME="default"
 
 # The S3 bucket needs to be defined to activate s3 backups by pgBackRest
 export PGO_CLUSTER_S3_BUCKET="${SK_CLUSTER}-postgres-backup"

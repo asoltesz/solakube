@@ -10,10 +10,10 @@
 #export PGO_NAMESPACE=pgo
 #
 ## Új DB cluster létrehozása
-#pgo create cluster hippo
+#pgo create cluster default
 #
 ## Clusterben a postgres admin user password-jének reset-elése
-#pgo update user hippo --username=postgres --password=solasola
+#pgo update user default --username=postgres --password=solasola
 #
 ## Egy futó feladat figyelése
 #pgo watch workflow <workflow>

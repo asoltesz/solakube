@@ -8,7 +8,7 @@ With this solution, you need to roll your own backup/restore strategy.
 
 # Configuration
 
-## POSTGRES_STORAGE_CLASS
+## PGSSTORAGE_CLASS
 
 The storage class for the database files (PVC).
 
@@ -21,7 +21,7 @@ Optional, defaults to the first available storage class listed in DEFAULT_STORAG
 By setting this in variables.sh:
 
 ~~~
-export SK_DEPLOY_POSTGRES_SIMPLE="Y"
+export SK_DEPLOY_PGS="Y"
 ~~~
 
 ## Manually, after the initial cluster build
@@ -29,16 +29,17 @@ export SK_DEPLOY_POSTGRES_SIMPLE="Y"
 By executing the deploy command:
 
 ~~~
-sk deploy postgres-simple
+sk deploy pgs
 ~~~
 
 # Using Postgres databases by other deployments/applications
 
-The Postgres access parameters - which are used by other deployers like Nextcloud - will automatically be configured for you:
+The Postgres access parameters - which are used by other deployers like Nextcloud - will automatically be configured for you when creating application databases:
 
 - POSTGRES_ADMIN_USERNAME
 - POSTGRES_ADMIN_PASSWORD
 - POSTGRES_SERVICE_HOST
+- POSTGRES_NAMESPACE
 
 See their docs and defaults in variables.sh.
  

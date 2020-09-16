@@ -12,21 +12,21 @@
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
-echoHeader "Undeploying the PostgreSQL DBMS from your cluster "
+echoHeader "Undeploying the PostgreSQL DBMS from your cluster (Postgres-Simple)"
 
-checkAppName "postgres"
+checkAppName "pgs"
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
 # ------------------------------------------------------------
-deleteHelmRelease postgres
+deleteHelmRelease "${PGS_APP_NAME}"
 
 # ------------------------------------------------------------
 echoSection "Deleting namespace"
 
-deleteNamespace ${POSTGRES_APP_NAME}
+deleteNamespace "${PGS_APP_NAME}"
 
 # ------------------------------------------------------------
-echoSection "Postgres has been removed from your cluster"
+echoSection "Postgres has been removed from your cluster  (Postgres-Simple)"
 

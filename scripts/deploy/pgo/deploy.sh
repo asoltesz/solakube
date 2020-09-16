@@ -155,21 +155,8 @@ if [[ "${OPERATION}" == "install" ]] && [[ "${PGO_CREATE_CLUSTER:-Y}" == "Y" ]]
 then
     echoSection "Creating the Postgres DB cluster"
 
-    ${SK_SCRIPT_HOME}/sk pgo create-cluster
+    ${SK_SCRIPT_HOME}/sk pgo create-cluster "default"
 
-    if [[ "${PGO_CLUSTER_BACKUP_FULL_SCHEDULE}" ]]
-    then
-        echo "Deploying the full backup schedule"
-
-        ${SK_SCRIPT_HOME}/sk pgo schedule-full-backups
-    fi
-
-    if [[ "${PGO_CLUSTER_BACKUP_INCR_SCHEDULE}" ]]
-    then
-        echo "Deploying the incremental backup schedule"
-
-        ${SK_SCRIPT_HOME}/sk pgo schedule-full-backups
-    fi
 fi
 
 

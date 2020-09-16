@@ -39,10 +39,7 @@ deleteNamespace ${REDMINE_APP_NAME}
 # ------------------------------------------------------------
 echoSection "Dropping the Postgres database of Redmine"
 
-processTemplate drop-pg-database.sql
-
-executePostgresAdminScript ${TMP_DIR}/drop-pg-database.sql ${POSTGRES_NAMESPACE} ${POSTGRES_SERVICE_HOST}
-
+dropPgApplicationDatabase ${REDMINE_APP_NAME}
 
 # ------------------------------------------------------------
 echoSection "Redmine has been removed from your cluster"

@@ -18,6 +18,8 @@
 HELM_CHART_VERSION=8.1.2
 POSTGRES_VERSION=11.6.0
 
+# Source the PGS shared library
+. ${SK_SCRIPT_HOME}/pgs/pgs-shared.sh
 
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
@@ -27,14 +29,14 @@ echoHeader "Deploying PostgreSQL (postgres) on your cluster"
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
-checkAppName "postgres"
+checkAppName "pgs"
 
-checkStorageClass "postgres"
+checkStorageClass "pgs"
 
 # ------------------------------------------------------------
 echoSection "Preparing temp folder"
 
-createTempDir "postgres"
+createTempDir "pgs"
 
 # ------------------------------------------------------------
 echoSection "Preparing Helm chart values"
@@ -45,7 +47,7 @@ processTemplate chart-values.yaml
 # ------------------------------------------------------------
 echoSection "Creating namespace"
 
-defineNamespace ${POSTGRES_APP_NAME}
+defineNamespace ${PGS_APP_NAME}
 
 # ------------------------------------------------------------
 echoSection "Creating PVC"
@@ -56,11 +58,11 @@ applyTemplate pvc.yaml
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install ${POSTGRES_APP_NAME} stable/postgresql \
-    --namespace ${POSTGRES_APP_NAME} \
+helm install ${PGS_APP_NAME} stable/postgresql \
+    --namespace ${PGS_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml \
-    --set postgresqlPassword=${POSTGRES_ADMIN_PASSWORD}
+    --set postgresqlPassword=${PGS_ADMIN_PASSWORD}
 
 # ------------------------------------------------------------
 

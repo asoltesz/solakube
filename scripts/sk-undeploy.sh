@@ -28,6 +28,10 @@ fi
 # Loading the deployment support shared library
 . ${SK_SCRIPT_HOME}/deploy/deploy-shared.sh
 
+# Loading the Postgres shared library since many application deployments
+# need to create a database for themselves
+. ${SK_SCRIPT_HOME}/postgres/postgres-shared.sh
+
 # Deploy script storage folder
 export DEPLOY_SCRIPTS_DIR="$(resolvePathOnRoots "scripts/deploy/${DEPLOY_COMPONENT}")"
 

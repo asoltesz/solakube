@@ -39,10 +39,7 @@ deleteNamespace ${JCR_APP_NAME}
 # ------------------------------------------------------------
 echoSection "Dropping the Postgres database of JCR"
 
-processTemplate drop-pg-database.sql
-
-executePostgresAdminScript ${TMP_DIR}/drop-pg-database.sql ${POSTGRES_NAMESPACE} ${POSTGRES_SERVICE_HOST}
-
+dropPgApplicationDatabase ${JCR_APP_NAME}
 
 # ------------------------------------------------------------
 echoSection "JFrog Container Registry has been removed from your cluster"

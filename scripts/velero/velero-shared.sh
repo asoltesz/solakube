@@ -1,24 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# Normalizes a single config variable
-#
-# 1 - variable name
-# 2 - prefix
-#
-function normalizeVariable {
-
-    local varName=$1
-    local prefix=$2
-
-    local var="${prefix}_${varName}"
-
-    # echo "Normalizing: $var (${!var})"
-
-    export ${varName}=${!var}
-    # echo "Exported: $varName (${!varName})"
-}
-
 
 #
 # Normalizes disaster recovery config/profile variables

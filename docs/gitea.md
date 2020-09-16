@@ -56,21 +56,6 @@ export SMTP_ENABLED="true"
 ...
 ~~~
 
-Make sure that you have the necessary Postgres parameters configured:
-
-~~~
-# PostgreSQL admin user (DBA, typically called 'postgres') password
-export POSTGRES_ADMIN_PASSWORD="xxx"
-
-# The namespace in which the Postgres service is installed or in which the
-# postgres client pod can execute
-export POSTGRES_NAMESPACE="postgres"
-
-# The host name on which the Postgres service is available
-export POSTGRES_SERVICE_HOST="postgres-postgresql.postgres"
-
-~~~
-
 # Deployment
 
 In case the deployment is part of the initial cluster build (sk build), set the appropriate deployer flag before building the cluster:

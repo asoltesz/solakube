@@ -55,6 +55,28 @@ paramValidation() {
 }
 
 #
+# Checks the existence of a namespace in the cluster.
+#
+# $1 - Name of the namespace
+#
+namespaceExists() {
+
+    local namespace=$1
+
+    # Checking the namespace, dropping error messages
+    local description="$(kubectl describe namespace ${namespace} 2> /dev/null)"
+
+    if [[ "${description}" ]]
+    then
+        # Namespace is present in the cluster
+        return
+    fi
+
+    false
+}
+
+
+#
 # Adds a namespace to the cluster if it doesn't exist.
 #
 # Defines the DEPLOY_NAMESPACE variable in the shell.
@@ -65,10 +87,7 @@ defineNamespace() {
 
     local namespace=$1
 
-    # Checking the namespace, dropping error messages
-    local description="$(kubectl describe namespace ${namespace} 2> /dev/null)"
-
-    if [[ "${description}" ]]
+    if namespaceExists "${namespace}"
     then
         echo "Namespace already present"
         export DEPLOY_NAMESPACE=${namespace}
@@ -91,9 +110,7 @@ deleteNamespace() {
 
     local namespace=$1
 
-    local description="$(kubectl describe namespace ${namespace} 2> /dev/null)"
-
-    if [[ ! "${description}" ]]
+    if ! namespaceExists "${namespace}"
     then
         echo "${namespace} namespace doesn't exists in the cluster."
         return
@@ -793,86 +810,32 @@ copyFileToPod() {
 }
 
 
+
 #
-# Executes a script with the Postgres client as the admin user (the 'postgres' user).
+# Checks if a K8s object is present.
 #
-# 1 - path of the SQL script to be executed
-# 2 - The namespace in which the postgres pod runs
-#     (defaults to 'postgres')
-# 3 - The hostname on which the Postgres service is available
-#     (defaults to 'postgres-postgresql')
-# 4 - The database to connect to
-#     (defaults to 'postgres')
+# It will return false if not
 #
-executePostgresAdminScript() {
+# 1 - object type
+# 2 - object name
+# 3 - namespace
+#
+isKubeObjectPresent() {
 
-    local scriptPath=$1
-    local namespace=${2:-postgres}
-    local hostname=${3:-postgres-postgresql}
-    local db=${4:-postgres}
+    local objectType=$1
+    local objectName=$2
+    local namespace=$3
 
-    # Copy the create script into the postgres container
+    local result=$(kubectl get ${objectType} \
+        --field-selector=metadata.name=${objectName} --no-headers=true \
+        --namespace=${namespace})
 
-    deleteKubeObject "configmap" "postgres-script" "${namespace}"
+    if [[ ${result} ]]
+    then
+        return
+    fi
 
-    kubectl create configmap postgres-script \
-        --namespace ${namespace} \
-        --from-file=sql-script.sql=${scriptPath}
-
-    local overrides="$(cat <<-EOF
-        {
-            "spec": {
-                "containers": [
-                    {
-                        "stdin": true,
-                        "tty": true,
-                        "args": [
-                          "psql",
-                          "--host=${hostname}",
-                          "-U", "postgres",
-                          "-d", "${db}",
-                          "-p", "5432",
-                          "-f", "/script/sql-script.sql"
-                        ],
-                        "env": [
-                            {
-                                "name": "PGPASSWORD",
-                                "value": "${POSTGRES_ADMIN_PASSWORD}"
-                            }
-                        ],
-                        "name": "pg-client-cont",
-                        "image": "docker.io/bitnami/postgresql:11.6.0-debian-9-r0",
-                        "volumeMounts": [
-                            {
-                                "name": "postgres-script",
-                                "mountPath": "/script/sql-script.sql",
-                                "subPath": "sql-script.sql"
-                            }
-                        ]
-                    }
-                ],
-                "volumes": [
-                    {
-                        "name": "postgres-script",
-                        "configMap": {
-                                "name": "postgres-script"
-                        }
-                    }
-                ]
-            }
-        }
-EOF
-)"
-    deleteKubeObject "pod" "postgres-client" "${namespace}"
-
-    kubectl run postgres-client \
-        -i --rm --tty --restart='Never' \
-        --namespace ${namespace} \
-        --image="will-be-overridden" \
-        --overrides="${overrides}" \
-        --command \
-        -- psql --host ${hostname} -U postgres -d ${db} -p 5432
-
+    false
 }
 
 #
@@ -890,11 +853,7 @@ deleteKubeObject() {
     local objectName=$2
     local namespace=$3
 
-    local result=$(kubectl get ${objectType} \
-        --field-selector=metadata.name=${objectName} --no-headers=true \
-        --namespace=${namespace})
-
-    if [[ ! ${result} ]]
+    if ! isKubeObjectPresent "${objectType}" "${objectName}" "${namespace}"
     then
         return 0
     fi

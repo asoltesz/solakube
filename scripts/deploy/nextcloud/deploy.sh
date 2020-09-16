@@ -50,9 +50,7 @@ processTemplate chart-values.yaml
 # ------------------------------------------------------------
 echoSection "Creating the Postgres database for NextCloud"
 
-processTemplate create-pg-database.sql
-
-executePostgresAdminScript ${TMP_DIR}/create-pg-database.sql ${POSTGRES_NAMESPACE} ${POSTGRES_SERVICE_HOST}
+createPgApplicationDatabase ${NEXTCLOUD_APP_NAME} ${NEXTCLOUD_DB_PASSWORD}
 
 # ------------------------------------------------------------
 echoSection "Creating namespace"

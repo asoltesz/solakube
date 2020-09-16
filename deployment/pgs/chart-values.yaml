@@ -1,7 +1,7 @@
 
 persistence:
     enabled: true
-    existingClaim: ${POSTGRES_APP_NAME}
+    existingClaim: ${PGS_APP_NAME}
 
 # A test database to be created after the DB-Cluster is initialized
 postgresqlDatabase: test-db

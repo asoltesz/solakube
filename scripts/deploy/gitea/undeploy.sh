@@ -39,9 +39,7 @@ deleteNamespace ${GITEA_APP_NAME}
 # ------------------------------------------------------------
 echoSection "Dropping the Postgres database of Gitea"
 
-processTemplate drop-pg-database.sql
-
-executePostgresAdminScript ${TMP_DIR}/drop-pg-database.sql ${POSTGRES_NAMESPACE} ${POSTGRES_SERVICE_HOST}
+dropPgApplicationDatabase ${GITEA_APP_NAME}
 
 
 # ------------------------------------------------------------

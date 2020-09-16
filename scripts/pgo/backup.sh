@@ -4,6 +4,10 @@
 #
 # Takes a backup from the pre-configured cluster with pgBackrest.
 #
+# Works on the currently selected cluster (PGO_CURRENT_CLUSTER).
+#
+# Parameters:
+#
 # 1 - Backup storage type ("local" or "s3" or "local,s3",
 #     defaults to "PGO_CLUSTER_BACKUP_LOCATIONS" and then to "s3"
 #
@@ -24,16 +28,25 @@
 trap errorHandler ERR
 
 BACKUP_STORAGE_TYPE=${1}
-cexport BACKUP_STORAGE_TYPE "${PGO_CLUSTER_BACKUP_LOCATIONS}"
-cexport BACKUP_STORAGE_TYPE "s3"
 
 BACKUP_TYPE=${2}
 cexport BACKUP_TYPE "incr"
 
 TIMEOUT="${3:-600}"
 
+# If a non-default cluster is selected, variables need to be imported
+if [[ ${PGO_CURRENT_CLUSTER:-"default"} != "default" ]]
+then
+    importPgoClusterVariables "${PGO_CURRENT_CLUSTER}"
+fi
+
+# Configuring cluster defaults if not everything is specified
+setPgoClusterDefaults
+
+cexport BACKUP_STORAGE_TYPE "${PGO_CLUSTER_BACKUP_LOCATIONS}"
+cexport BACKUP_STORAGE_TYPE "s3"
+
 cexport CLUSTER_NAME "${PGO_CLUSTER_NAME}"
-cexport CLUSTER_NAME "hippo"
 
 echoSection "Starting: Backup for the '${CLUSTER_NAME}' PG cluster"
 

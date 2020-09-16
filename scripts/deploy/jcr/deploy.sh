@@ -50,10 +50,7 @@ processTemplate chart-values.yaml
 # ------------------------------------------------------------
 echoSection "Creating the Postgres database for JCR"
 
-processTemplate create-pg-database.sql
-
-executePostgresAdminScript ${TMP_DIR}/create-pg-database.sql ${POSTGRES_NAMESPACE} ${POSTGRES_SERVICE_HOST}
-
+createPgApplicationDatabase ${JCR_APP_NAME} ${JCR_DB_PASSWORD}
 # ------------------------------------------------------------
 echoSection "Creating namespace"
 
