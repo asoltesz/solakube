@@ -53,6 +53,9 @@ helm install ${OPENEBS_APP_NAME} stable/openebs \
 
 # ------------------------------------------------------------
 
+# OpenEBS provisioner must be ready when volumes are requested so the
+# startup must be waited upon
+waitAllPodsActive ${OPENEBS_APP_NAME}
 
 # ------------------------------------------------------------
 echoSection "OpenEBS has been installed on your cluster"
