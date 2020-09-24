@@ -37,4 +37,6 @@ function exportPgsClusterAccessVars() {
 
     exportPgsClusterVariable "ADMIN_USERNAME"
     exportPgsClusterVariable "ADMIN_PASSWORD"
+
+    exportPgsClusterVariable "SEARCH_PATH"
 }

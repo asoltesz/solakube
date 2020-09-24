@@ -186,6 +186,7 @@ function importPgoClusterVariables {
     normalizeVariable "PGO_CLUSTER_WAL_STORAGE_CLASS" ${prefix}
     normalizeVariable "PGO_CLUSTER_WAL_STORAGE_SIZE" ${prefix}
     normalizeVariable "PGO_CLUSTER_CREATE_EXTRA_OPTIONS" ${prefix}
+    normalizeVariable "PGO_CLUSTER_SEARCH_PATH" ${prefix}
 }
 
 #
@@ -197,10 +198,12 @@ function setPgoClusterDefaults {
 
     local cluster=$1
 
-    cexport "PGO_CLUSTER_NAME" "${cluster}"
+    cexport PGO_CLUSTER_NAME "${cluster}"
 
-    cexport "PGO_CLUSTER_NAME" "${PGO_CURRENT_CLUSTER}"
-    cexport "PGO_CLUSTER_NAME" "default"
+    cexport PGO_CLUSTER_NAME "${PGO_CURRENT_CLUSTER}"
+    cexport PGO_CLUSTER_NAME "default"
+
+    cexport PGO_CLUSTER_SEARCH_PATH "public"
 
     cexport PGO_CLUSTER_MEMORY "256Mi"
     # No memory limit will be set
@@ -252,6 +255,8 @@ function exportPgoClusterAccessVars {
 
     export POSTGRES_ADMIN_USERNAME="postgres"
     export POSTGRES_ADMIN_PASSWORD="${PGO_CLUSTER_ADMIN_PASSWORD}"
+
+    export POSTGRES_SEARCH_PATH="${PGO_CLUSTER_SEARCH_PATH}"
 
 }
 

@@ -287,6 +287,8 @@ function createPgApplicationDatabase() {
     export POSTGRES_APP_NAME=${appName}
     export POSTGRES_APP_DB_PASSWORD=${appPassword}
 
+    cexport POSTGRES_SEARCH_PATH "public"
+
     local script="$(resolvePathOnRoots "deployment/postgres/create-app-database.sql")"
 
     processTemplate ${script}
