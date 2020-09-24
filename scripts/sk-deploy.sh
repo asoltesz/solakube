@@ -33,6 +33,9 @@ fi
 # need to create a database for themselves
 . ${SK_SCRIPT_HOME}/postgres/postgres-shared.sh
 
+# Deployments may need private registry access
+. ${SK_SCRIPT_HOME}/registry/registry-shared.sh
+
 
 # Deploy script storage folder
 export DEPLOY_SCRIPTS_DIR=$(resolvePathOnRoots "scripts/deploy/${DEPLOY_COMPONENT}")
