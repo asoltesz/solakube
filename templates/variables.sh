@@ -115,6 +115,26 @@ export SMTP_PASSWORD="xxx"
 
 
 # ------------------------------------------------------------------------------
+# Shared Private Docker Registry settings
+# Only needed if:
+# - Private Docker Registry is needed for an application
+#   (images come from a private registry)
+# - Registry is external to the cluster
+# - Registry is internal but auto-discovery is not supported for it
+#   (auto discovery is only supported for the SolaKube deployed Docker Registry
+#    via the "registry" deployer)
+# ------------------------------------------------------------------------------
+
+# Hostname and port of the registry service
+export DEFAULT_PRIVATE_REGISTRY_FQN=""
+# Username for the registry access
+export DEFAULT_PRIVATE_REGISTRY_USERNAME=""
+# Password for the username for the registry access
+export DEFAULT_PRIVATE_REGISTRY_PASSWORD=""
+
+
+
+# ------------------------------------------------------------------------------
 # Rancher access and the ID of the new cluster
 # ------------------------------------------------------------------------------
 

@@ -17,6 +17,8 @@
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
+. ${SK_SCRIPT_HOME}/registry/registry-shared.sh
+
 checkAppName "registry"
 
 createTempDir "registry"
