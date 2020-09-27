@@ -8,7 +8,7 @@
 #          Use the pgo client for that before removing pgo itself
 # ==============================================================================
 
-export SCRIPTS_SUB_DIR=${SK_SCRIPT_HOME}/deploy/pgo
+export SCRIPTS_SUB_DIR=${SK_SCRIPT_HOME}/pgo
 
 # Executing the script
 . ${SCRIPTS_SUB_DIR}/deploy.sh uninstall

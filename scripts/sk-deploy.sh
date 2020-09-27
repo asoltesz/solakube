@@ -38,7 +38,7 @@ fi
 
 
 # Deploy script storage folder
-export DEPLOY_SCRIPTS_DIR=$(resolvePathOnRoots "scripts/deploy/${DEPLOY_COMPONENT}")
+export DEPLOY_SCRIPTS_DIR=$(resolvePathOnRoots "scripts/${DEPLOY_COMPONENT}")
 # Deploy script storage folder
 if [[ ! -d "${DEPLOY_SCRIPTS_DIR}" ]]
 then
