@@ -59,7 +59,7 @@ export SK_DEPLOY_JCR="Y"
 export SK_DEPLOY_B2S3="Y"
 
 # Whether to deploy a PostgreSQL DBMS on your cluster (simple version)
-# export SK_DEPLOY_POSTGRES_SIMPLE="Y"
+export SK_DEPLOY_PGS="Y"
 
 # Whether to deploy a pgAdmin on your cluster
 export SK_DEPLOY_PGADMIN="Y"
