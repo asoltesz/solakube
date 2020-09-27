@@ -73,15 +73,28 @@ then
 
     if [[ ! -f "${COMMAND_SCRIPT}" ]]
     then
-        # not a project-specific EM script, it must be a core EM script
-        COMMAND_SCRIPT="${SK_SCRIPT_HOME}/sk-${COMMAND}.sh"
+        FOLDER="$(resolvePathOnRoots "scripts/${COMMAND}")"
+
+        if [[ ! -d "${FOLDER}" ]]
+        then
+            echo "ERROR: Command script/folder not found: ${COMMAND}"
+            exit 1
+        else
+            # The COMMAND was a folder, there must be an actual COMMAND too
+            shift
+
+            SUB_COMMAND=$1
+            COMMAND_SCRIPT="$(resolvePathOnRoots "scripts/${COMMAND}/${SUB_COMMAND}.sh")"
+
+            if [[ ! -f "${COMMAND_SCRIPT}" ]]
+            then
+                echo "ERROR: Command script not found: ${COMMAND}/${SUB_COMMAND}.sh"
+                exit 1
+            fi
+        fi
     fi
 
-    if [[ ! -f "${COMMAND_SCRIPT}" ]]
-    then
-        echo "Command script not found: ${COMMAND_SCRIPT}"
-        exit 1
-    fi
+    # Command script found, proceeding
 
     shift
 

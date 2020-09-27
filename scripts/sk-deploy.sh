@@ -4,7 +4,7 @@
 # Deploy a component with a SolaKube deployer
 #
 # 1 - The component to deploy (e.g: "rook-ceph")
-#
+# ... - parameters intended to the un-deployer script
 
 DEPLOY_COMPONENT=$1
 
@@ -15,16 +15,6 @@ then
 fi
 
 shift
-
-OPERATION=$1
-
-if [[ ! "${OPERATION}" ]]
-then
-    OPERATION="deploy"
-else
-    shift
-fi
-
 
 # Loading the deployment support shared library
 . ${SK_SCRIPT_HOME}/deploy/deploy-shared.sh
@@ -57,5 +47,5 @@ then
 fi
 
 # Executing the deployer
-. ${DEPLOY_SCRIPTS_DIR}/${OPERATION}.sh $@
+. ${DEPLOY_SCRIPTS_DIR}/deploy.sh $@
 
