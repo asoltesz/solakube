@@ -1,6 +1,13 @@
 # Docker Registry & Helm Repository
 
-# Docker registries (internal/external, public/private)
+SolaKube supports deploying 2 types of Docker image registries on the K8s cluster (Docker Registry, JFrog Container Registry).
+ 
+It also allows configuring a default/shared private registry or a per-application private registry for applications that need it [see the relevant section](Configuring a private registry for applications).   
+
+
+# Registry Considerations
+
+## Docker registry types (internal/external, public/private)
 
 In most non-trivial, production-grade Kubernetes clusters there is a private Docker registry that allows for higher self-containment, better resiliency to external changes and faster Docker image pulls compared to pulling images from external registries.
 
@@ -18,7 +25,7 @@ Internal registries may be cleaned and pruned very efficiently because you may o
 
 The content of an internal registry is usually backed up like any other persistent data on your cluster, so you can migrate all of your Docker images together with your normal data and recreate your cluster practically anywhere.
 
-# Helm repositories
+## Helm repositories
 
 Helm repositories are similar to Docker registries in purpose, only they contain Helm charts instead of Docker images.
 
@@ -28,15 +35,17 @@ Helm charts may also be managed in private Git repositories and charts downloade
 
 Due to this, having a private Helm registry is less important than an internal Docker registry.
 
-# Docker Registry (simple)
+# Supported registries
+
+## Docker Registry (simple)
 
 SolaKube supports the deployment of the bare-bone Docker Registry released by Docker itself.
 
-This only supports Docker images (no Helm chart support), has no user interface at all and doesn't have full-blown access control. However, it also has modest default resource needs in terms of memory and CPU so it is eminently suitable for small clusters.  
+This only supports Docker images (no Helm chart support), has no user interface at all and doesn't have full-blown access control. However, it also has modest default resource needs in terms of memory and CPU so it is eminently suitable for small clusters with a small number of private images.  
 
 Details in the [Docker Registry](docker-registry.md) page.
 
-# JFrog Container Registry (JCR)
+## JFrog Container Registry (JCR)
 
 This is a full blown Docker image and Helm chart registry with proper access control (e.g.: LDAP authentication). However, its resource use is much-much higher. Doesn't have built-in vulnerability scanning, requires a paid component (XRay) for it.
 
@@ -71,6 +80,84 @@ Looks to require much less resources than Harbor/JCR/Nexus. Default beta Helm ch
 
 Currently, it doesn't have a stable Helm chart. There used to be a beta chart in incubator but it has been removed. It seems to have very little activity around it.
 
-## Nexus OSS
+## Nexus 3 OSS
+
+Besides being able to serve as a Docker image registry, Nexus supports many artifact repository types (e.g.: Maven).
+
+It is very heavy on resources, requires minimum 4 CPU cores and 8 GB RAM [according to the documentation](https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-CPU).
 
 
+# Configuring a private registry for applications
+
+SolaKube allows configuring a default/shared private registry or a per-application private registry for applications that need it [see the relevant section](Configuring a private registry for applications).   
+
+# The default private registry
+
+If more than one of your application will use a private registry, the DEFAULT registry can be defined with the following variables:
+
+~~~
+# Hostname and port of the registry service
+export DEFAULT_PRIVATE_REGISTRY_FQN=""
+
+# Username for the registry access
+export DEFAULT_PRIVATE_REGISTRY_USERNAME=""
+
+# Password for the username for the registry access
+export DEFAULT_PRIVATE_REGISTRY_PASSWORD=""
+~~~ 
+
+# Application specific registry
+
+If the DEFAULT registry is not suitable for the application, an application-specific registry can be defined (in the sample, the app is 'APP1' ) :
+
+~~~
+# Hostname and port of the registry service
+export APP1_PRIVATE_REGISTRY_FQN=""
+
+# Username for the registry access
+export APP1_PRIVATE_REGISTRY_USERNAME=""
+
+# Password for the username for the registry access
+export APP1_PRIVATE_REGISTRY_PASSWORD=""
+~~~
+
+# Preparing an application deployer for using a private registry
+
+ATM, most SolaKube application deployers do not support private registries since the images are supposed to come from Docker Hub.
+
+When a private registry is needed:
+
+## ensuring the derived variables and the registry secretű
+
+The deployer script needs to include the method call that ensures that the necessary secret is deployed in the application's namespace (that contains the access credentials for Kubernetes):
+
+~~~
+# Ensuring private registry access params
+ensureRegistryAccessForApp "${XYZ_APP_NAME}"
+~~~
+
+NOTE: typically the ${XYZ_APP_NAME} is also the name of the namespace of the application by deployer convention.
+
+This will also define the following, derived variables from the DEFAULT or application-specific variables:
+
+- PRIVATE_REGISTRY_FQN
+- PRIVATE_REGISTRY_USERNAME
+- PRIVATE_REGISTRY_PASSWORD 
+   
+## Referencing the private registry in deployment descriptors
+
+The application deployment files need to be able to reference the PRIVATE_REGISTRY_FQN variable defined by SolaKube.
+
+If the deployer uses a Helm chart, the Helm chart values must contain the reference to the private registry.
+
+It will be something similar to this:
+
+~~~
+frontend:
+    # image: awesome-app:8.4.6
+    registry: ${PRIVATE_REGISTRY_FQN}
+~~~
+
+Typically, the chart-values.yaml file of the application must be modified to include the reference. See the chart's documentation how to provide the private registry.
+
+NOTE: Sometimes the Helm chart is capable of creating the private registry secret as well. In this case, it also accepts the PRIVATE_REGISTRY_USERNAME and PRIVATE_REGISTRY_PASSWORD in a chart variable and "ensureRegistryAccessForApp" is not necessary. 
