@@ -43,14 +43,14 @@ echoSection "Preparing temp folder"
 createTempDir "redmine"
 
 # ------------------------------------------------------------
-echoSection "Preparing Helm chart values"
-
-processTemplate chart-values.yaml
-
-# ------------------------------------------------------------
 echoSection "Creating the Postgres database for Redmine"
 
 createPgApplicationDatabase ${REDMINE_APP_NAME} ${REDMINE_DB_PASSWORD}
+
+# ------------------------------------------------------------
+echoSection "Preparing Helm chart values"
+
+processTemplate chart-values.yaml
 
 # ------------------------------------------------------------
 echoSection "Creating namespace"

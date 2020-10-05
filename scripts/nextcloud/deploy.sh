@@ -43,14 +43,14 @@ echoSection "Preparing temp folder"
 createTempDir "nextcloud"
 
 # ------------------------------------------------------------
-echoSection "Preparing Helm chart values"
-
-processTemplate chart-values.yaml
-
-# ------------------------------------------------------------
 echoSection "Creating the Postgres database for NextCloud"
 
 createPgApplicationDatabase ${NEXTCLOUD_APP_NAME} ${NEXTCLOUD_DB_PASSWORD}
+
+# ------------------------------------------------------------
+echoSection "Preparing Helm chart values"
+
+processTemplate chart-values.yaml
 
 # ------------------------------------------------------------
 echoSection "Creating namespace"

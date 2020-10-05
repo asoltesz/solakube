@@ -43,14 +43,14 @@ echoSection "Preparing temp folder"
 createTempDir "gitea"
 
 # ------------------------------------------------------------
-echoSection "Preparing Helm chart values"
-
-processTemplate chart-values.yaml
-
-# ------------------------------------------------------------
 echoSection "Creating the Postgres database for Gitea"
 
 createPgApplicationDatabase ${GITEA_APP_NAME} ${GITEA_DB_PASSWORD}
+
+# ------------------------------------------------------------
+echoSection "Preparing Helm chart values"
+
+processTemplate chart-values.yaml
 
 # ------------------------------------------------------------
 echoSection "Creating namespace"

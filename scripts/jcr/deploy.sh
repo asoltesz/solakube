@@ -43,14 +43,15 @@ echoSection "Preparing temp folder"
 createTempDir "jcr"
 
 # ------------------------------------------------------------
+echoSection "Creating the Postgres database for JCR"
+
+createPgApplicationDatabase ${JCR_APP_NAME} ${JCR_DB_PASSWORD}
+
+# ------------------------------------------------------------
 echoSection "Preparing Helm chart values"
 
 processTemplate chart-values.yaml
 
-# ------------------------------------------------------------
-echoSection "Creating the Postgres database for JCR"
-
-createPgApplicationDatabase ${JCR_APP_NAME} ${JCR_DB_PASSWORD}
 # ------------------------------------------------------------
 echoSection "Creating namespace"
 
