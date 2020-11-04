@@ -32,19 +32,11 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 [[ -z "$CLUSTER" ]] && { echo "Please specify the name of the cluster with '--cluster'" ; exit 1; }
 
 # Entering the Terraform home folder for the cluster
-cd ${SK_SCRIPT_HOME}/../terraform/clusters/${CLUSTER}
+CLUSTER_DIR="$(resolvePathOnRoots "terraform/clusters/${CLUSTER}")"
+cd "${CLUSTER_DIR}"
 if [[ $? != 0 ]]
 then
     echo "Couldn't enter the Terraform folder of the cluster".
-    exit 1
-fi
-
-# Loading secrets for the cluster from ~/.solakube
-SECRET_FILE=~/.solakube/${CLUSTER}/variables.sh
-source ${SECRET_FILE}
-if [[ $? != 0 ]]
-then
-    echo "Couldn't load secrets for the cluster from ${SECRET_FILE}"
     exit 1
 fi
 

@@ -7,7 +7,7 @@
 #
 
 
-${SK_SCRIPT_HOME}/sk-tf.sh apply "$@"
+. ${SK_SCRIPT_HOME}/sk-tf.sh apply "$@"
 checkResultExit "Terraform apply"
 
 # The ID of the newly created cluster in your Rancher installation
