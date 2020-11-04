@@ -542,13 +542,15 @@ applyTemplate() {
 }
 
 #
-# Deletes an application (helm-release) with Helmi if it is present
+# Deletes an application (helm-release) with Helm if it is present
 #
 # 1 - Name of the release
+# 2 - Namespace
 #
 deleteHelmRelease() {
 
     local releaseName=$1
+    local namespace=${2:-"${releaseName}"}
 
     echo "Uninstalling ${releaseName} with Helm"
 
@@ -565,7 +567,7 @@ deleteHelmRelease() {
         return 0
     fi
 
-    helm uninstall ${releaseName}
+    helm uninstall ${releaseName} --namespace="${namespace}"
     if [[ $? != 0 ]]
     then
         echo "Error when deleting the release with Helm"
