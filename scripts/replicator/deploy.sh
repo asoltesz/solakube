@@ -22,11 +22,9 @@ trap errorHandler ERR
 # ------------------------------------------------------------
 echoSection "Installing replicator v${REPLICATOR_VERSION}"
 
-kubectl apply -f \
-    https://raw.githubusercontent.com/mittwald/kubernetes-replicator/v${REPLICATOR_VERSION}/deploy/rbac.yaml
+kubectl apply -f rbac.yaml
 
-kubectl apply -f \
-    https://raw.githubusercontent.com/mittwald/kubernetes-replicator/v${REPLICATOR_VERSION}/deploy/deployment.yaml
+kubectl apply -f deployment.yaml
 
 # Allowing Replicator to finish initializing before any replicatable content
 # could appear in the cluster
