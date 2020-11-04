@@ -1,8 +1,10 @@
 
-/rke-test/cluster.rkestate
-/rke-test/kube_config_cluster.yml
 .vagrant
 
 # IDEA project files
 .idea
 *.iml
+
+# RKE state and generated cluster access yaml
+cluster.rkestate
+kube_config_cluster.yml
