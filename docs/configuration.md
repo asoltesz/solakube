@@ -75,3 +75,15 @@ Name the keys as "id_rsa" and "id_rsa.pub"
 If you accept the default paths, you will have them in the ~/.ssh folder, just where SolaKube expects them.
 
 If you save them to a different folder, please change the reference to them in all Terraform, Ansible and SolaKube configuration files that refer to "id_rsa".
+
+# Private Docker Registry
+
+It is possible to define a central private registry for deployers in variables.sh:
+
+~~~
+export SK_PRIVATE_REGISTRY "registry.example.com"
+export SK_PRIVATE_REGISTRY_USERNAME "admin"
+export SK_PRIVATE_REGISTRY_PASSWORD "secret"
+~~~
+
+If you deploy the Docker Registry as an internal registry (with the SolaKube deployer), there is no need to define the internal registry, it will be auto-discovered and the parameters set into the SK_PRIVATE_REGISTRY_XXX variables.
