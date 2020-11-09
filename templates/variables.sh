@@ -215,7 +215,7 @@ export CLOUDFLARE_API_KEY="xxx"
 # class configured.
 # This is a list of storage classes. The first class available in the K8s
 # cluster will be auto-selected.
-export DEFAULT_STORAGE_CLASS="rook-ceph-block,hcloud-volumes,openebs-hostpath,standard"
+export DEFAULT_STORAGE_CLASS="rook-ceph-block,hcloud-volumes,openebs-hostpath,standard,local-path"
 
 
 # ------------------------------------------------------------------------------
