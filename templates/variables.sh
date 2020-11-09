@@ -133,7 +133,6 @@ export DEFAULT_PRIVATE_REGISTRY_USERNAME=""
 export DEFAULT_PRIVATE_REGISTRY_PASSWORD=""
 
 
-
 # ------------------------------------------------------------------------------
 # Rancher access and the ID of the new cluster
 # ------------------------------------------------------------------------------
