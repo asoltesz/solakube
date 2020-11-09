@@ -318,17 +318,6 @@ export PGS_SERVICE_HOST="pgs-postgresql.pgs"
 # The password of the PGO 'admin' user
 export PGO_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 
-if [[ ${SK_DEPLOY_PGO} == "Y" ]]
-then
-    # The username of the admin user in the new cluster
-    export POSTGRES_ADMIN_USERNAME="default"
-    # The password of the admin user in the new cluster
-    export POSTGRES_ADMIN_PASSWORD="${PGO_ADMIN_PASSWORD}"
-    # The namespace in which the Postgres service is installed
-    export POSTGRES_NAMESPACE="pgo"
-    # The internal host name on which the Postgres service is available
-    export POSTGRES_SERVICE_HOST="default.pgo"
-fi
 
 # The currently selected PG cluster for SolaKube scripts
 export PGO_CURRENT_CLUSTER_NAME="default"
