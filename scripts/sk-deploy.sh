@@ -32,7 +32,7 @@ export DEPLOY_SCRIPTS_DIR=$(resolvePathOnRoots "scripts/${DEPLOY_COMPONENT}")
 # Deploy script storage folder
 if [[ ! -d "${DEPLOY_SCRIPTS_DIR}" ]]
 then
-    echo "No deploy script for deployer '${DEPLOY_COMPONENT}'"
+    echo "ERROR: No deploy script for deployer '${DEPLOY_COMPONENT}'"
     exit 1
 fi
 
