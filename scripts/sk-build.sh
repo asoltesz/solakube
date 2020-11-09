@@ -109,6 +109,15 @@ then
     checkResultExit "Deploying CrunchyData Postgres Operator to the cluster"
 fi
 
+#
+# Installing Mailu Email Services
+# ------------------
+if [[ "${SK_DEPLOY_MAILU}" == "Y" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk deploy mailu
+    checkResultExit "Deploying Mailu Email Services to the cluster"
+fi
+
 
 #
 # Installing pgAdmin

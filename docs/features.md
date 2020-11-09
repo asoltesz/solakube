@@ -35,6 +35,9 @@ Storage & persistence
 - A [simple Postgres deployment](postgres-simple.md) for prototyping, development
 - [CrunchyData Postgres Operator](postgres-pgo.md) for deploying highly available, scalable, performant Postgres clusters on your K8s cluster.  
 
+Email Services ([Mailu](mailu.md))
+- You can install a cluster-internal SMTP server (and other email services like IMAP and webmail) by deploying [Mailu](mailu.md).
+ 
 Cluster Management
 - The newly provisioned cluster is registered into your Rancher instance, so RBAC, Monitoring, Catalog, Etcd backups and other management features are available for it.
 

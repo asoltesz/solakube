@@ -61,6 +61,9 @@ export SK_DEPLOY_B2S3="Y"
 # Whether to deploy a PostgreSQL DBMS on your cluster (simple version)
 export SK_DEPLOY_PGS="Y"
 
+# Whether to install Mailu Email Services
+export SK_DEPLOY_MAILU="Y"
+
 # Whether to deploy a pgAdmin on your cluster
 export SK_DEPLOY_PGADMIN="Y"
 
@@ -571,7 +574,63 @@ export WORDPRESS_ADMIN_EMAIL="${SK_ADMIN_EMAIL}"
 export WORDPRESS_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 
+# ------------------------------------------------------------------------------
+# Mailu Email Services
+# ------------------------------------------------------------------------------
 
+# Whether the Roundcube webmail is enabled
+export MAILU_ROUNDCUBE_ENABLED="true"
+
+# Whether email virus-checking service is enbaled
+export MAILU_CLAMAV_ENABLED="false"
+
+# Whether the Dovecot IMAP service is enabled
+export MAILU_DOVECOT_ENABLED="true"
+
+# The mailer domain (a single domain, may not even be one that receives email)
+export MAILU_DOMAIN="${CLUSTER_FQN}"
+
+# The list of mail hosts handled by Mailu (JSON array definition)
+# e.g.: "[ 'mail.example.com', 'mail.example2.io' ]"
+# If not defined, the ${CLUSTER_FQN} will be used
+#export MAILU_HOSTNAMES="[ 'mailu.${CLUSTER_FQN}' ]"
+
+# The admin email MUST be from one of the domains listed in the MAILU_HOSTNAMES
+export MAILU_ADMIN_EMAIL="admin@${CLUSTER_FQN}"
+# Password for the admin user
+export MAILU_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+
+# The TLS settings for Mailu communications
+export MAILU_TLS_FLAVOR="cert"
+
+# The password for the mailu DB user
+export MAILU_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
+
+# The secret key is required for protecting authentication cookies and must be set individually for each deployment
+# Generate it with the "pwgen" on linux: sudo apt install pwgen && pwgen 16 1
+export MAILU_SECRET_KEY="baiph8Chizai7boo"
+
+# No IMAP storage and no ClamAV in this instance, so a smaller PV size is enough
+# (only mail forwarding, mail aliases ...etc)
+export MAILU_PVC_SIZE="5Gi"
+
+# Whether Mailu frontend needs to be exposed with External-DNS
+export MAILU_DEPLOY_EXTERNAL_DNS="true"
+
+# The type of DNS service provider to expose DNS MX record with
+# If you change this, ensure that you include fields in
+# chart-values-external-dns.yaml as well
+export MAILU_EXTERNAL_DNS_PROVIDER="cloudflare"
+
+# Whether TLS certificate with Cert-Manager needs to be requested
+export MAILU_CERT_NEEDED="N"
+
+# ------------------------------------------------------------------------------
+# Limes (WARNING: DO NOT INCLUDE IN THE TEMPLATE)
+# ------------------------------------------------------------------------------
+export LIMES_CONFIG="$(resolvePathOnRoots "variables-limes.sh")"
+. "${LIMES_CONFIG}"
 
 # ------------------------------------------------------------------------------
 # Exports for Terraform

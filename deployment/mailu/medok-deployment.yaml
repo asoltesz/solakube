@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: medok
+spec:
+    selector:
+        matchLabels:
+            app: medok
+    replicas: 1
+    template:
+        metadata:
+            labels:
+                app: medok
+        spec:
+            serviceAccountName: medok
+            containers:
+            - name: medok
+              image: soltesza/medok:1.0.0-SNAPSHOT
+              env:
+              - name: MEDOK_NAMESPACE
+                value: "${MAILU_APP_NAME}"
+              - name: MEDOK_MAILU_SERVER_FQN
+                value: "${MAILU_FQN}"
+              - name: MEDOK_MAILU_FRONTEND_POD_SELECTOR
+                value: "app=${MAILU_APP_NAME},component=front"

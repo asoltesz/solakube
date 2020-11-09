@@ -1,0 +1,145 @@
+#
+# Apply this with the "Mailu" namespace
+#
+
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+    name: medok
+
+
+#
+# Watch & list pods
+#
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: medok-pod-lister
+rules:
+-   apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - list
+    - watch
+
+#
+# Get node data about the node which runs the Mailu Front pod
+#
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: medok-node-info
+rules:
+-   apiGroups:
+    - ""
+    resources:
+    - nodes
+    verbs:
+    - get
+
+
+#
+# List CRDs
+#
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: medok-crd-lister
+rules:
+-   apiGroups:
+    - "apiextensions.k8s.io"
+    resources:
+    - customresourcedefinitions
+    verbs:
+    - list
+    - get
+
+
+
+#
+# Maintain External-DNS records
+#
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: medok-endpoint-maintainer
+rules:
+-   apiGroups:
+    - "externaldns.k8s.io"
+    resources:
+    - dnsendpoints
+    verbs:
+    - list
+    - create
+    - update
+    - delete
+    - get
+- apiGroups: ["externaldns.k8s.io"]
+  resources: ["dnsendpoints/status"]
+  verbs: ["*"]
+
+
+#
+# Watch & list pods in the Mailu namespace
+#
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+    name: medok-pod-lister
+subjects:
+-   kind: ServiceAccount
+    name: medok
+roleRef:
+    kind: ClusterRole
+    name: medok-pod-lister
+    apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+    name: medok-endpoint-maintainer
+subjects:
+-   kind: ServiceAccount
+    name: medok
+roleRef:
+    kind: ClusterRole
+    name: medok-endpoint-maintainer
+    apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+    name: medok-crd-lister
+subjects:
+-   kind: ServiceAccount
+    name: medok
+    namespace: ${MAILU_APP_NAME}
+roleRef:
+    kind: ClusterRole
+    name: medok-crd-lister
+    apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+    name: medok-node-info
+subjects:
+-   kind: ServiceAccount
+    name: medok
+    namespace: ${MAILU_APP_NAME}
+roleRef:
+    kind: ClusterRole
+    name: medok-node-info
+    apiGroup: rbac.authorization.k8s.io

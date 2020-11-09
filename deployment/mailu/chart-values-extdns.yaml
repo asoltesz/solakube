@@ -1,0 +1,20 @@
+sources:
+- crd
+- service
+
+namespace: ${MAILU_APP_NAME}
+
+provider: ${MAILU_EXTERNAL_DNS_PROVIDER}
+
+# Cloudflare-specific settings
+cloudflare:
+    apiKey: ${CLOUDFLARE_API_KEY}
+    email: ${CLOUDFLARE_EMAIL}
+    proxied: false
+
+# MEDOK will use CRDs to request DNS records for Mailu
+crd:
+    create: true
+
+# DNS record needs to be removed if the CRD is deleted
+policy: sync

@@ -1,0 +1,16 @@
+#
+# TLS secret for non-HTTP services of Mailu.
+# (replicated from the namespace/ingress-level TLS cert)
+#
+
+apiVersion: v1
+kind: Secret
+metadata:
+    name: ${MAILU_APP_NAME}-certificates
+    annotations:
+        replicator.v1.mittwald.de/replicate-from: ${MAILU_APP_NAME}/${MAILU_APP_NAME}-tls
+data: {
+    tls.crt: '',
+    tls.key: ''
+}
+type: kubernetes.io/tls

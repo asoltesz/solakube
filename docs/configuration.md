@@ -76,6 +76,36 @@ If you accept the default paths, you will have them in the ~/.ssh folder, just w
 
 If you save them to a different folder, please change the reference to them in all Terraform, Ansible and SolaKube configuration files that refer to "id_rsa".
 
+# Configuring email ports
+
+In case you don't want to install the Mailu server (email services) on your cluster, comment out the Mailu ports under the "open_ports" section in "vars.yaml". This will result in Ansible NOT opening these ports on the Kubernetes nodes during provisioning.
+
+In this case, you may want to enable the Postfix Ansible role in "provision.yaml" so that the hosts can send email messages to you (the administrator).
+
+NOTE: When Mailu is installed on the cluster, none of the Kubernetes hosts should run Postfix or any other server software that reserves the same email-related ports as Mailu uses (SMTP: 25/465, IMAPS: 993...stb).
+
+# Configuring Email sending (SMTP)
+
+YOu can configure SMTP based email sending via the SMTP_xxx parameters in variables.sh:
+
+~~~
+export SMTP_ENABLED="true"
+export SMTP_HOST="smtp.mailgun.org"
+export SMTP_PORT="587"
+export SMTP_USERNAME="postmaster@xxxx.mailgun.org"
+export SMTP_PASSWORD="xxxx"
+
+~~~
+
+All application deployers that can use SMTP settings will automatically pick-up teh values in these variables. 
+
+
+# Email Services (Mailu)
+
+You can install an cluster-internal SMTP server (and other email services like IMAP and webmail) by deploying Mailu.
+
+See the documentation of the [Mailu deployer](mailu.md). 
+
 # Private Docker Registry
 
 It is possible to define a central private registry for deployers in variables.sh:
