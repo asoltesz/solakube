@@ -96,8 +96,8 @@ fi
 # ------------------
 if [[ "${SK_DEPLOY_PGS}" == "Y" ]]
 then
-    . ${SK_SCRIPT_HOME}/sk deploy postgres-simple
-    checkResultExit "Deploying PostgreSQL to the cluster"
+    . ${SK_SCRIPT_HOME}/sk deploy pgs
+    checkResultExit "Deploying PostgreSQL (simple) to the cluster"
 fi
 
 #
