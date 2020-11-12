@@ -12,29 +12,38 @@
 # ------------------------------------------------------------------------------
 
 #
-# Creating/updating the cluster
+# Minikube and other hand-built clusters don't need Terraform, only
+# a proper Hetzner cluster type
 #
-. ${SK_SCRIPT_HOME}/sk-apply.sh -auto-approve
-checkResultExit "Terraform cluster create/update"
+if [[ ${SK_CLUSTER_TYPE} == "hetzner" ]]
+then
+    #
+    # Creating/updating the cluster
+    #
+    . ${SK_SCRIPT_HOME}/sk-apply.sh -auto-approve
+    checkResultExit "Terraform cluster create/update"
 
-#
-# Downloading the KubeCtl settings file
-#
-. ${SK_SCRIPT_HOME}/sk-dl-config.sh
-checkResultExit "Downloading the Kubectl config"
+    #
+    # Downloading the KubeCtl settings file
+    #
+    . ${SK_SCRIPT_HOME}/sk-dl-config.sh
+    checkResultExit "Downloading the Kubectl config"
 
-#
-# Waiting for the cluster nodes to provision
-#
-. ${SK_SCRIPT_HOME}/sk-wait-for-rancher.sh
-checkResultExit "Waiting for successful Rancher cluster provisioning"
+    #
+    # Waiting for the cluster nodes to provision
+    #
+    . ${SK_SCRIPT_HOME}/sk-wait-for-rancher.sh
+    checkResultExit "Waiting for successful Rancher cluster provisioning"
 
-#
-# Installing Hetzner-specific components like fip-controller and volumes
-# ------------------
-. ${SK_SCRIPT_HOME}/sk deploy hetzner
-checkResultExit "Deploying Hetzner-cloud support components"
-#
+    #
+    # Installing Hetzner-specific components like fip-controller and volumes
+    # ------------------
+    . ${SK_SCRIPT_HOME}/sk deploy hetzner
+    checkResultExit "Deploying Hetzner-cloud support components"
+
+else
+    echo "Base cluster building skipped for type: ${SK_CLUSTER_TYPE}"
+fi
 
 #
 # Installing the Velero Disaster Recovery tool
