@@ -82,6 +82,9 @@ export SK_DEPLOY_GITEA="Y"
 # Whether to install the Redmine Issue/Project Management Server
 # export SK_DEPLOY_REDMINE="Y"
 
+# Whether to install the New Relic monitoring client
+# export SK_DEPLOY_NEWRELIC="Y"
+
 # Whether to install the Jenkins CI/CD server
 export SK_DEPLOY_JENKINS="Y"
 
@@ -513,6 +516,14 @@ export NEXTCLOUD_DB_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 # Whether the built-in backup profile (Velero) can be deployed
 export NEXTCLOUD_BACKUP_ENABLED="Y"
+
+
+# ------------------------------------------------------------------------------
+# New Relic monitoring client
+# ------------------------------------------------------------------------------
+
+export NEWRELIC_LICENSE_KEY="xxxx"
+
 
 # ------------------------------------------------------------------------------
 # Jenkins CI/CD Server

@@ -21,6 +21,7 @@ The SolaKube deployed cluster will have the following features, in short:
 - [Data persistence](docs/persistent-volumes.md) (Hetzner Volumes + [Rook/Ceph](docs/rook.md))
 - Fully automated, reproducible cluster builds with infrastructure component + application deployments
 - Built in [disaster recovery](docs/disaster-recovery.md) tooling (Velero + application backup profiles)
+- [Monitoring & Alerting](docs/monitoring.md) via Prometheus or New Relic.
 - Simplified deployments for
   - infrastructure components (e.g.: [Postgres as a service](docs/postgres.md), [Velero](docs/velero-backups.md))
   - popular applications ([Nextcloud](docs/nextcloud.md), [Redmine](docs/redmine.md), Wordpress...etc)

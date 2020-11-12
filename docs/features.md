@@ -40,6 +40,7 @@ Email Services ([Mailu](mailu.md))
  
 Cluster Management
 - The newly provisioned cluster is registered into your Rancher instance, so RBAC, Monitoring, Catalog, Etcd backups and other management features are available for it.
+- [Monitoring & Alerting](monitoring.md) via Prometheus or New Relic.
 
 # Applications & further Infrastructure Components
 
