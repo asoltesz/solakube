@@ -39,9 +39,6 @@ then
 fi
 
 
-# Loading variables
-. ~/.solakube/${SK_CLUSTER}/variables.sh
-
 # If the SK_ROOTS has not been set, we construct it
 if [[ -z "${SK_ROOTS}" ]]
 then
@@ -49,10 +46,21 @@ then
 
     if [[ -d "${SK_PROJECT_HOME}" ]]
     then
-        export SK_ROOTS="${SK_ROOTS},${SK_PROJECT_HOME}"
+        export SK_ROOTS="${SK_ROOTS}:${SK_PROJECT_HOME}"
     fi
 fi
 
+# Loading variables from each SK_ROOT
+
+for root in ${SK_ROOTS//:/ }
+do
+    if [[ -f "${root}/variables.sh" ]]
+    then
+        # echo "Loading variables from root: ${root}"
+
+        . ${root}/variables.sh
+    fi
+done
 
 # ------------------------------
 # Execute the sub-script
