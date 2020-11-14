@@ -37,6 +37,8 @@ checkCertificate "gitea"
 # Defaulting to 3 GB PVC size, if not set
 cexport GITEA_PVC_SIZE "3Gi"
 
+cexport GITEA_ADMIN_USERNAME "gitea"
+
 # ------------------------------------------------------------
 echoSection "Preparing temp folder"
 
@@ -132,9 +134,8 @@ waitAllPodsActive ${GITEA_APP_NAME}
 
 echo "execInPod...................................................................................................................."
 
-execInPod "app=${GITEA_APP_NAME}-gitea" ${GITEA_APP_NAME} "su-exec git gitea admin create-user --name=gitea --password=${GITEA_ADMIN_PASSWORD} --email=${GITEA_ADMIN_EMAIL} --admin --must-change-password=false"
-
-# su-exec git gitea admin create-user --name=gitea --password=sola23sola --email=soltesz.andras@gmail.com --admin --must-change-password=false
+execInPod "app=${GITEA_APP_NAME}-gitea" ${GITEA_APP_NAME} \
+  "su-exec git gitea admin create-user --name=${GITEA_ADMIN_USERNAME} --password=${GITEA_ADMIN_PASSWORD} --email=${GITEA_ADMIN_EMAIL} --admin --must-change-password=false"
 
 # ------------------------------------------------------------
 echoSection "Gitea has been installed on your cluster"

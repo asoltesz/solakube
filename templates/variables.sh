@@ -436,6 +436,11 @@ export JCR_BACKUP_ENABLED="Y"
 # ------------------------------------------------------------------------------
 
 #
+# The username for the Gitea admin user (the main administrative user).
+#
+export GITEA_ADMIN_USERNAME="gitea"
+
+#
 # The password for the 'admin' user of Gitea (the main administrative user).
 #
 export GITEA_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
