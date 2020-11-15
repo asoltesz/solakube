@@ -46,6 +46,7 @@ then
     cd "${DEPLOYMENT_DIR}"
 fi
 
-# Executing the deployer
-. ${DEPLOY_SCRIPTS_DIR}/deploy.sh $@
+cexport DEPLOY_SCRIPT_NAME "deploy.sh"
 
+# Executing the deployer
+. ${DEPLOY_SCRIPTS_DIR}/${DEPLOY_SCRIPT_NAME} $@
