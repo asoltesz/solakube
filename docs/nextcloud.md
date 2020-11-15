@@ -60,46 +60,37 @@ This will:
 
 The 'admin' user can install and configure your Nextcloud instance.
 
-## OnlyOffice
+## Collabora Online Document Server and Document Editors
 
-Nextcloud has built-in support for running the free (but connection limited) OnlyOffice document server by 2 Nextcloud applications (plugins). They are called 'Community Document Server' (OnlyOffice server component) and 'ONLYOFFICE' (integrates the UI of the OnlyOffice web editors into the NextCloud UI).
+Nextcloud has built-in support for integrating with the CODE document server (Collabora Online Developer Edition) and the web-based document editors.
 
-However, the default NextCloud php configuration will make the Community Document Server application download fail, so a manual installation is needed instead of just clicking on the admin UI.
+### Installing the document server
 
-Steps:
-- Login to your NextCloud pod
-- Download the binary from the [Document Server Releases](https://github.com/nextcloud/documentserver_community/releases). Version 0.1.5 is the current version as the time of this writing.
-- Extract the application package
-- Enable the application on the UI
+NextCloud can install the document server internally, into the Nextcloud pod.
 
-Steps with sample commands (correct the pod name to your own):
+This is not ideal from the scaling/scheduling perspective but it is the easiest to install.
 
-~~~
-# Switch to the nextcloud namespace
-sk ns nextcloud
+Go to the Applications section of the Nextcloud UI and enable the "Collabora Online - Built-in CODE Server" application.
 
-# Get the name of your nextcloud pod
-kubectl get pods
+#### Standalone CODE Server
 
-# Get a remote shell into the NextCloud pod
-kubectl exec -it nextcloud-66df5bdf6f-fk9zh /bin/bash
+SolaKube includes a sample, standalone CODE deployer ("code") which installs the document server into its own namespace on your cluster and makes it accessible publicly. However, ATM, it is not usable due to unresolved security settings (see the [deployer docs](code.md)). 
 
-# Enter the NextCloud applications (plugins) folder
-cd /var/www/html/apps
+### Installing the document editors
 
-# Download the server binary
-curl https://github.com/nextcloud/documentserver_community/releases/download/v0.1.5/documentserver_community.tar.gz -L --output docserver.tar.gz 
+Go to the Applications section of the Nextcloud UI and enable the "Collabora Online" application.
 
-# Extract the binary package (a subfolder will be created)
-tar -xzf docserver.tar.gz 
+Refresh the page and check if NextCloud installed AND enabled the application. Sometimes it gets installed but it remains in disabled state (as of NC 20.0.1).
 
-# Delete the download package (not needed anymore)
-rm docserver.tar.gz
-~~~
+Wait for the document server to start up (that may take several minutes). 
 
-After this, go to the Applications section of the Nextcloud UI and enable the Community Document Server application.
+Go into the "Collabora Online" page in the Settings section and select the internal server option. If you can save the option, the internal server has properly started up and accessible.
 
-Also, install the 'ONLYOFFICE' application (the UI parts).
+### Document editing
+
+After the above installation/setup steps, you should be able to edit ODF and Microsoft Office document files on the user interface of Nextcloud by clicking on the file in the Files app.
+
+Refresh the Files app before your first try because it needs to know if the Collabora Online extension has been installed in the meantime (otherwise, it will just try to download your documents). 
 
 # Notes
 

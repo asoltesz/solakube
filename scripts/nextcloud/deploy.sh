@@ -15,7 +15,7 @@
 
 # Internal parameters
 
-# NextCloud version: 17.0.0
+export NEXTCLOUD_VERSION="20.0.1"
 HELM_CHART_VERSION=1.9.3
 
 # Stop immediately if any of the deployments fail

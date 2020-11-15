@@ -1,6 +1,6 @@
 # Overriding the Nextcloud Docker image version to a newer one
 image:
-    tag: 18.0.3-apache
+    tag: ${NEXTCLOUD_VERSION}-apache
 
 
 # We will supply our own ingress definition
