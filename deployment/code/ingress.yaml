@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: ${CODE_APP_NAME}
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+
+        # Allowing the Code client to upload bigger chunks than usual
+        nginx.ingress.kubernetes.io/proxy-body-size: 512m
+    labels:
+        app: ${CODE_APP_NAME}
+spec:
+    tls:
+        - secretName: ${CODE_TLS_SECRET_NAME}
+          hosts:
+              - ${CODE_FQN}
+    rules:
+        - host: ${CODE_FQN}
+          http:
+              paths:
+                  - path: /
+                    backend:
+                        serviceName: ${CODE_APP_NAME}-collabora-code
+                        servicePort: http
