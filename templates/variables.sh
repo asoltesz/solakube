@@ -239,6 +239,22 @@ then
     fi
 fi
 
+
+# ------------------------------------------------------------------------------
+# OpenEBS
+# ------------------------------------------------------------------------------
+
+# The dedicated storage device/partition for OpenEBS on the nodes
+# export OPENEBS_STORAGE_DEVICE="sda2"
+
+#if [[ -n "${OPENEBS_STORAGE_DEVICE}" ]]
+#then
+#    # A dedicated local data partition/device is marked for usage for OpenEBS
+#    # Replacing the hostpath storage class with the device one
+#    export DEFAULT_STORAGE_CLASS="${DEFAULT_STORAGE_CLASS//openebs-hostpath/openebs-device}
+#fi
+
+
 # ------------------------------------------------------------------------------
 # Backblaze B2 storage access parameters
 # ------------------------------------------------------------------------------

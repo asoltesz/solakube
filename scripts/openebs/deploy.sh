@@ -15,7 +15,7 @@
 
 # Internal parameters
 
-HELM_CHART_VERSION=1.11.0
+HELM_CHART_VERSION=2.3.0
 
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
@@ -46,10 +46,15 @@ defineNamespace ${OPENEBS_APP_NAME}
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install ${OPENEBS_APP_NAME} stable/openebs \
+processTemplate chart-values.yaml
+
+helm repo add openebs https://openebs.github.io/charts
+helm repo update
+
+helm install ${OPENEBS_APP_NAME} openebs/openebs \
     --namespace ${OPENEBS_APP_NAME} \
-    --version=${HELM_CHART_VERSION}
-#    --values ${TMP_DIR}/chart-values.yaml
+    --version=${HELM_CHART_VERSION} \
+    --values ${TMP_DIR}/chart-values.yaml
 
 # ------------------------------------------------------------
 

@@ -1,0 +1,13 @@
+ndm:
+    filters:
+        # Utilizing a separate partition in order to provision volumes from a
+        # safely segregated partition
+        #
+        # Currently doesn't work because NDM always ignores it because sda2 is on the
+        # same device as the operating system partiton (sda1)
+        # (on Hetzner machines at least)
+        #
+        # When this is fixed, the separate storage device can be utilized:
+        # https://github.com/openebs/openebs/issues/3133:
+        #
+        # includePaths: ${OPENEBS_STORAGE_DEVICE}
