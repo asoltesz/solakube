@@ -13,6 +13,7 @@ minikube start \
     --kubernetes-version="v1.15.11" \
     --feature-gates="VolumeSnapshotDataSource=true" \
     --driver="docker" \
+    --disk-size=20g
     $@
 
 
