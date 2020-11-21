@@ -68,7 +68,7 @@ helm install ${PGS_APP_NAME} stable/postgresql \
 
 # We need to wait for pgInit before an application could start use PG
 echo "Waiting for the Postgres installation to finish"
-sleep 45
+sleep 75
 
 # ------------------------------------------------------------
 echoSection "Postgres ${POSTGRES_VERSION} has been installed on your cluster"
