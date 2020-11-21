@@ -27,7 +27,8 @@ then
     export SK_CLUSTER_CTX="minikube"
 fi
 
-# General admin password
+# General admin credentials (app deployers may use it as defaults)
+export SK_ADMIN_USERNAME="admin"
 export SK_ADMIN_PASSWORD="xxx"
 export SK_ADMIN_EMAIL="xxxxxxx@example.com"
 

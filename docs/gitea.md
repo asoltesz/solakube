@@ -26,6 +26,11 @@ Basic Gitea variables:
 
 ~~~
 #
+# The username for the Gitea admin user (the main administrative user).
+#
+export GITEA_ADMIN_USERNAME="${SK_ADMIN_USERNAME}"
+
+#
 # The password for the 'gitea' user of Gitea (the main administrative user).
 #
 export GITEA_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
