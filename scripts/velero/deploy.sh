@@ -15,10 +15,10 @@
 
 # Internal parameters
 
-export VELERO_VERSION="1.4.0"
+export VELERO_VERSION="1.4.2"
 export VELERO_AWS_PLUGIN_VERSION="1.1.0"
 
-HELM_CHART_VERSION="2.12.0"
+HELM_CHART_VERSION="2.12.17"
 
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
