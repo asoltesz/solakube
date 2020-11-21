@@ -48,7 +48,7 @@ sk deploy b2s3
 To remove it:
 
 ~~~
-sk deploy b2s3 undeploy
+sk undeploy b2s3
 ~~~
 
 

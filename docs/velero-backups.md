@@ -96,7 +96,7 @@ If you set this to "N", SolaKube backup profiles will not be deployed for any of
 Use public guides or the following command:
 
 ~~~
-sk deploy velero install-cli
+sk deploy-script velero install-cli.sh
 ~~~
 
 Without this, none of the backup operations and application profile deployments can happen because SolaKube uses the CLI client to define the Velero resources in the cluster.
@@ -221,7 +221,7 @@ export SK_DEPLOY_PGADMIN_BACKUP="Y"
 
 b) After the original cluster building, with a specific deploy command:
 ~~~
-sk deploy pgadmin deploy-backup-config 
+sk deploy-script pgadmin backup-config.sh
 ~~~
 
 

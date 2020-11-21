@@ -136,13 +136,13 @@ See [Persistent Volumes](persistent-volumes.md) for more details about the stora
 The following command displays status info about the Ceph storage cluster:
 
 ~~~
-sk deploy rook-ceph status 
+sk deploy-script rook-ceph status.sh
 ~~~
 
 This will utilize the rook-ceph-tools deployment that can also be utilized from a shell:
 
 ~~~
-sk deploy rook-ceph toolbox-shell 
+sk deploy-script rook-ceph toolbox-shell.sh 
 ~~~
 
 

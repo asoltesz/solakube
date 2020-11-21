@@ -242,7 +242,7 @@ sk deploy jenkins
 After the initial deployment, the recommended way of updating the configuration (including the job descriptions) is updating the chart-values files and executing the update with SolaKube:
 
 ~~~
-sk deploy jenkins update
+sk deploy-script jenkins update.sh
 ~~~ 
 
 This will load the updated configuration into Kubernetes ConfigMaps that are the basis of the Jenkins configuration.
