@@ -28,6 +28,8 @@ echoSection "Validating parameters"
 paramValidation "REGISTRY_ADMIN_PASSWORD" \
    "the password of the 'admin' user of the registry"
 
+cexport REGISTRY_STORAGE_CLASS "${DEFAULT_STORAGE_CLASS}"
+
 checkAppName "registry"
 
 checkStorageClass "registry"

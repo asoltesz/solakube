@@ -22,12 +22,15 @@ When more is needed, raise the resource allocation in chart-values.yaml.
 
 ## Storage space and storage class
 
-The registry will need a fair amount of space, so class preference is changed.
+The registry will need a fair amount of space, so class preference can be changed by a parameter like this:
 
 ~~~
 export REGISTRY_STORAGE_CLASS="hcloud-volumes,openebs-hostpath,rook-ceph-block,standard"
 ~~~
+
 In smaller clusters, the Rook provider is better used for smaller volumes (for larger ones, Hetzner Cloud Volumes may be more suitable).
+
+If not specified, the DEFAULT_STORAGE_CLASS will be used to select the first available storage class.
 
 Unless specified, the Registry will get 10 GB storage. Depending on how many application images you want to store, you may need to raise it.
 ~~~ 
@@ -42,6 +45,49 @@ The password to be used for the single user of the registry called "admin".
 # Password for the 'admin' user of the registry
 export REGISTRY_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 ~~~
+
+# Accessing the registry
+
+## Normal, publicly accessible cluster
+
+The registry will be exposed with a normal ingress on HTTPS (by the SolaKube deployer).
+
+The registry does not have a UI but the REST interface will be accessible for pushing and pulling images:
+~~~
+https://registry.example.com
+~~~
+
+The access port is not 5000 but the normal HTTPS port (443).
+
+Pushing and pulling images can both happen via the above URL. The URL can also be utilized as the private registry URL (see below) since the Docker clients on your nodes will be able to resolve the hostname, thus access the registry. 
+
+## Minikube
+
+In non-public test environments, one needs to port-forward the registry to localhost, and push the necessary images via the localhost port.
+
+This can be used to push the image into the repo to test that it is working.
+
+However, it cannot be used for deployments because the docker client in Minikube will not be able to resolve.
+
+Example:
+
+~~~
+export POD_NAME=$(kubectl get pods --namespace registry -l "app=docker-registry,release=registry" -o jsonpath="{.items[0].metadata.name}")
+
+kubectl -n registry port-forward $POD_NAME 5000:5000
+
+docker tag my-awesome-image:tag localhost:5000/my-awesome-image:tag
+docker login localhost:5000
+...log in ...
+docker push localhost:5000/my-awesome-image:tag
+~~~ 
+
+
+# Using it as the private registry for the cluster
+
+Define the access parameters into the DEFAULT_PRIVATE_REGISTRY_XX parameters.
+
+See the [Registries](registries.md) for more info on this.
 
 # Image maintenance
 

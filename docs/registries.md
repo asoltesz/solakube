@@ -89,7 +89,7 @@ It is very heavy on resources, requires minimum 4 CPU cores and 8 GB RAM [accord
 
 # Configuring a private registry for applications
 
-SolaKube allows configuring a default/shared private registry or a per-application private registry for applications that need it [see the relevant section](Configuring a private registry for applications).   
+SolaKube allows configuring a default/shared private registry or a per-application private registry for applications that need it [see the relevant section](#Application specific registry).   
 
 # The default private registry
 
@@ -121,22 +121,24 @@ export APP1_PRIVATE_REGISTRY_USERNAME=""
 export APP1_PRIVATE_REGISTRY_PASSWORD=""
 ~~~
 
+NOTE: The SolaKube deployer of the application must also be able to detect the registry variables (ensureRegistryAccessForApp method) and pass them into the Helm chart values file (or whatever it uses as deploy mechanism). Currently, this is not implemented in most deployers (see below).
+
 # Preparing an application deployer for using a private registry
 
 ATM, most SolaKube application deployers do not support private registries since the images are supposed to come from Docker Hub.
 
 When a private registry is needed:
 
-## ensuring the derived variables and the registry secretű
+## ensuring the derived variables and the registry secret
 
-The deployer script needs to include the method call that ensures that the necessary secret is deployed in the application's namespace (that contains the access credentials for Kubernetes):
+The deployer script needs to include the method call that ensures that the necessary secret is deployed in the application's namespace (that contains the access credentials of the private registry for Kubernetes):
 
 ~~~
 # Ensuring private registry access params
 ensureRegistryAccessForApp "${XYZ_APP_NAME}"
 ~~~
 
-NOTE: typically the ${XYZ_APP_NAME} is also the name of the namespace of the application by deployer convention.
+NOTE: typically the ${XYZ_APP_NAME} is also the name of the namespace of the application by deployer convention (e.g.: "nextcloud").
 
 This will also define the following, derived variables from the DEFAULT or application-specific variables:
 
