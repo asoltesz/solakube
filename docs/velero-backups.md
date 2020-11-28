@@ -132,7 +132,7 @@ You may also use SolaKube's Velero support do deploy backup profiles for your ow
 
 ## Ensuring pod annotations for Velero
 
-Velero requires that pods are labeled so that Restic is allowed to backup their PVCs.
+As of version 1.4, Velero requires that pods are labeled so that Restic is allowed to backup their PVCs.
 
 For applications that have a SolaKube pre-built backup profile, this annotation is solved, typically as part of the application deployment process.
 
