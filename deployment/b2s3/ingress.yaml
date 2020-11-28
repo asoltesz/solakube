@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${B2S3_APP_NAME}
@@ -11,14 +11,17 @@ metadata:
         app: ${B2S3_APP_NAME}
 spec:
     tls:
-        - secretName: ${B2S3_TLS_SECRET_NAME}
-          hosts:
-              - ${B2S3_FQN}
+    -   secretName: ${B2S3_TLS_SECRET_NAME}
+        hosts:
+        - ${B2S3_FQN}
     rules:
-        - host: ${B2S3_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${B2S3_APP_NAME}
-                        servicePort: http
+    -   host: ${B2S3_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${B2S3_APP_NAME}
+                        port:
+                            name: http

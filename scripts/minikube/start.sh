@@ -10,7 +10,7 @@ shift
 
 # Docker based Minikube driver backend
 minikube start \
-    --kubernetes-version="v1.15.11" \
+    --kubernetes-version="v1.19.4" \
     --feature-gates="VolumeSnapshotDataSource=true" \
     --driver="docker" \
     --disk-size=20g

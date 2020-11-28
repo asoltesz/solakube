@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${JENKINS_APP_NAME}
@@ -14,14 +14,17 @@ metadata:
         app: ${JENKINS_APP_NAME}
 spec:
     tls:
-        - secretName: ${JENKINS_TLS_SECRET_NAME}
-          hosts:
-              - ${JENKINS_FQN}
+    -   secretName: ${JENKINS_TLS_SECRET_NAME}
+        hosts:
+        - ${JENKINS_FQN}
     rules:
-        - host: ${JENKINS_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${JENKINS_APP_NAME}
-                        servicePort: http
+    -   host: ${JENKINS_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${JENKINS_APP_NAME}
+                        port:
+                            name: http

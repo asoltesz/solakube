@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${REDMINE_APP_NAME}
@@ -11,14 +11,17 @@ metadata:
         app: ${REDMINE_APP_NAME}
 spec:
     tls:
-        - secretName: ${REDMINE_TLS_SECRET_NAME}
-          hosts:
-              - ${REDMINE_FQN}
+    -   secretName: ${REDMINE_TLS_SECRET_NAME}
+        hosts:
+        - ${REDMINE_FQN}
     rules:
-        - host: ${REDMINE_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${REDMINE_APP_NAME}
-                        servicePort: http-redmine
+    -   host: ${REDMINE_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${REDMINE_APP_NAME}
+                        port:
+                            name: http-redmine

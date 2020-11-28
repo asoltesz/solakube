@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${WORDPRESS_APP_NAME}
@@ -11,14 +11,17 @@ metadata:
         app: ${WORDPRESS_APP_NAME}
 spec:
     tls:
-        - secretName: ${WORDPRESS_TLS_SECRET_NAME}
-          hosts:
-              - ${WORDPRESS_FQN}
+    -   secretName: ${WORDPRESS_TLS_SECRET_NAME}
+        hosts:
+        - ${WORDPRESS_FQN}
     rules:
-        - host: ${WORDPRESS_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${WORDPRESS_APP_NAME}
-                        servicePort: http
+    -   host: ${WORDPRESS_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${WORDPRESS_APP_NAME}
+                        port:
+                            name: http

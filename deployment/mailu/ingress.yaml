@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${MAILU_APP_NAME}
@@ -14,14 +14,17 @@ metadata:
         app: ${MAILU_APP_NAME}
 spec:
     tls:
-        - secretName: ${MAILU_TLS_SECRET_NAME}
-          hosts:
-              - ${MAILU_FQN}
+    -   secretName: ${MAILU_TLS_SECRET_NAME}
+        hosts:
+        - ${MAILU_FQN}
     rules:
-        - host: ${MAILU_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${MAILU_APP_NAME}-front
-                        servicePort: 80
+    -   host: ${MAILU_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${MAILU_APP_NAME}-front
+                        port:
+                            number: 80

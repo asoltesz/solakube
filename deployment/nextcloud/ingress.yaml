@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${NEXTCLOUD_APP_NAME}
@@ -14,14 +14,17 @@ metadata:
         app: ${NEXTCLOUD_APP_NAME}
 spec:
     tls:
-        - secretName: ${NEXTCLOUD_TLS_SECRET_NAME}
-          hosts:
-              - ${NEXTCLOUD_FQN}
+    -   secretName: ${NEXTCLOUD_TLS_SECRET_NAME}
+        hosts:
+        - ${NEXTCLOUD_FQN}
     rules:
-        - host: ${NEXTCLOUD_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${NEXTCLOUD_APP_NAME}
-                        servicePort: http
+    -   host: ${NEXTCLOUD_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${NEXTCLOUD_APP_NAME}
+                        port:
+                            name: http

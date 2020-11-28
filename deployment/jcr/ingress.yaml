@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${JCR_APP_NAME}
@@ -11,14 +11,17 @@ metadata:
         app: ${JCR_APP_NAME}
 spec:
     tls:
-        - secretName: ${JCR_TLS_SECRET_NAME}
-          hosts:
-              - ${JCR_FQN}
+    -   secretName: ${JCR_TLS_SECRET_NAME}
+        hosts:
+        - ${JCR_FQN}
     rules:
-        - host: ${JCR_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${JCR_APP_NAME}-artifactory-nginx
-                        servicePort: http
+    -   host: ${JCR_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${JCR_APP_NAME}-artifactory-nginx
+                        port:
+                            name: http

@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${CODE_APP_NAME}
@@ -12,14 +12,17 @@ metadata:
         app: ${CODE_APP_NAME}
 spec:
     tls:
-        - secretName: ${CODE_TLS_SECRET_NAME}
-          hosts:
-              - ${CODE_FQN}
+    -   secretName: ${CODE_TLS_SECRET_NAME}
+        hosts:
+        - ${CODE_FQN}
     rules:
-        - host: ${CODE_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${CODE_APP_NAME}-collabora-code
-                        servicePort: http
+    -   host: ${CODE_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${CODE_APP_NAME}-collabora-code
+                        port:
+                            name: http

@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${GITEA_APP_NAME}
@@ -11,14 +11,17 @@ metadata:
         app: ${GITEA_APP_NAME}
 spec:
     tls:
-        - secretName: ${GITEA_TLS_SECRET_NAME}
-          hosts:
-              - ${GITEA_FQN}
+    -   secretName: ${GITEA_TLS_SECRET_NAME}
+        hosts:
+        - ${GITEA_FQN}
     rules:
-        - host: ${GITEA_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${GITEA_APP_NAME}-gitea-http
-                        servicePort: http
+    -   host: ${GITEA_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${GITEA_APP_NAME}-gitea-http
+                        port:
+                            name: http

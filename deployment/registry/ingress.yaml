@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: docker-registry
@@ -13,15 +13,18 @@ metadata:
         instance: ${REGISTRY_APP_NAME}
 spec:
     tls:
-        - secretName: docker-registry-tls
-          hosts:
-              - ${REGISTRY_FQN}
+    -   secretName: docker-registry-tls
+        hosts:
+        - ${REGISTRY_FQN}
 
     rules:
-        - host: ${REGISTRY_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${REGISTRY_APP_NAME}-docker-registry
-                        servicePort: 5000
+    -   host: ${REGISTRY_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${REGISTRY_APP_NAME}-docker-registry
+                        port:
+                            number: 5000

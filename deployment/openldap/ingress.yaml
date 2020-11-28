@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${OPENLDAP_APP_NAME}
@@ -11,14 +11,17 @@ metadata:
         app: ${OPENLDAP_APP_NAME}
 spec:
     tls:
-        - secretName: ${OPENLDAP_FQN}
-          hosts:
-              - ${OPENLDAP_FQN}
+    -   secretName: ${OPENLDAP_FQN}
+        hosts:
+        - ${OPENLDAP_FQN}
     rules:
-        - host: ${OPENLDAP_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${OPENLDAP_APP_NAME}
-                        servicePort: http
+    -   host: ${OPENLDAP_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${OPENLDAP_APP_NAME}
+                        port:
+                            name: http

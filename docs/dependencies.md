@@ -23,7 +23,7 @@ The tools and their versions, this cluster building method is tested on:
 - Terraform 0.12.24
 - Ansible 2.9.1
 - Rancher Server 2.3.6
-- Kubectl 1.15.5
+- Kubectl 1.19.3
   - (always the major+minor version of the k8s cluster created by Rancher)
 - Helm 2.16.1
 - Bash 4+

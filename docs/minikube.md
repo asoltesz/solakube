@@ -7,23 +7,12 @@ This makes development/testing work more efficient since only reasonably well wo
 # Create the cluster
 
 ~~~
-minikube start --kubernetes-version=v1.15.11
-~~~
-
-# Setup ingresses with Minikube
-
-Guide: https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/
-
-## Install Ingress Controller capability
-
-~~~
-minikube addons enable ingress
-minikube addons enable ingress-dns
+sk minikube start
 ~~~
 
 ## Ensure services get resolved
 
-In order to be able to browse the services on your local minikube instance similarly to a public cluster on the internet (e.g.: pgadmin.example.com) you either need to maintain  the service hostnames in your /etc/hosts file, or configure/use ingress-dns.
+In order to be able to browse the services on your local minikube instance similarly to a public cluster on the internet (e.g.: pgadmin.example.com) you either need to maintain the service hostnames in your /etc/hosts file, or configure/use ingress-dns.
 
 ## Configure ingress-dns
 
