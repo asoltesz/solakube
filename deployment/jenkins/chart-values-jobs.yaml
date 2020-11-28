@@ -4,7 +4,7 @@
 # Must define all of the jobs you want to execute with Jenkins
 # ------------------------------------------------------------------------------
 
-#master:
+#controller:
 #    JCasC:
 #        configScripts:
 #            jobs: |

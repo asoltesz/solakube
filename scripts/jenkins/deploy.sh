@@ -14,9 +14,9 @@
 
 # Internal parameters
 
-# Jenkins version: 2.235.3-lts
+# Jenkins version: 2.249.3
 
-HELM_CHART_VERSION=2.5.0
+HELM_CHART_VERSION=3.0.2
 
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
@@ -89,7 +89,10 @@ then
     CHART_VALUES_TEST_JOB_CLAUSE="--values ${TMP_DIR}/chart-values-jobs-test.yaml"
 fi
 
-helm ${OPERATION} ${JENKINS_APP_NAME} stable/jenkins \
+helm repo add jenkins https://charts.jenkins.io
+helm repo update
+
+helm ${OPERATION} ${JENKINS_APP_NAME} jenkins/jenkins \
     --namespace ${JENKINS_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml \
