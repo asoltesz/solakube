@@ -800,15 +800,21 @@ copyFileToPod() {
                       --no-headers
                     )
 
-    if [[ ! ${podName} ]]
+    if [[ -z "${podName}" ]]
     then
         echo "ERROR: pod not found with selector: ${selector}"
-        exit 1
+        return 1
     fi
 
     kubectl cp ${localPath} ${podName}:${podPath} -n ${namespace}
 
-    return $?
+    if [[ $? != 0 ]]
+    then
+        echo "ERROR: when copying file into pod '${podName}' found with selector '${selector}'"
+        return 1
+    fi
+
+    return 0
 }
 
 
