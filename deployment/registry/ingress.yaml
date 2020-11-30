@@ -13,7 +13,7 @@ metadata:
         instance: ${REGISTRY_APP_NAME}
 spec:
     tls:
-    -   secretName: docker-registry-tls
+    -   secretName: ${REGISTRY_TLS_SECRET_NAME}
         hosts:
         - ${REGISTRY_FQN}
 

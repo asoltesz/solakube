@@ -67,7 +67,8 @@ docker run --rm -ti xmartlabs/htpasswd admin ${REGISTRY_ADMIN_PASSWORD} > ${TMP_
 # ------------------------------------------------------------
 echoSection "Installing Docker-Registry (without ingress)"
 
-helm install ${REGISTRY_APP_NAME} stable/docker-registry \
+helm upgrade ${REGISTRY_APP_NAME} stable/docker-registry \
+    --install \
     --namespace ${REGISTRY_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml \
@@ -77,10 +78,15 @@ helm install ${REGISTRY_APP_NAME} stable/docker-registry \
 
 if [[ "${REGISTRY_CERT_NEEDED}" == "Y" ]]
 then
-
-    echoSection "Installing the cert-manager certificate for Docker-Registry"
+    echoSection "Installing a dedicated TLS certificate-request"
 
     applyTemplate certificate.yaml
+else
+    # A cluster-level, wildcard cert needs to be replicated into the namespace
+    if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
+    then
+        applyTemplate cluster-fqn-tls-secret.yaml
+    fi
 fi
 
 # ------------------------------------------------------------
@@ -88,7 +94,6 @@ echoSection "Installing the Ingress for Docker-Registry (with TLS by cert-manage
 
 
 applyTemplate ingress.yaml
-
 
 # ------------------------------------------------------------
 echoSection "Docker-registry has been installed on your cluster"
