@@ -57,7 +57,7 @@ executePostgresAdminScript() {
                             }
                         ],
                         "name": "pg-client-cont",
-                        "image": "docker.io/bitnami/postgresql:11.6.0-debian-9-r0",
+                        "image": "docker.io/bitnami/postgresql:12.5.0-debian-10-r16",
                         "volumeMounts": [
                             {
                                 "name": "postgres-script",
