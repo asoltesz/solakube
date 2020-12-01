@@ -8,7 +8,7 @@
 # - rke up
 #
 
-kubernetes_version: v1.19.3-rancher1
+kubernetes_version: v1.19.4-rancher1-1
 
 
 

@@ -22,7 +22,7 @@ echoHeader "Deploying Hetzner specific cloud-support components"
 #
 # The Hcloud Fip Controller version (branch/tag on GitHub)
 #
-export HETZNER_FIP_CTRL_VERSION=v0.3.0
+export HETZNER_FIP_CTRL_VERSION=v0.4.1
 
 #
 # The Hetzner CSI Driver version (branch/tag on GitHub)
@@ -70,8 +70,7 @@ applyTemplate cloud-controller-secret.yaml
 # ------------------------------------------------------------
 echoSection "Installing HETZNER cloud controller with networks driver"
 
-kubectl apply -f  \
-    https://raw.githubusercontent.com/hetznercloud/hcloud-cloud-controller-manager/${HETZNER_CLOUD_CTRL_VERSION}/deploy/${HETZNER_CLOUD_CTRL_VERSION}-networks.yaml
+applyTemplate cloud-controller-networks.yaml
 
 
 # ------------------------------------------------------------
