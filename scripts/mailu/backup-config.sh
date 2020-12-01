@@ -18,7 +18,7 @@ echoHeader "Deploying backup config for Mailu "
 # ------------------------------------------------------------
 echoSection "Deploying backup configuration"
 
-. ${SK_SCRIPT_HOME}/sk-velero.sh ${MAILU_APP_NAME} backup default schedule
+. ${SK_SCRIPT_HOME}/sk-velero.sh backup schedule ${MAILU_APP_NAME} default
 
 # ------------------------------------------------------------
 echoHeader "Deployed backup config for Mailu "

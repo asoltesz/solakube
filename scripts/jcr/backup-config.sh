@@ -18,7 +18,7 @@ checkAppName "jcr"
 # ------------------------------------------------------------
 echoSection "Deploying backup configuration"
 
-. ${SK_SCRIPT_HOME}/sk-velero.sh ${JCR_APP_NAME} backup default schedule
+. ${SK_SCRIPT_HOME}/sk-velero.sh backup schedule ${JCR_APP_NAME} default
 
 # ------------------------------------------------------------
 echoHeader "Deployed backup config for JFrog Container Registry"

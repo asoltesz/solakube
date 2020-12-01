@@ -18,7 +18,7 @@ checkAppName "registry"
 # ------------------------------------------------------------
 echoSection "Deploying backup configuration"
 
-. ${SK_SCRIPT_HOME}/sk-velero.sh ${OPENLDAP_APP_NAME} backup default schedule
+. ${SK_SCRIPT_HOME}/sk-velero.sh backup schedule ${OPENLDAP_APP_NAME} default
 
 # ------------------------------------------------------------
 echoHeader "Deployed backup config for OpenLDAP"

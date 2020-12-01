@@ -23,7 +23,7 @@ createTempDir "jenkins"
 # ------------------------------------------------------------
 echoSection "Deploying backup configuration"
 
-. ${SK_SCRIPT_HOME}/sk-velero.sh ${JENKINS_APP_NAME} backup default schedule
+. ${SK_SCRIPT_HOME}/sk-velero.sh backup schedule ${JENKINS_APP_NAME} default
 
 # ------------------------------------------------------------
 echoHeader "Deployed backup config for Jenkins"
