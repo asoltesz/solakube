@@ -112,12 +112,16 @@ then
         echo "Helm chart already present in /tmp"
     fi
 
+    CURR_DIR="$(pwd)"
+
     cd ${TMP_DIR}/helm-chart
     git reset --hard
     git fetch
-    git checkout "0.0.7-podAnnotation-and-postgres"
+    git checkout "master"
 
     MAILU_CHART_REPO_LOCAL_PATH=${TMP_DIR}/helm-chart
+
+    cd "${CURR_DIR}"
 fi
 
 # ------------------------------------------------------------
@@ -191,8 +195,10 @@ then
     processTemplate chart-values-extdns.yaml
 
     helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm repo update
 
-    helm install ${MAILU_APP_NAME}-external-dns bitnami/external-dns \
+    helm upgrade ${MAILU_APP_NAME}-external-dns bitnami/external-dns \
+        --install \
         --namespace ${MAILU_APP_NAME} \
         --version=${EXTERNAL_DNS_HELM_CHART_VERSION} \
         --values ${TMP_DIR}/chart-values-extdns.yaml
