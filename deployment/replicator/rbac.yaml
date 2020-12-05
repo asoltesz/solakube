@@ -19,11 +19,11 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: replicator
-  namespace: kube-system
+  namespace: replicator
 
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
     name: replicator
-    namespace: kube-system
+    namespace: replicator

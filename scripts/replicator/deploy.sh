@@ -18,13 +18,19 @@ REPLICATOR_VERSION=2.0.1
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
+# ------------------------------------------------------------
+echoSection "Creating namespace"
+
+defineNamespace "replicator"
 
 # ------------------------------------------------------------
 echoSection "Installing replicator v${REPLICATOR_VERSION}"
 
-kubectl apply -f rbac.yaml
+kubectl apply -f rbac.yaml \
+    -n replicator
 
-kubectl apply -f deployment.yaml
+kubectl apply -f deployment.yaml \
+    -n replicator
 
 # Allowing Replicator to finish initializing before any replicatable content
 # could appear in the cluster
