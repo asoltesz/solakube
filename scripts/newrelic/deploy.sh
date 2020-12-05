@@ -49,6 +49,7 @@ echoSection "Installing application with Helm chart (without ingress)"
 helm repo add newrelic https://helm-charts.newrelic.com
 
 helm upgrade ${NEWRELIC_APP_NAME} newrelic/nri-bundle \
+    --install \
     --namespace ${NEWRELIC_APP_NAME} \
     --values ${TMP_DIR}/chart-values.yaml
 
