@@ -296,12 +296,24 @@ Drop application namespace (but keep its Postgres database).
 kubectl delete namespace nextcloud
 ~~~
 
-## Restore
+## Restore from latest backup
 
 Restore the manual backup you took before destroying the Nextcloud namespace.
 ~~~
+sk velero restore nextcloud default 
+~~~
+
+NOTE: This will auto-query the last fully successful backup and restore from that.
+
+## Restore from earlier backup (optional)
+
+In case you need to restore from an earlier backup, you can query the exact name of the backup and restore from that:
+~~~
+velero get backup | grep nextcloud-default
+
 sk velero restore nextcloud default "--from-backup=nextcloud-default-20200724-2333"
 ~~~
+
 
 ## Check the application
 

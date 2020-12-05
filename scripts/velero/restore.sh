@@ -23,7 +23,7 @@ trap errorHandler ERR
 
 APPLICATION=$1
 
-if [[ ! "${APPLICATION}" ]]
+if [[ -z "${APPLICATION}" ]]
 then
     echo "ERROR: Application/component not specified (e.g.: 'nextcloud'). Aborting."
     exit 1
@@ -31,27 +31,41 @@ fi
 
 PROFILE=$2
 
-if [[ ! "${PROFILE}" ]]
+if [[ -z "${PROFILE}" ]]
 then
+    echo "Backup profile not specified, using 'default' "
     PROFILE="default"
-else
-    shift
 fi
-
 
 BACKUP_SELECTOR=$3
 
-echoHeader "Velero: Restoring with the '${PROFILE}' profile for ${APPLICATION}"
+echoHeader "Velero: Restoring with the '${PROFILE}' profile for the '${APPLICATION}' application"
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
-if [[ ! ${BACKUP_SELECTOR} ]]
+if [[ -z ${BACKUP_SELECTOR} ]]
 then
     echo "No backup is specified for the '${PROFILE}' profile of the '${APPLICATION}' application"
-    echo "The last backup of the daily schedule will be targeted for restore"
+    echo "The last backup will be selected for restore"
 
-    BACKUP_SELECTOR="--from-schedule ${APPLICATION}-${PROFILE:-default}-daily"
+    LAST_BACKUP=$(
+        kubectl get backup \
+            --namespace="velero" \
+            --sort-by=.metadata.creationTimestamp \
+            --output=jsonpath='{range .items[*]}{.status.completionTimestamp}{"::"}{.metadata.name}{"::"}{.status.phase}{"\n"}' \
+           | grep "::Completed" \
+           | grep "${APPLICATION}-${PROFILE}" \
+           | sort -r \
+           | head -n 1 \
+           | grep -oP '::(.*?)::'
+    )
+    LAST_BACKUP="${LAST_BACKUP//:}"
+
+    BACKUP_SELECTOR="--from-backup=${LAST_BACKUP}"
+    echo "Last backup: ${LAST_BACKUP}"
+else
+    echo "Using provided backup selector: ${BACKUP_SELECTOR}"
 fi
 
 # loading application-specific backup config variables into generic ones
