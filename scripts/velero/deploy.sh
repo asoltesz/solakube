@@ -85,7 +85,8 @@ helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 
 echo "Deploying Velero to the cluster with Helm"
 
-helm install ${VELERO_APP_NAME} vmware-tanzu/velero \
+helm upgrade ${VELERO_APP_NAME} vmware-tanzu/velero \
+    --install \
     --namespace ${VELERO_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml \
