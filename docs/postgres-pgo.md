@@ -164,7 +164,7 @@ Optional, defaults to the SK_ADMIN_PASSWORD base variable.
 
 The hostname, on which the targeted PG cluster is visible for in-cluster services that need a database (e.g.: Nextcloud).
 
-By Kubernetes rules, this is <clustername>.<namespace>, so in case of hippo, it is "hippo.pgo" (SolaKube uses the "pgo" namespace for clusters).
+By Kubernetes rules, this is <clustername>.<namespace>, so in case of default, it is "default.pgo" (SolaKube uses the "pgo" namespace for clusters).
 
 Optional, defaults to <PGO_CLUSTER_NAME>.pgo
 
@@ -174,10 +174,10 @@ If you want to be able to backup your cluster to an offsite S3-compatible storag
 
 Minimally, the bucket name must be provided (PGO_CLUSTER_S3_BUCKET), all of the others are auto-loaded from your generic S3 access parameters (S3_XXX). In case, you want to specify them for the targeted PG cluster, the prefix is PGO_CLUSTER_S3 and the endings are the same as with the generic S3 parameters.
 
-The PGO_CLUSTER_S3_REPO_PATH specifies the folder of the backups within the S3 cluster. Defaults to "/backrestrepo/<CLUSTER_NAME>-backrest-shared-repo", so in case of hippo, it is:
+The PGO_CLUSTER_S3_REPO_PATH specifies the folder of the backups within the S3 cluster. Defaults to "/backrestrepo/<CLUSTER_NAME>-backrest-shared-repo", so in case of default, it is:
 
 ~~~
-/backrestrepo/hippo-backrest-shared-repo
+/backrestrepo/default-backrest-shared-repo
 ~~~ 
 
 #### S3 certificates
@@ -428,7 +428,7 @@ NOTE: You can create several PG clusters by modifying the PGO_CLUSTER_NAME varia
 The create-cluster command also accepts the SolaKube name of the DB cluster like this:
 
 ~~~
-sk pgo create-cluster hippo
+sk pgo create-cluster default
 ~~~
 
 ## Testing the cluster
@@ -493,19 +493,24 @@ Currently, there is no formal documentation about this in PGOs docs so only this
 With the following SolaKube command:
 
 ~~~
-sk pgo create-cluster hippo Y 
+sk pgo create-cluster default Y 
 ~~~
 
-In this case "hippo" is the name of the cluster in SolaKube.
+In this case "default" is the name of the cluster in SolaKube.
+
+The last parameter (Y) will instruct SolaKube that the cluster creation is to be done with restoring the database-cluster content from the S3 backups.
 
 The S3 access parameters need to be configured for the DB cluster (see configuration).
 
 After the successful recovery, you need to manually promote the cluster from standby state (read-only) to working (read/write):
 
 ~~~
-pgo update cluster hippo --promote-standby
+sk pgo client-shell
+
+pgo update cluster default --promote-standby
 ~~~ 
-In this case "hippo" is the name of the cluster in PGO.
+
+("default" is the name of the database cluster in PGO)
 
 
 ### When the DB cluster is not completely lost
@@ -515,7 +520,7 @@ If the Postgres cluster only suffered a data corruption but otherwise would be o
 You can use the "pgo restore" command directly from the PGO client-shell:
 
 ~~~
-pgo restore hippo --pgbackrest-storage-type=s3 ...
+pgo restore default --pgbackrest-storage-type=s3 ...
 ~~~
  
 or the SolaKube wrapper with 3 different parametering:
@@ -549,15 +554,15 @@ Unfortunately, as of version 4.3.2 PGO doesn't provide easy ways to track the su
 
 You need to manually query pod statuses with kubectl (or the dashboard) and take logs from pods to investigate issues.
 
-In the examples, I will use pod names that assume the Postgres cluster name 'hippo'
+In the examples, I will use pod names that assume the Postgres cluster name 'default'
 
 ## pgBackrest stanza-create error for S3
 
-The job "hippo-stanza-create" fails.
+The job "default-stanza-create" fails.
 
 Possible reasons:
 
-### S3 provider doesn't support DNS-style bucket names
+### S3 provider doesn't support URI-style bucket names
 
 The bucket must be available as a hostname. E.g.: s3.eu-central-1.wasabisys.com
 
@@ -569,6 +574,6 @@ URI style S3 bucket URL-s are not yet supported in PGO but may become possible [
 
 Check if you can write into the S3 bucket with your credentials.
 
-### The S3 bucket has already been used to backup a PG cluster named hippo
+### The S3 bucket has already been used to backup a PG7173271b-532a-44e8-bffd-d8fd9985efa9 cluster named default
 
 You need to use a different S3 bucket or manually remove the pgbackrest folder created for the backups of the cluster in question. 
