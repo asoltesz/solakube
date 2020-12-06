@@ -481,7 +481,7 @@ In more complex cases, start a PGO client shell (see earlier) and execute a manu
 
 ### When the DB cluster is lost
 
-In this case, the local backup repository is also lost, so you can only recover the data from the S3 repository.
+In this case, the local, in-cluster backup repository is also lost, so you can only recover the data from the S3 repository.
 
 Restoring from S3 backups may be necessary in the following scenarios:
 - total loss of the K8s cluster (the local backup repository is lost too or we didn't even keep local backups, only remote S3 backups)
@@ -490,7 +490,14 @@ Restoring from S3 backups may be necessary in the following scenarios:
 
 Currently, there is no formal documentation about this in PGOs docs so only this [issue](https://github.com/CrunchyData/postgres-operator/issues/1305) serves as the basis for our instructions.
 
-With the following SolaKube command:
+If the database cluster definition is present but is inoperable, you will need to delete it first:
+
+~~~
+sk pgo client-shell
+pgo delete cluster default
+~~~
+
+Then, you can recreate the cluster from the S3 backups with the following SolaKube command:
 
 ~~~
 sk pgo create-cluster default Y 

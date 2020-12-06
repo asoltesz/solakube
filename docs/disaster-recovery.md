@@ -25,3 +25,21 @@ The CrunchyData Postgres Operator (the 'pgo' deployer) has built-in Point-In-Tim
 SolaKube aims to automate the configuration of pgBackest when new Postgres database clusters are created via PGO by configuring the appropriate S3 access parameters.
  
 See the details in the [CrunchyData Postgres Operator](postgres-crunchy.md) page. 
+
+# Recovering from complete cluster loss
+
+In case Velero/S3 application and infrastructure backups were properly enabled/deployed and PGO/S3 Postgres database backups were also enabled, the cluster can be recovered from a complete, catastrophic failure (e.g.: all nodes lost, cluster completely destroyed).
+
+Main recovery steps:
+- Recreate a "bare" cluster (SK_BUILD_BARE_CLUSTER="Y")
+- Install Hetzner components
+- Install Velero 
+- Restore the "Infra" (Infrastructure) backup with Velero
+- Restore the PGO-managed postgres database clusters (see docs for S3 recovery in postgres-pgo.md)
+- Restore each application backups with Velero
+
+TBW: More details
+
+# Migrating the cluster
+
+Similarly to the complete cluster loss, the backups can be used to clone a cluster or migrate it to a new place.
