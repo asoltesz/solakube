@@ -9,6 +9,11 @@
 # - SK_DEPLOY_***
 #   Whether to deploy a certain *** component to the cluster.
 #   See templates/variables.sh and variables.md for possible values.
+#
+# - SK_BUILD_BARE_CLUSTER (Y/N)
+#   Whether the cluster build process only build a bare cluster.
+#   A bare cluster is intended to be a target for restore operations
+#   (Starting with a Rancher Etcd snapshot restore)
 # ------------------------------------------------------------------------------
 
 #
@@ -35,6 +40,12 @@ then
     . ${SK_SCRIPT_HOME}/sk-wait-for-rancher.sh
     checkResultExit "Waiting for successful Rancher cluster provisioning"
 
+    if [[ ${SK_BUILD_BARE_CLUSTER} == "Y" ]]
+    then
+        echoSection "Only a bare cluster was requested. Stopping."
+        return
+    fi
+
     #
     # Installing Hetzner-specific components like fip-controller and volumes
     # ------------------
@@ -43,6 +54,13 @@ then
 
 else
     echo "Base cluster building skipped for type: ${SK_CLUSTER_TYPE}"
+fi
+
+
+if [[ ${SK_BUILD_BARE_CLUSTER} == "Y" ]]
+then
+    echoSection "Only a bare cluster was requested. Stopping."
+    return
 fi
 
 #
