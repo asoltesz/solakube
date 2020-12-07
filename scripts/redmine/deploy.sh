@@ -68,11 +68,13 @@ echoSection "Installing application with Helm chart (without ingress)"
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
-helm install ${REDMINE_APP_NAME} bitnami/redmine \
+helm upgrade ${REDMINE_APP_NAME} bitnami/redmine \
+    --install \
     --namespace=${REDMINE_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values=${TMP_DIR}/chart-values.yaml \
-    --wait
+
+waitAllPodsActive ${REDMINE_APP_NAME}
 
 # ------------------------------------------------------------
 

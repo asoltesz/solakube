@@ -93,12 +93,14 @@ git checkout "0.2.2-podAnnotation"
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install ${GITEA_APP_NAME} \
+helm upgrade ${GITEA_APP_NAME} \
     . \
+    --install \
     --namespace=${GITEA_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values=${TMP_DIR}/chart-values.yaml \
-    --wait
+
+waitAllPodsActive ${GITEA_APP_NAME}
 
 # ------------------------------------------------------------
 

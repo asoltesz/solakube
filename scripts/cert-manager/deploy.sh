@@ -59,7 +59,8 @@ echo "Add the Jetstack Helm repository"
 helm repo add jetstack https://charts.jetstack.io
 
 echo "Install the cert-manager Helm chart"
-helm install cert-manager jetstack/cert-manager \
+helm upgrade cert-manager jetstack/cert-manager \
+  --install \
   --namespace cert-manager \
   --version v${CERT_MAN_CHART_VERSION}
 
