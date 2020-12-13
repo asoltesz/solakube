@@ -8,9 +8,13 @@
 
 shift
 
+KUBERNETES_VERSION="v1.19.4"
+
+echoSection "Starting minikube with Kubernetes ${KUBERNETES_VERSION}"
+
 # Docker based Minikube driver backend
 minikube start \
-    --kubernetes-version="v1.19.4" \
+    --kubernetes-version="${KUBERNETES_VERSION}" \
     --feature-gates="VolumeSnapshotDataSource=true" \
     --driver="docker" \
     --disk-size=20g
