@@ -58,10 +58,28 @@ applyTemplate pvc.yaml
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install ${PGADMIN_APP_NAME} stable/pgadmin \
+helm upgrade ${PGADMIN_APP_NAME} stable/pgadmin \
+    --install \
     --namespace ${PGADMIN_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml
+
+
+# ------------------------------------------------------------
+echoSection "Patching the deployment for Velero/Restic annotations"
+# This is also needed for manual backups (non-scheduled)
+
+sleep 5
+
+waitAllPodsActive ${PGADMIN_APP_NAME}
+
+echo
+
+kubectl patch deployment ${PGADMIN_APP_NAME} \
+  --patch "$(cat velero-deployment-patch.yaml)" \
+  -n ${PGADMIN_APP_NAME}
+
+echo
 
 # ------------------------------------------------------------
 

@@ -23,24 +23,6 @@ createTempDir "pgadmin"
 
 
 # ------------------------------------------------------------
-echoSection "Patching the deployment for Velero/Restic annotations"
-
-sleep 5
-
-waitAllPodsActive ${PGADMIN_APP_NAME}
-
-echo
-
-kubectl patch deployment ${PGADMIN_APP_NAME} \
-  --patch "$(cat velero-deployment-patch.yaml)" \
-  -n ${PGADMIN_APP_NAME}
-
-echo
-sleep 5
-
-waitAllPodsActive ${PGADMIN_APP_NAME}
-
-# ------------------------------------------------------------
 echoSection "Deploying backup configuration"
 
 . ${SK_SCRIPT_HOME}/sk-velero.sh backup schedule ${PGADMIN_APP_NAME} default
