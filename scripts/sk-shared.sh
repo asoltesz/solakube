@@ -228,10 +228,10 @@ function resolvePathOnRoots() {
 # 2 - prefix (e.g.: NEXTCLOUD)
 # 3 - new prefix prepended to the short variable ame (optional)
 #
-function normalizeVariable {
+function normalizeVariable() {
 
-    local varName=$1
-    local prefix=$2
+    local varName=${1//-/_}
+    local prefix=${2//-/_}
     local newPrefix=$3
 
     local var="${prefix}_${varName}"
