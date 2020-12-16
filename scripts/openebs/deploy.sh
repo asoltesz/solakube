@@ -15,12 +15,14 @@
 
 # Internal parameters
 
-HELM_CHART_VERSION=2.3.0
+HELM_CHART_VERSION="2.3.0"
+OPENEBS_VERSION="2.3.0"
 
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
 echoHeader "Deploying the OpenEBS storage provisioner "
+echo "Version: ${OPENEBS_VERSION}"
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
@@ -51,12 +53,23 @@ processTemplate chart-values.yaml
 helm repo add openebs https://openebs.github.io/charts
 helm repo update
 
-helm install ${OPENEBS_APP_NAME} openebs/openebs \
+echo "Executing Helm chart install/upgrade"
+
+helm upgrade ${OPENEBS_APP_NAME} openebs/openebs \
+    --install \
     --namespace ${OPENEBS_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml
 
 # ------------------------------------------------------------
+
+# Test why open-iscsi doesn't work on Ubuntu 20.04 before adding this
+#if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
+#then
+#    echo "Dropping NDM because it cannot be used on Minikube"
+#    kubectl delete deployment ${OPENEBS_APP_NAME}-ndm \
+#        --namespace ${OPENEBS_APP_NAME} \
+#fi
 
 # OpenEBS provisioner must be ready when volumes are requested so the
 # startup must be waited upon
