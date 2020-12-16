@@ -37,5 +37,17 @@ kubectl apply -f deployment.yaml \
 sleep 60
 
 # ------------------------------------------------------------
+echoSection "Deploying Velero backup schedule"
+
+DEPLOY_BCK_PROFILE="$(shouldDeployBackupProfile "replicator")"
+
+if [[ "${DEPLOY_BCK_PROFILE}" == "true" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk-velero.sh backup schedule "replicator" default
+else
+    echo "Built-in backup profile is not deployed: ${DEPLOY_BCK_PROFILE}"
+fi
+
+# ------------------------------------------------------------
 echoSection "Replicator has been installed on your cluster"
 
