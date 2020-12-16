@@ -68,7 +68,11 @@ helm install ${PGS_APP_NAME} stable/postgresql \
 
 # We need to wait for pgInit before an application could start use PG
 echo "Waiting for the Postgres installation to finish"
-sleep 75
+
+# Application deployers MUST find PGS ready when they execute and want to
+# create their own application databases
+waitAllPodsActive ${PGS_APP_NAME}
+
 
 # ------------------------------------------------------------
 echoSection "Postgres ${POSTGRES_VERSION} has been installed on your cluster"
