@@ -55,5 +55,17 @@ helm upgrade ${NEWRELIC_APP_NAME} newrelic/nri-bundle \
 
 
 # ------------------------------------------------------------
+echoSection "Deploying Velero backup schedule"
+
+DEPLOY_BCK_PROFILE="$(shouldDeployBackupProfile "${NEWRELIC_APP_NAME}")"
+
+if [[ "${DEPLOY_BCK_PROFILE}" == "true" ]]
+then
+    . ${SK_SCRIPT_HOME}/sk-velero.sh backup schedule "${NEWRELIC_APP_NAME}" default
+else
+    echo "Built-in backup profile is not deployed: ${DEPLOY_BCK_PROFILE}"
+fi
+
+# ------------------------------------------------------------
 echoSection "NewRelic monitoring client has been installed on your cluster"
 
