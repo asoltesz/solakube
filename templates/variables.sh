@@ -153,6 +153,20 @@ export DEFAULT_PRIVATE_REGISTRY_USERNAME=""
 # Password for the username for the registry access
 export DEFAULT_PRIVATE_REGISTRY_PASSWORD=""
 
+if [[ ${SK_CLUSTER_TYPE} == "hetzner" ]]
+then
+    # If private registry is NOT configured
+    # we try to set a more sensible default (expecting the Docker Registry
+    # to be installed on the cluster)
+
+    # Hostname and port of the registry service
+    cexport DEFAULT_PRIVATE_REGISTRY_FQN "registry.${CLUSTER_FQN}"
+    # Username for the registry access
+    cexport DEFAULT_PRIVATE_REGISTRY_USERNAME "admin"
+    # Password for the username for the registry access
+    cexport DEFAULT_PRIVATE_REGISTRY_PASSWORD "${SK_ADMIN_PASSWORD}"
+fi
+
 
 # ------------------------------------------------------------------------------
 # Rancher access and the ID of the new cluster
