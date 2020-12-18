@@ -684,7 +684,7 @@ waitAllPodsRunning() {
 
 
 #
-# Waits until a single pod become Active in a namespace
+# Waits until a single pod become Ready in a namespace
 #
 # 1 - namespace
 # 2 - name of the pod (or part of the name)
@@ -694,24 +694,34 @@ waitAllPodsRunning() {
 waitSinglePodActive() {
 
     local namespace=$1
-    local podName=$1
-    local timeout=${2:-600}
-    local checkInterval=${3:-5}
+    local podNamePart=$2
+    local timeout=${3:-600}
+    local checkInterval=${4:-5}
 
     local startTime=$(date +%s)
     local limit=$(( ${startTime} + ${timeout} ))
 
-    echo "Checking pods in namespace '${namespace}' to become all Running"
+    echo "Checking single pod '${podNamePart}' in namespace '${namespace}' to become Ready"
 
     local now=$(date +%s)
 
+    local jsonPath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'
+
     while (( ${now} < ${limit} ))
     do
-        local result=$(kubectl get pods --field-selector=metadata.name=${podName},status.phase=Running --namespace=${namespace})
+        # Query the pods which are ready and named as the pod
 
-        if [[ "${result}" != "No resources found." ]]
+        local result=$( \
+            kubectl get pods \
+                --field-selector=status.phase=Running \
+                --output jsonpath="${jsonPath}" \
+                --namespace=${namespace}  \
+                | grep "Ready=True" | grep "${podNamePart}"
+        )
+
+        if [[ "${result}" ]]
         then
-            echo "Pods ${podName} is in 'Running' state (time in waiting: $(( ${now} - ${startTime} ))s"
+            echo "Pod has become 'Ready' (time: $(( ${now} - ${startTime} ))s)"
             return 0
         fi
 
@@ -721,6 +731,12 @@ waitSinglePodActive() {
     done
 
     echo "Timeout passed (${timeout}). Stopping checking attempts. Check failed."
+
+    echo "Status of the pod:"
+    kubectl get pods \
+        --namespace=${namespace}  \
+        | grep "${podNamePart}"
+
     return 1
 }
 
