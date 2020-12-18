@@ -254,7 +254,7 @@ function isBackupSystemAvailable() {
 
 
 #
-# Whether we should deploy a backup profile for an application or not.
+# Whether we should deploy a scheduled backup profile for an application or not.
 #
 # If the VELERO_APP_BACKUPS_ENABLED is not "Y" (the default), it returns false.
 #
@@ -267,6 +267,12 @@ function isBackupSystemAvailable() {
 function shouldDeployBackupProfile() {
 
     local application=$1
+
+    if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
+    then
+        echo "Cluster type is MiniKube. Dev/Testing environment."
+        return
+    fi
 
     if [[ ${VELERO_APP_BACKUPS_ENABLED:-"Y"} != "Y" ]]
     then
