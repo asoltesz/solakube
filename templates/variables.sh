@@ -681,6 +681,16 @@ export TF_VAR_hcloud_token="${HETZNER_CLOUD_TOKEN}"
 # The Rancher API Key
 export TF_VAR_rancher_api_token="${RANCHER_API_TOKEN}"
 
+#
 # Parameters for the S3 storage for etcd backup (done by Rancher)
-export TF_VAR_etcd_s3_access_key=
-export TF_VAR_etcd_s3_secret_key=
+#
+if [[ -n "${S3_ENDPOINT}" ]]
+then
+    export TF_VAR_etcd_backup_enabled="true"
+    export TF_VAR_etcd_s3_bucket_name="${SK_CLUSTER}-rancher-etcd-backup"
+    # Endpoint must come without the protocol for Rancher "https://"
+    export TF_VAR_etcd_s3_endpoint="${S3_ENDPOINT//https:\/\/}"
+    export TF_VAR_etcd_s3_region="${S3_REGION}"
+    export TF_VAR_etcd_s3_access_key="${S3_ACCESS_KEY}"
+    export TF_VAR_etcd_s3_secret_key="${S3_SECRET_KEY}"
+fi
