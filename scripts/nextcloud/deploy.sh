@@ -120,7 +120,7 @@ sleep 60
 echo "Now, you should be able to connect to Nextcloud with the official clients as well."
 
 # ------------------------------------------------------------
-echoSection "NextCloud has been installed on your cluster"
+echoSection "Deploying backup schedule"
 
 DEPLOY_BCK_PROFILE="$(shouldDeployBackupProfile ${NEXTCLOUD_APP_NAME})"
 
@@ -130,3 +130,6 @@ then
 else
     echo "Built-in backup profile is not deployed: ${DEPLOY_BCK_PROFILE}"
 fi
+
+# ------------------------------------------------------------
+echoSection "NextCloud has been installed on your cluster"
