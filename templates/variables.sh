@@ -32,6 +32,20 @@ export SK_ADMIN_USERNAME="admin"
 export SK_ADMIN_PASSWORD="xxx"
 export SK_ADMIN_EMAIL="xxxxxxx@example.com"
 
+# The domain FQN for the cluster
+export CLUSTER_FQN="andromeda.nostran.com"
+
+if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
+then
+    export CLUSTER_FQN="andromeda.mk"
+fi
+
+#
+# Whether the cluster build process only build a bare cluster.
+# A bare cluster is intended to be a target for cluster restore from backups
+# (Starting with a Rancher Etcd snapshot restore)
+#
+export SK_BUILD_BARE_CLUSTER="N"
 
 # ------------------------------------------------------------------------------
 # Components to install
@@ -197,14 +211,6 @@ fi
 # The name of the secret for the cluster-level, wildcard certificate.
 export CLUSTER_CERT_SECRET_NAME="cluster-fqn-tls"
 
-
-# The domain FQN for the cluster
-export CLUSTER_FQN="andromeda.example.com"
-
-if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
-then
-    export CLUSTER_FQN="andromeda.mk"
-fi
 
 # The Cloudflare administrator account email address (dns01 issuer)
 export CLOUDFLARE_EMAIL="${SK_ADMIN_EMAIL}"
