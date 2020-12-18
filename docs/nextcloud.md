@@ -92,6 +92,24 @@ After the above installation/setup steps, you should be able to edit ODF and Mic
 
 Refresh the Files app before your first try because it needs to know if the Collabora Online extension has been installed in the meantime (otherwise, it will just try to download your documents). 
 
+# Administration
+
+## Running occ commands in the container
+
+The occ command can only be executed with the 'www-data' user.
+
+In the container shell, switch the user to www-data:
+
+~~~
+su -s /bin/bash www-data
+~~~ 
+
+Then, you can run an occ command (e.g: a document reindex, as follows):
+
+~~~
+php /var/www/html/occ files:scan --all
+~~~
+
 # Notes
 
 ## Uploading big files
