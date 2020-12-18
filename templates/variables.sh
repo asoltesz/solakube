@@ -665,11 +665,6 @@ export MAILU_EXTERNAL_DNS_PROVIDER="cloudflare"
 # Whether TLS certificate with Cert-Manager needs to be requested
 export MAILU_CERT_NEEDED="N"
 
-# ------------------------------------------------------------------------------
-# Limes (WARNING: DO NOT INCLUDE IN THE TEMPLATE)
-# ------------------------------------------------------------------------------
-export LIMES_CONFIG="$(resolvePathOnRoots "variables-limes.sh")"
-. "${LIMES_CONFIG}"
 
 # ------------------------------------------------------------------------------
 # Exports for Terraform
