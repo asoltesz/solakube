@@ -157,8 +157,10 @@ else
     if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
     then
         # TLS Secret for the ingress
+        deleteKubeObject "secret" "cluster-fqn-tls" "${MAILU_APP_NAME}"
         applyTemplate cluster-fqn-tls-secret.yaml
         # TLS secret for other, non-HTTPS parts of Mailu
+        deleteKubeObject "secret" "${MAILU_APP_NAME}-certificates" "${MAILU_APP_NAME}"
         applyTemplate cluster-fqn-tls-secret-2.yaml
     fi
 fi
