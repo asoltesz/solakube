@@ -71,8 +71,14 @@ fi
 # loading application-specific backup config variables into generic ones
 normalizeConfigVariables "${APPLICATION}" "${PROFILE}"
 
-# Setting defaults for generic backup variables if they are not defined
-applyDefaults "${APPLICATION}" "${PROFILE}"
+# Setting defaults in general
+applyGenericDefaults
+
+if [[ ${BACKUP_IS_APPLICATION} == "true" ]]
+then
+    # Setting defaults for generic backup variables if they are not defined
+    applyApplicationDefaults "${APPLICATION}" "${PROFILE}"
+fi
 
 
 # Ensuring that no new backups can write into the location while
@@ -80,7 +86,7 @@ applyDefaults "${APPLICATION}" "${PROFILE}"
 setLocationAccessMode ${BACKUP_LOCATION_NAME} "ReadOnly"
 
 # ------------------------------------------------------------
-echoSection "Executing backup"
+echoSection "Executing restore"
 
 RESTORE_NAME="${APPLICATION}-${PROFILE:-default}-$(date +%Y%m%d-%H%M)"
 

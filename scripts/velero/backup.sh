@@ -62,12 +62,21 @@ echoHeader "Velero backup ${OPERATION} for ${APPLICATION}"
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
+# Applying defaults for the "schedules" and "cluster" backups
+defineSchedulesBackupDefaults
+defineClusterBackupDefaults
 
 # loading application-specific backup config variables into generic ones
 normalizeConfigVariables "${APPLICATION}" "${PROFILE}"
 
-# Setting defaults for generic backup variables if they are not defined
-applyDefaults "${APPLICATION}" "${PROFILE}"
+# Setting defaults in general
+applyGenericDefaults
+
+if [[ ${BACKUP_IS_APPLICATION} == "true" ]]
+then
+    # Setting defaults for generic backup variables if they are not defined
+    applyApplicationDefaults "${APPLICATION}" "${PROFILE}"
+fi
 
 # Validates mandatory filesystem/restic specific backup variables
 validateVariables "${APPLICATION}" "${PROFILE}"

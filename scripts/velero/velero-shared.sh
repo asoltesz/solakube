@@ -40,8 +40,7 @@ function normalizeConfigVariables {
 
 
 #
-# Applies generic defaults for an application and backup profile for the
-# following variables:
+# Applies defaults for an application backup profile.
 #
 # - BACKUP_NAMESPACE
 # - BACKUP_LOCATION_NAME
@@ -53,7 +52,7 @@ function normalizeConfigVariables {
 # 1 - Name of the application ('nextcloud')
 # 2 - Name of the profile ('profile1')
 #
-function applyDefaults() {
+function applyApplicationDefaults() {
 
     local application=${1}
     local profile=${2}
@@ -79,6 +78,55 @@ function applyDefaults() {
 
 }
 
+
+function applyGenericDefaults() {
+
+    # Unless stated, the backup is for an application (not cluster-level)
+    cexport BACKUP_IS_APPLICATION "true"
+
+    # We use Restic to back up volumes by default, so snapshotting is not needed
+    # (unless explicitely specified)
+    cexport BACKUP_SNAPSHOT_VOLUMES "false"
+
+    # The backup repository name to be used
+    cexport BACKUP_LOCATION_NAME "default"
+
+    # Backup retention & scheduling settings
+
+    cexport BACKUP_RETENTION_DAILY 30
+    cexport BACKUP_RETENTION_MONTHLY 6
+    cexport BACKUP_RETENTION_YEARLY 0
+
+    # Every day, 01:00 in the morning
+    cexport BACKUP_SCHEDULE_DAILY "0 1 * * *"
+    # First day of the month, 03:00 in the morning
+    cexport BACKUP_SCHEDULE_MONTHLY "0 3 1 * *"
+    # First day of the year, 05:00 in the morning
+    cexport BACKUP_SCHEDULE_YEARLY "0 5 1 1 *"
+
+}
+
+
+#
+# Kubernetes object types that should be excluded from application (namespace) backups
+#
+function applicationBackupExcludedTypes() {
+
+        local lst="apiservices.apiregistration.k8s.io"
+        lst="$lst,castemplates.openebs.io"
+        lst="$lst,certificatesigningrequests.certificates.k8s.io"
+        lst="$lst,clusterrolebindings.rbac.authorization.k8s.io"
+        lst="$lst,clusterroles.rbac.authorization.k8s.io"
+        lst="$lst,csinodes.storage.k8s.io"
+        lst="$lst,customresourcedefinitions.apiextensions.k8s.io"
+        lst="$lst,nodes"
+        lst="$lst,priorityclasses.scheduling.k8s.io"
+        lst="$lst,storageclasses.storage.k8s.io"
+        lst="$lst,storagepools.openebs.io"
+        lst="$lst,validatingwebhookconfigurations.admissionregistration.k8s.io"
+
+        echo "${lst}"
+}
 
 
 #
@@ -209,4 +257,28 @@ setLocationAccessMode() {
         --namespace velero \
         --type merge \
         --patch "{\"spec\":{\"accessMode\":\"${accessMode}\"}}"
+}
+
+#
+# Defines the default settings for the Infrastructure backup
+#
+defineSchedulesBackupDefaults() {
+
+    # All namespaces hosting infrastructure components
+    cexport VELERO_SCHEDULES_BACKUP_NAMESPACES "velero"
+
+    # Cert-Manager would try to order certificates again after restore
+    cexport VELERO_SCHEDULES_BACKUP_RESOURCES "schedules.velero.io"
+}
+
+defineClusterBackupDefaults() {
+
+    # All namespaces hosting infrastructure components
+    cexport VELERO_CLUSTER_BACKUP_NAMESPACES "default"
+
+    # All cluster level objects like certificate issuers
+    cexport VELERO_CLUSTER_BACKUP_CLUSTER_RESOURCES "true"
+
+    # Cluster level objects should be included
+    cexport VELERO_CLUSTER_IS_APPLICATION "false"
 }
