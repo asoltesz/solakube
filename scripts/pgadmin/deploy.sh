@@ -10,7 +10,12 @@
 # WARNING: Assumes that a cert-manager ClusterIssuer named "letsencrypt-http01"
 # is already deployed on the cluster (it will define the Certificate to be
 # requested from)
-#
+# 1 - Operation type of the deployment. Possible values:
+#     - install (default):
+#           install pgadmin
+#     - update
+#           update pgadmin to a newer version
+#           no backup schedules will be installed
 # ==============================================================================
 
 # Internal parameters
@@ -22,8 +27,19 @@ trap errorHandler ERR
 
 echoHeader "Deploying the pgAdmin DB administration tool "
 
+OPERATION=${1:-"install"}
+
+echo "Operation to be executed: ${OPERATION}"
+
 # ------------------------------------------------------------
 echoSection "Validating parameters"
+
+if [[ -z $(echo ",install,update," | grep ",${OPERATION},") ]]
+then
+    echo "FATAL: Unsupported script operation mode: ${OPERATION}"
+    exit 1
+fi
+
 
 checkAppName "pgadmin"
 
@@ -103,17 +119,22 @@ echoSection "Installing the Ingress (with TLS by cert-manager)"
 applyTemplate ingress.yaml
 
 
+# ------------------------------------------------------------
+
+if [[ "${OPERATION}" == "install" ]]
+then
+    echoSection "Deploying backup schedule"
+
+    DEPLOY_BCK_PROFILE="$(shouldDeployBackupProfile ${PGADMIN_APP_NAME})"
+
+    if [[ "${DEPLOY_BCK_PROFILE}" == "true" ]]
+    then
+        . ${DEPLOY_SCRIPTS_DIR}/backup-config.sh
+    else
+        echo "Built-in backup profile is not deployed: ${DEPLOY_BCK_PROFILE}"
+    fi
+fi
+
 
 # ------------------------------------------------------------
 echoSection "PgAdmin has been installed on your cluster"
-
-
-DEPLOY_BCK_PROFILE="$(shouldDeployBackupProfile ${PGADMIN_APP_NAME})"
-
-if [[ "${DEPLOY_BCK_PROFILE}" == "true" ]]
-then
-    . ${DEPLOY_SCRIPTS_DIR}/backup-config.sh
-else
-    echo "Built-in backup profile is not deployed: ${DEPLOY_BCK_PROFILE}"
-fi
-
