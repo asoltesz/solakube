@@ -40,12 +40,6 @@ then
     . ${SK_SCRIPT_HOME}/sk-wait-for-rancher.sh
     checkResultExit "Waiting for successful Rancher cluster provisioning"
 
-    if [[ ${SK_BUILD_BARE_CLUSTER} == "Y" ]]
-    then
-        echoSection "Only a bare cluster was requested. Stopping."
-        return
-    fi
-
     #
     # Installing Hetzner-specific components like fip-controller and volumes
     # ------------------
