@@ -17,4 +17,4 @@ echo "--------------"
 # Executing the uploaded command script
 execInPod "name=pgo-client" "pgo" "bash /tmp/cmd.sh"
 
-exit $?
+return $?

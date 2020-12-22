@@ -2,6 +2,7 @@ CREATE TABLE fruit (
   id VARCHAR(100) PRIMARY KEY,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+--DROP TABLE fruit;
 
 INSERT INTO fruit (id) VALUES ('apple');
 INSERT INTO fruit (id) VALUES ('pear');

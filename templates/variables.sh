@@ -362,11 +362,11 @@ export PGS_SERVICE_HOST="pgs-postgresql.pgs"
 export PGO_ADMIN_PASSWORD="${SK_ADMIN_PASSWORD}"
 
 
-# The currently selected PG cluster for SolaKube scripts
-export PGO_CURRENT_CLUSTER_NAME="default"
+# Whether it is allowed to automatically create the default DB cluster
+export PGO_CREATE_DEFAULT_CLUSTER="N"
 
-# The name of the PG cluster in PGO (cluster identifier for PGO)
-export PGO_CLUSTER_NAME="default"
+# The name of the SolaKube PG cluster definition to target.
+export PGO_CURRENT_CLUSTER="default"
 
 # The S3 bucket needs to be defined to activate s3 backups by pgBackRest
 export PGO_CLUSTER_S3_BUCKET="${SK_CLUSTER}-postgres-backup"

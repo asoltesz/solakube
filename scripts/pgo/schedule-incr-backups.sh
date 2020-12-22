@@ -45,7 +45,7 @@ END
 )
 
 # Executing the command
-${SK_SCRIPT_HOME}/sk pgo client "${COMMAND}"
+${SK_SCRIPT_HOME}/sk pgo exec "${COMMAND}"
 
 
 # ------------------------------------------------------------

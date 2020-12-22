@@ -6,9 +6,16 @@
 # Postgres Database cluster.
 #
 # 1 - Operation type of the deployment. Possible values:
-#     - install (default) - install pgo to the cluster
-#     - update - update existing install to a newer version
-#     - uninstall - remove pgo from the cluster
+#     - install (default)
+#         Install PGO to the K8s cluster.
+#         Backup schedules are automatically installed if possible.
+#     - update
+#         update existing install to a newer PGO version
+#     - recovery
+#         used when re-installing in recovery mode.
+#         Backup schedules should NOT be installed
+#     - uninstall
+#         remove PGO from the K8s cluster
 #
 # ==============================================================================
 
@@ -20,13 +27,9 @@ trap errorHandler ERR
 
 # Internal parameters
 
-export PGO_VERSION="4.3.2"
+export PGO_VERSION="4.5.1"
 
-OPERATION=$1
-if [[ ! ${OPERATION} ]]
-then
-    OPERATION="install"
-fi
+OPERATION=${1:-"install"}
 
 echo "Operation to be executed: ${OPERATION}"
 
@@ -39,6 +42,12 @@ echo "PGO version: ${PGO_VERSION}"
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
+
+if [[ -z $(echo ",install,update,recovery,uninstall," | grep ",${OPERATION},") ]]
+then
+    echo "FATAL: Unsupported script operation mode: ${OPERATION}"
+    exit 1
+fi
 
 paramValidation SK_CLUSTER "The name of your cluster (e.g.: 'andromeda')"
 
@@ -74,65 +83,38 @@ fi
 # ------------------------------------------------------------
 echoSection "Preparing temp folder"
 
-createTempDir "pgo" "Y"
+createTempDir "pgo"
 
 
-# ------------------------------------------------------------
-echoSection "Ansible inventory.ini"
-
-# processTemplate inventory.ini
 
 # ------------------------------------------------------------
 #echoSection "Creating namespace"
-#defineNamespace ${PGO_APP_NAME}
+defineNamespace "pgo"
 
 
 # ------------------------------------------------------------
-echoSection "Preparing the inventory file"
 
-if [[ ${PGO_CLUSTER_S3_BUCKET} ]]
+if [[ "${OPERATION}" == "install" ]] || [[ "${OPERATION}" == "recovery" ]]
 then
-    # S3 backups are needed for pgBackRest
+    echoSection "Preparing the Operator Configuration file"
 
-    processTemplate "backrest-s3.ini"
+    processTemplate "config.yaml"
 
-    export PGO_BACKREST_S3_SECTION="$(cat ${TMP_DIR}/backrest-s3.ini)"
+    deleteKubeObject "configmap" "pgo-deployer-cm" "pgo"
+
+    kubectl create configmap pgo-deployer-cm \
+      --from-file="values.yaml=${TMP_DIR}/config.yaml" \
+      --namespace="pgo"
 fi
 
-processTemplate "inventory.ini"
-
-
-# ------------------------------------------------------------
-echoSection "Downloading and extracting the PGO Ansible role"
-
-if [[ ! -d "${TMP_DIR}/pgo" ]]
-then
-    git clone https://github.com/CrunchyData/postgres-operator ${TMP_DIR}/pgo
-else
-    echo "Ansible role already present in /tmp"
-fi
-
-cd ${TMP_DIR}/pgo
-git reset --hard
-git fetch
-git checkout "v${PGO_VERSION}"
+applyTemplate "postgres-operator.yml"
 
 # ------------------------------------------------------------
-echoSection "Replacing the inventory.ini file with our own"
+echoSection "Installing the operator with Kubectl"
 
-cd ${TMP_DIR}/pgo/installers/ansible
-
-# Removing the default/sample inventory coming with the Git sources
-rm -Rf inventory
-
-# Copying the assembled inventory
-cp ${TMP_DIR}/inventory.ini ./inventory
-
-
-# ------------------------------------------------------------
-echoSection "Installing the operator with Ansible"
-
-ansible-playbook -i inventory --tags=${OPERATION} main.yml
+# Avoid error when there is no pod in the namespace at all
+sleep 30
+waitSinglePodActive pgo pgo-client
 
 # Patching the PGO client environment so that all PGO commands execute
 # in this namespace
@@ -141,25 +123,43 @@ kubectl set env deployment/pgo-client \
     --namespace="pgo"
 
 # ------------------------------------------------------------
-echoSection "Waiting for the PGO installation to stabilize"
-sleep 10
+echoSection "Waiting for the PGO client installation to stabilize"
 
-waitAllPodsActive pgo 600 5
+# Waitin for the patch to take effect
+sleep 5
+waitSinglePodActive pgo pgo-client
 
+# Waiting for the non-patched pgo-client pod to be removed
+sleep 15
 
 # ------------------------------------------------------------
 
 # Deploying the DB cluster if not specifically disallowed
 
-if [[ "${OPERATION}" == "install" ]] && [[ "${PGO_CREATE_CLUSTER:-Y}" == "Y" ]]
+if [[ "${OPERATION}" == "install" ]] && [[ "${PGO_CREATE_DEFAULT_CLUSTER:-Y}" == "Y" ]]
 then
-    echoSection "Creating the Postgres DB cluster"
+    echoSection "Creating the 'default' Postgres DB cluster"
 
     ${SK_SCRIPT_HOME}/sk pgo create-cluster "default"
 
 fi
 
+# ------------------------------------------------------------
+# echoSection "Deploying backup schedule"
 
+if [[ "${OPERATION}" == "install" ]]
+then
+    echoSection "Deploying backup schedule"
+
+    DEPLOY_BCK_PROFILE="$(shouldDeployBackupProfile ${PGO_APP_NAME})"
+
+    if [[ "${DEPLOY_BCK_PROFILE}" == "true" ]]
+    then
+        . ${DEPLOY_SCRIPTS_DIR}/backup-config.sh
+    else
+        echo "Built-in backup profile is not deployed: ${DEPLOY_BCK_PROFILE}"
+    fi
+fi
 
 # ------------------------------------------------------------
 echoSection "CrunchyData Postgres Operator has been ${OPERATION}ed on your cluster"

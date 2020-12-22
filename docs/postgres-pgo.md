@@ -90,7 +90,7 @@ SolaKube commands helps managing a single PG cluster at a time (identified by PG
 
 ## PGO-global variables
 
-### PGO_CREATE_CLUSTER
+### PGO_CREATE_DEFAULT_CLUSTER
 
 (Y)es or (N)o.
 
@@ -124,11 +124,10 @@ All configuration variables that has with PGO_CLUSTER_ or <clustername>_PGO_CLUS
 
 Cluster specific variables can be defined in two form:
 
-- Variable for the default DB cluster. These are shorter, since the variable name omits the name of the DB cluster. E.g.: PGO_CLUSTER_ADMIN_USERNAME.
-- Variable for a non-default cluster. E.g.: PGO_WORDPRESS_CLUSTER_ADMIN_NAME
+- Variable for the "default" DB cluster. These are shorter, since the variable name omits the name of the DB cluster. E.g.: PGO_CLUSTER_ADMIN_USERNAME.
+- Variable for a non-default cluster. E.g.: WORDPRESS_PGO_CLUSTER_ADMIN_NAME. The variables start with rhe name of the cluster and continue with the normal variable name.
 
-
-All variables (e.g.: PGO_CREATE_CLUSTER) are PGO-global and can be defined only once.
+All other, non-cluster-specific variables (e.g.: PGO_CREATE_DEFAULT_CLUSTER) are PGO-global and can be defined only once.
 
 ### PGO_CLUSTER_NAME
 
@@ -459,25 +458,31 @@ If there was no error when executing the statements, your database cluster shoul
 
 ## Starting a manual backup
 
-In case you need to take a backup manually (as opposed to the automatic, scheduled backups) SolaKube provides a helper script which wraps the "pgo backup" command which allows to take a backup with pgBackrest.
+In case you need to take a backup manually (as opposed to the automatic, scheduled backups) SolaKube 
+provides a helper script which wraps the "pgo backup" command which allows to take a backup with pgBackrest.
 
 ~~~
 # A full backup to s3 storage (slower)
-sk pgo backup "s3" "full"
+sk pgo backup "default" "s3" "full"
 
 # An incremental backup to the local pgbackrest repo
-sk pgo backup "local" "incr"
+sk pgo backup "default" "local" "incr"
 
 # A full backup to the default backup storage places, tracking for 20 minutes
-# (the DB is big, it will complete lower)
-sk pgo backup "" "full" 1200
+# (the DB is big, it will complete slower)
+sk pgo backup "default" "" "full" 1200
 ~~~
-
-If you have multiple PG clusters, ensure the PGO_CURRENT_CLUSTER is set appropriately.
+NOTE: "default" is the name of the DB cluster in each command. 
 
 In more complex cases, start a PGO client shell (see earlier) and execute a manually constructed pgo backup command.
 
 ## Restoring a PG cluster from backups
+
+The recovery strategy described below assumes that you have your PGO cluster attributes defined as SolaKube variables (minimally the ones that cannot/hard to be changed later). For example: the size of the PVCs under the database pods, memory and CPU requests/limits.
+
+In case you have changed PG cluster parameters after creating it with SolaKube, either make sure that you sync the attributes back to the SK variables or you will need to re-apply your changes after the recovery (by using the pgo client).
+
+NOTE: The "pgo" namespace backup (taken with Velero) always contains all information about your DB clusters. This can be used to reconstruct DB cluster attributes.
 
 ### When the DB cluster is lost
 
@@ -493,8 +498,7 @@ Currently, there is no formal documentation about this in PGOs docs so only this
 If the database cluster definition is present but is inoperable, you will need to delete it first:
 
 ~~~
-sk pgo client-shell
-pgo delete cluster default
+sk pgo exec delete cluster default
 ~~~
 
 Then, you can recreate the cluster from the S3 backups with the following SolaKube command:
@@ -503,21 +507,27 @@ Then, you can recreate the cluster from the S3 backups with the following SolaKu
 sk pgo create-cluster default Y 
 ~~~
 
-In this case "default" is the name of the cluster in SolaKube.
+In this case "default" is the name of the Postgres cluster in SolaKube.
 
-The last parameter (Y) will instruct SolaKube that the cluster creation is to be done with restoring the database-cluster content from the S3 backups.
+The last parameter (Y) will instruct SolaKube that the PG cluster creation is to be done with restoring the database-cluster content from the S3 backups.
 
 The S3 access parameters need to be configured for the DB cluster (see configuration).
 
 After the successful recovery, you need to manually promote the cluster from standby state (read-only) to working (read/write):
 
 ~~~
-sk pgo client-shell
-
-pgo update cluster default --promote-standby
+sk pgo exec update cluster default --promote-standby
 ~~~ 
 
 ("default" is the name of the database cluster in PGO)
+
+IMPORTANT NOTE (slow recovery and promotion): 
+
+Very often, the recovery is not actually finished by the time the PGO workflow finishes and the script says that you can now promote your standby to primary. 
+
+In this case (as of PGO v4.5.1), you will see "New primary still in recovery, waiting one second..." messages and sometimes you will have to wait for a long time until the standby actually promotes to primary.
+ 
+ The time is proportionate to the size of your database cluster and the number of WAL records to be applied after the last full backup. Recovery can probably be faster with fewer WAL records between full backups.
 
 
 ### When the DB cluster is not completely lost
@@ -527,10 +537,10 @@ If the Postgres cluster only suffered a data corruption but otherwise would be o
 You can use the "pgo restore" command directly from the PGO client-shell:
 
 ~~~
-pgo restore default --pgbackrest-storage-type=s3 ...
+sk pgo exec restore default --pgbackrest-storage-type=s3 ...
 ~~~
  
-or the SolaKube wrapper with 3 different parametering:
+or the SolaKube wrapper with 3 different parameterization:
 
 ~~~
 # Last backup from local repo
@@ -550,7 +560,7 @@ If you have multiple PG clusters, ensure the PGO_CURRENT_CLUSTER is set appropri
 
 ## Tracking the success of PGO operations
 
-As of v4.3.2 the PGO command line client doesn't provide any tracking for the operations it starts. It starts the operation and displays what it starts but then the user/administrator is left without the actual result and has to manually check for problems and issues. See this [feature request](https://github.com/CrunchyData/postgres-operator/issues/1604)
+As of v4.5.1 the PGO command line client doesn't provide any tracking for the operations it starts. It starts the operation and displays what it starts but then the user/administrator is left without the actual result and has to manually check for problems and issues. See this [feature request](https://github.com/CrunchyData/postgres-operator/issues/1604)
 
 For the few operations supported/wrapped by SolaKube there is tracking for the task completion itself (success or fail) but logs and error statuses are not returned. In case you want to implement tracking for your own automation, you may be able to use the tracking code in pgo-shared.sh.
 
@@ -567,7 +577,7 @@ In the examples, I will use pod names that assume the Postgres cluster name 'def
 
 The job "default-stanza-create" fails.
 
-Possible reasons:
+Possible reasons are in subsections.
 
 ### S3 provider doesn't support URI-style bucket names
 
@@ -581,6 +591,6 @@ URI style S3 bucket URL-s are not yet supported in PGO but may become possible [
 
 Check if you can write into the S3 bucket with your credentials.
 
-### The S3 bucket has already been used to backup a PG7173271b-532a-44e8-bffd-d8fd9985efa9 cluster named default
+### The S3 bucket has already been used to backup a PG cluster named default
 
-You need to use a different S3 bucket or manually remove the pgbackrest folder created for the backups of the cluster in question. 
+You need to use a different S3 bucket or manually remove the pgbackrest folder created for the backups of the DB cluster in question. 

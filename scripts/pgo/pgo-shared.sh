@@ -25,7 +25,7 @@ function waitForWorkflow() {
 
     while (( ${now} < ${limit} ))
     do
-        local result=$(${SK_SCRIPT_HOME}/sk pgo client show workflow ${flowId} | grep "${completionMessage}")
+        local result=$(${SK_SCRIPT_HOME}/sk pgo exec show workflow ${flowId} | grep "${completionMessage}")
 
         if [[ "${result}" ]]
         then
@@ -121,19 +121,19 @@ checkPgoStorageClasses() {
     # Storage class preferences for the database pods
     # These should be on the fastest storage possible
 
-    DB_PREF_CLASSES="openebs-hostpath,rook-ceph-block,hcloud-volume,standard"
+    cexport PGO_DB_PREF_CLASSES "openebs-hostpath,rook-ceph-block,hcloud-volume,standard"
 
-    checkStorageClass "pgo_cluster_primary" ${DB_PREF_CLASSES}
-    checkStorageClass "pgo_cluster_replica" ${DB_PREF_CLASSES}
+    checkStorageClass "pgo_cluster_primary" ${PGO_DB_PREF_CLASSES}
+    checkStorageClass "pgo_cluster_replica" ${PGODB_PREF_CLASSES}
 
     # Storage class preferences for the non-database pods
     # These should be on HA storage whenever possible
 
-    OTHER_PREF_CLASSES="rook-ceph-block,hcloud-volume,standard"
+    cexport PGO_OTHER_PREF_CLASSES "rook-ceph-block,hcloud-volume,standard"
 
-    checkStorageClass "pgo_cluster_backrest" ${OTHER_PREF_CLASSES}
-    checkStorageClass "pgo_cluster_backup" ${OTHER_PREF_CLASSES}
-    checkStorageClass "pgo_cluster_wal" ${OTHER_PREF_CLASSES}
+    checkStorageClass "pgo_cluster_backrest" ${PGO_OTHER_PREF_CLASSES}
+    checkStorageClass "pgo_cluster_backup" ${PGO_OTHER_PREF_CLASSES}
+    checkStorageClass "pgo_cluster_wal" ${PGO_OTHER_PREF_CLASSES}
 
     echo "--------"
     echo "Selected storage classes:"
@@ -178,13 +178,17 @@ function importPgoClusterVariables {
     normalizeVariable "PGO_CLUSTER_S3_BUCKET" ${prefix}
     normalizeVariable "PGO_CLUSTER_S3_ENDPOINT" ${prefix}
     normalizeVariable "PGO_CLUSTER_S3_REGION" ${prefix}
+
     normalizeVariable "PGO_CLUSTER_PRIMARY_STORAGE_CLASS" ${prefix}
     normalizeVariable "PGO_CLUSTER_PRIMARY_STORAGE_SIZE" ${prefix}
+
     normalizeVariable "PGO_CLUSTER_REPLICA_STORAGE_CLASS" ${prefix}
     normalizeVariable "PGO_CLUSTER_BACKREST_STORAGE_CLASS" ${prefix}
     normalizeVariable "PGO_CLUSTER_BACKREST_STORAGE_SIZE" ${prefix}
+
     normalizeVariable "PGO_CLUSTER_WAL_STORAGE_CLASS" ${prefix}
     normalizeVariable "PGO_CLUSTER_WAL_STORAGE_SIZE" ${prefix}
+
     normalizeVariable "PGO_CLUSTER_CREATE_EXTRA_OPTIONS" ${prefix}
     normalizeVariable "PGO_CLUSTER_SEARCH_PATH" ${prefix}
 }
@@ -223,7 +227,7 @@ function setPgoClusterDefaults {
 }
 
 #
-# Eports the access variables for a PGO-managed cluster in a way, the main
+# Exports the access variables for a PGO-managed cluster in a way, the main
 # SolaKube postgres API expects it.
 #
 # - POSTGRES_<cluster>_SERVICE_HOST

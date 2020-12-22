@@ -2,8 +2,7 @@
 
 # ==============================================================================
 #
-# Installs the CrunchyData Postgres Operator and then deploys the pre-configured
-# Postgres Database cluster see PGO_CLUSTER_xxx variables.
+# Creates or restores a new, PGO-managed Postgres cluster.
 #
 # 1 - Name of the cluster for SolaKube variables.
 #     Defaults to PGO_CURRENT_CLUSTER, then to "default"
@@ -40,6 +39,12 @@ checkPgoStorageClasses
 
 if [[ ${RESTORE_FROM_S3} == "Y" ]]
 then
+    if [[ -z ${PGO_CLUSTER_S3_BUCKET} ]]
+    then
+        echo "FATAL: The S3 bucket is not specified. Cannot restore from S3."
+        exit 1
+    fi
+
     echo "WARNING: Restoring cluster data from the last S3 state (backup + WAL entries)"
     echo "Make sure that no active PG cluster is using the backup storage"
     echo "configured for this cluster."
@@ -121,6 +126,7 @@ COMMAND=$(cat <<-END
     --database=${PGO_CLUSTER_NAME} \
     --username=${PGO_CLUSTER_APP_USERNAME} \
     --password=${PGO_CLUSTER_APP_PASSWORD} \
+    --password-replication=${PGO_CLUSTER_ADMIN_PASSWORD} \
     --password-superuser=${PGO_CLUSTER_ADMIN_PASSWORD} \
     --memory=${PGO_CLUSTER_MEMORY} \
     --memory-limit=${PGO_CLUSTER_MEMORY_LIMIT} \
@@ -147,7 +153,7 @@ END
 )
 
 # Executing with the PGO CLI
-${SK_SCRIPT_HOME}/sk pgo client "${COMMAND}"
+${SK_SCRIPT_HOME}/sk pgo exec "${COMMAND}"
 
 
 WORKFLOW_ID=$(getWorkflowId "${PGO_CLUSTER_NAME}-createcluster")
@@ -170,9 +176,17 @@ then
     echo
 fi
 
+# ------------------------------------------------------------
+echoSection "Created: CrunchyData PG cluster ${PGO_CLUSTER_NAME}"
+
 
 if [[ ${RESTORE_FROM_S3} == "Y" ]]
 then
+    # Without this it is possible to attempt promoting to primary too early
+    # which makes the instance stuck in standby permanently
+    echo "Waiting for the standby state to stabilize after restore"
+    sleep 60s
+
     echo
     echo
     echo "--------"
@@ -186,7 +200,7 @@ then
     echo
     echo "You can also execute this with SolaKube's embedded PGO client:"
     echo
-    echo "sk pgo client update cluster ${PGO_CLUSTER_NAME} --promote-standby"
+    echo "sk pgo exec update cluster ${PGO_CLUSTER_NAME} --promote-standby"
     echo "---------"
 
 else
@@ -212,9 +226,5 @@ else
     fi
 fi
 
-
-
-# ------------------------------------------------------------
-echoSection "Created: CrunchyData PG cluster ${PGO_CLUSTER_NAME}"
 
 return ${success}

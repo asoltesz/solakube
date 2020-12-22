@@ -6,29 +6,35 @@
 #
 # Works on the currently selected cluster (PGO_CURRENT_CLUSTER).
 #
-# 1 - Backup storage type ("local" or "s3", defaults to "s3")
-# 2 - Point In Time target (e.g.: "2020-06-07 19:20:00.000000-02")
+# 1 - The name of the PGO cluster (e.g.: "default")
+#
+# 2 - Backup storage type ("local" or "s3", defaults to "s3")
+#
+# 3 - Point In Time target (e.g.: "2020-06-07 19:20:00.000000-02")
 #     Optional. If empty, the latest state will be restored
-# 3 - Timeout to wait in seconds (deafults to 600 (10 minutes))
+#
+# 4 - Timeout to wait in seconds (deafults to 600 (10 minutes))
 # ==============================================================================
 
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
-BACKUP_STORAGE_TYPE=${1:-"s3"}
+DB_CLUSTER=${1:-"default"}
 
-PITR_TARGET="${2}"
+BACKUP_STORAGE_TYPE=${2:-"s3"}
 
-TIMEOUT="${3:-600}"
+PITR_TARGET="${3}"
+
+TIMEOUT="${4:-600}"
 
 # If a non-default cluster is selected, variables need to be imported
-if [[ ${PGO_CURRENT_CLUSTER:-"default"} != "default" ]]
+if [[ ${DB_CLUSTER} != "default" ]]
 then
-    importPgoClusterVariables "${PGO_CURRENT_CLUSTER}"
+    importPgoClusterVariables "${DB_CLUSTER}"
 fi
 
 # Configuring cluster defaults if not everything is specified
-setPgoClusterDefaults
+setPgoClusterDefaults "${DB_CLUSTER}"
 
 if [[ ${PITR_TARGET} ]]
 then
@@ -39,6 +45,9 @@ fi
 cexport CLUSTER_NAME "${PGO_CLUSTER_NAME}"
 
 echoSection "Starting: Restore for the '${PGO_CLUSTER_NAME}' PG cluster"
+echo "Backup locations: ${BACKUP_STORAGE_TYPE}"
+echo "PITR clause (if any): ${BACKUP_TYPE}"
+
 
 # Postgres pods get minimum 256 MB RAM and 200 milli CPU
 # Minio only supports URI-style bucket paths (as opposed to subdomain-style)
@@ -48,7 +57,7 @@ CMD="${CMD}    ${PITR_CLAUSE}"
 CMD="${CMD}    ${OPTS_CLAUSE}"
 
 # Executing the command via the PGO client
-${SK_SCRIPT_HOME}/sk pgo client "${CMD}"
+${SK_SCRIPT_HOME}/sk pgo exec "${CMD}"
 
 WORKFLOW_ID=$(getWorkflowId "${PGO_CLUSTER_NAME}-pgbackrestrestore")
 if [[ ! ${WORKFLOW_ID} ]]
