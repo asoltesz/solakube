@@ -15,8 +15,8 @@
 
 # Internal parameters
 
-HELM_CHART_VERSION=8.1.2
-POSTGRES_VERSION=11.6.0
+HELM_CHART_VERSION=10.2.0
+POSTGRES_VERSION=11.10.0
 
 # Source the PGS shared library
 . ${SK_SCRIPT_HOME}/pgs/pgs-shared.sh
@@ -58,7 +58,10 @@ applyTemplate pvc.yaml
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install ${PGS_APP_NAME} stable/postgresql \
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
+helm install ${PGS_APP_NAME} bitnami/postgresql \
     --namespace ${PGS_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml \

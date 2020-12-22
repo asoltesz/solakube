@@ -53,6 +53,9 @@ defineNamespace ${B2S3_APP_NAME}
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
+helm repo add stable https://charts.helm.sh/stable
+helm repo update
+
 helm install ${B2S3_APP_NAME} stable/minio \
     --namespace ${B2S3_APP_NAME} \
     --version=${HELM_CHART_VERSION} \

@@ -67,6 +67,9 @@ docker run --rm -ti xmartlabs/htpasswd admin ${REGISTRY_ADMIN_PASSWORD} > ${TMP_
 # ------------------------------------------------------------
 echoSection "Installing Docker-Registry (without ingress)"
 
+helm repo add stable https://charts.helm.sh/stable
+helm repo update
+
 helm upgrade ${REGISTRY_APP_NAME} stable/docker-registry \
     --install \
     --namespace ${REGISTRY_APP_NAME} \

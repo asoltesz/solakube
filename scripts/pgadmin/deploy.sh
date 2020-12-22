@@ -74,6 +74,9 @@ applyTemplate pvc.yaml
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
+helm repo add stable https://charts.helm.sh/stable
+helm repo update
+
 helm upgrade ${PGADMIN_APP_NAME} stable/pgadmin \
     --install \
     --namespace ${PGADMIN_APP_NAME} \
