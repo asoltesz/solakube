@@ -14,8 +14,6 @@
 #     - recovery
 #         used when re-installing in recovery mode.
 #         Backup schedules should NOT be installed
-#     - uninstall
-#         remove PGO from the K8s cluster
 #
 # ==============================================================================
 
@@ -43,7 +41,7 @@ echo "PGO version: ${PGO_VERSION}"
 # ------------------------------------------------------------
 echoSection "Validating parameters"
 
-if [[ -z $(echo ",install,update,recovery,uninstall," | grep ",${OPERATION},") ]]
+if [[ -z $(echo ",install,update,recovery," | grep ",${OPERATION},") ]]
 then
     echo "FATAL: Unsupported script operation mode: ${OPERATION}"
     exit 1

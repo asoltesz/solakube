@@ -4,11 +4,9 @@
 #
 # Deletes the CrunchyData Postgres Operator from the cluster
 #
-# WARNING: Doesn't remove the already installed PostgreSQL clusters !!!
+# WARNING: Doesn't remove the already installed PostgreSQL clusters if
+#          they are in separate namespaces.
 #          Use the pgo client for that before removing pgo itself
 # ==============================================================================
 
-export SCRIPTS_SUB_DIR=${SK_SCRIPT_HOME}/pgo
-
-# Executing the script
-. ${SCRIPTS_SUB_DIR}/deploy.sh uninstall
+deleteNamespace "pgo"
