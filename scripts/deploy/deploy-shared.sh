@@ -287,7 +287,8 @@ function shouldDeployBackupProfile() {
         return
     fi
 
-    local envVarName="${application}_BACKUP_ENABLED"
+    local envVarName="${application^^}_BACKUP_ENABLED"
+    envVarName="${envVarName//-/_}"
     local BACKUP_ENABLED=${!envVarName}
 
     if [[ ${BACKUP_ENABLED:-"Y"} != "Y" ]]
