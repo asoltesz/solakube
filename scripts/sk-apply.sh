@@ -6,12 +6,13 @@
 # All parameters are forwarded to the sk-tf.sh script and thus to Terraform
 #
 
-
 . ${SK_SCRIPT_HOME}/sk-tf.sh apply "$@"
 checkResultExit "Terraform apply"
 
 # The ID of the newly created cluster in your Rancher installation
-RANCHER_CLUSTER_ID="$(${SK_SCRIPT_HOME}/sk-tf.sh output "rancher_cluster_id")"
+RANCHER_CLUSTER_ID="$(. ${SK_SCRIPT_HOME}/sk-tf.sh output "rancher_cluster_id")"
+
+echo "Rancher cluster ID: ${RANCHER_CLUSTER_ID}"
 
 if [[ $? != 0 ]]
 then
