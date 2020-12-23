@@ -207,7 +207,7 @@ else
     # Normal cluster creation, not a restore
     echo "Deploying backup schedules (if defined)"
 
-    if [[ "${PGO_CLUSTER_BACKUP_FULL_SCHEDULE}" ]]
+    if [[ -n "${PGO_CLUSTER_BACKUP_FULL_SCHEDULE}" ]]
     then
         echo "Deploying the full-backup schedule"
 
@@ -216,11 +216,11 @@ else
         echo "NOT Deploying the full-backup schedule (not defined)"
     fi
 
-    if [[ "${PGO_CLUSTER_BACKUP_INCR_SCHEDULE}" ]]
+    if [[ -n "${PGO_CLUSTER_BACKUP_INCR_SCHEDULE}" ]]
     then
         echo "Deploying the incremental-backup schedule"
 
-        ${SK_SCRIPT_HOME}/sk pgo schedule-full-backups
+        ${SK_SCRIPT_HOME}/sk pgo schedule-incr-backups
     else
         echo "NOT Deploying the incremental-backup schedule (not defined)"
     fi
