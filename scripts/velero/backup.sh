@@ -9,7 +9,7 @@
 #
 # Parameters:
 # 1 - Command to execute ("execute" or "schedule")
-#     - "execute" - A backup is executed immediately
+#     - "execute" / "exec" - A backup is executed immediately
 #     - "schedule" - A periodic backup is scheduled for the future
 # 2 - The application to work with (e.g: "nextcloud")
 # 3 - The profile to be used (e.g.: "default")
@@ -34,6 +34,8 @@ trap errorHandler ERR
 
 OPERATION=${1:-"execute"}
 
+[[ ${OPERATION} == "exec" ]] && OPERATION="execute"
+
 if [[ ${OPERATION} != "execute" ]] && [[ ${OPERATION} != "schedule" ]]
 then
     echo "ERROR: Illegal Velero backup operation: ${OPERATION}"
@@ -57,7 +59,7 @@ else
     shift
 fi
 
-echoHeader "Velero backup ${OPERATION} for ${APPLICATION}"
+echoHeader "Velero backup ${OPERATION} for '${APPLICATION}'"
 
 # ------------------------------------------------------------
 echoSection "Validating parameters"
