@@ -62,19 +62,7 @@ helm install ${B2S3_APP_NAME} stable/minio \
     --values ${TMP_DIR}/chart-values.yaml
 
 # ------------------------------------------------------------
-if [[ "${B2S3_CERT_NEEDED}" == "Y" ]]
-then
-    echoSection "Installing the TLS certificate request"
-
-    applyTemplate certificate.yaml
-else
-    # A cluster-level, wildcard cert needs to be replicated into the namespace
-    if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
-    then
-        deleteKubeObject "secret" "cluster-fqn-tls" "${B2S3_APP_NAME}"
-        applyTemplate cluster-fqn-tls-secret.yaml
-    fi
-fi
+ensureCertificate "${B2S3_APP_NAME}"
 
 # ------------------------------------------------------------
 echoSection "Installing the Ingress (with TLS by cert-manager)"

@@ -79,19 +79,7 @@ helm upgrade ${REGISTRY_APP_NAME} stable/docker-registry \
 
 # ------------------------------------------------------------
 
-if [[ "${REGISTRY_CERT_NEEDED}" == "Y" ]]
-then
-    echoSection "Installing a dedicated TLS certificate-request"
-
-    applyTemplate certificate.yaml
-else
-    # A cluster-level, wildcard cert needs to be replicated into the namespace
-    if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
-    then
-        deleteKubeObject "secret" "cluster-fqn-tls" "${REGISTRY_APP_NAME}"
-        applyTemplate cluster-fqn-tls-secret.yaml
-    fi
-fi
+ensureCertificate "${REGISTRY_APP_NAME}"
 
 # ------------------------------------------------------------
 echoSection "Installing the Ingress for Docker-Registry (with TLS by cert-manager)"

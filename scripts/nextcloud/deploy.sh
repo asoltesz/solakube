@@ -76,19 +76,7 @@ helm install ${NEXTCLOUD_APP_NAME} stable/nextcloud \
 
 # ------------------------------------------------------------
 
-if [[ "${NEXTCLOUD_CERT_NEEDED}" == "Y" ]]
-then
-    echoSection "Installing a dedicated TLS certificate-request"
-
-    applyTemplate certificate.yaml
-else
-    # A cluster-level, wildcard cert needs to be replicated into the namespace
-    if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
-    then
-        deleteKubeObject "secret" "cluster-fqn-tls" "${NEXTCLOUD_APP_NAME}"
-        applyTemplate cluster-fqn-tls-secret.yaml
-    fi
-fi
+ensureCertificate "${NEXTCLOUD_APP_NAME}"
 
 # ------------------------------------------------------------
 echoSection "Installing the Ingress (with TLS by cert-manager)"

@@ -108,19 +108,7 @@ waitAllPodsActive ${GITEA_APP_NAME}
 
 cd "${DEPLOYMENT_DIR}"
 
-if [[ "${GITEA_CERT_NEEDED}" == "Y" ]]
-then
-    echoSection "Installing a dedicated TLS certificate-request"
-
-    applyTemplate certificate.yaml
-else
-    # A cluster-level, wildcard cert needs to be replicated into the namespace
-    if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
-    then
-        deleteKubeObject "secret" "cluster-fqn-tls" "${GITEA_APP_NAME}"
-        applyTemplate cluster-fqn-tls-secret.yaml
-    fi
-fi
+ensureCertificate "${GITEA_APP_NAME}"
 
 # ------------------------------------------------------------
 echoSection "Installing the Ingress (with TLS by cert-manager)"
@@ -131,11 +119,7 @@ applyTemplate ingress.yaml
 # ------------------------------------------------------------
 echoSection "Creating the 'gitea' Admin user"
 
-echo "start waiting...................................................................................................................."
-
 waitAllPodsActive ${GITEA_APP_NAME}
-
-echo "execInPod...................................................................................................................."
 
 execInPod "app=${GITEA_APP_NAME}-gitea" ${GITEA_APP_NAME} \
   "su-exec git gitea admin create-user --name=${GITEA_ADMIN_USERNAME} --password=${GITEA_ADMIN_PASSWORD} --email=${GITEA_ADMIN_EMAIL} --admin --must-change-password=false"

@@ -145,25 +145,12 @@ kubectl delete ingress/${MAILU_APP_NAME}-ingress \
 # ------------------------------------------------------------
 # Requesting the certificates
 
-if [[ "${MAILU_CERT_NEEDED}" == "Y" ]]
-then
-    echoSection "Installing a dedicated TLS certificate-request"
+ensureCertificate "${MAILU_APP_NAME}"
 
-    applyTemplate certificate.yaml
-    # TLS secret (copy) for other, non-HTTPS parts of Mailu
-    applyTemplate certificate-tls-copy.yaml
-else
-    # A cluster-level, wildcard cert needs to be replicated into the namespace
-    if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
-    then
-        # TLS Secret for the ingress
-        deleteKubeObject "secret" "cluster-fqn-tls" "${MAILU_APP_NAME}"
-        applyTemplate cluster-fqn-tls-secret.yaml
-        # TLS secret for other, non-HTTPS parts of Mailu
-        deleteKubeObject "secret" "${MAILU_APP_NAME}-certificates" "${MAILU_APP_NAME}"
-        applyTemplate cluster-fqn-tls-secret-2.yaml
-    fi
-fi
+ensureCertificate "${MAILU_APP_NAME}" \
+    "${MAILU_APP_NAME}-certificates" \
+    "cluster-fqn-tls-secret-2.yaml" \
+    "certificate-tls-copy.yaml"
 
 
 # ------------------------------------------------------------

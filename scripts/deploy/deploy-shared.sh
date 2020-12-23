@@ -894,3 +894,55 @@ deleteKubeObject() {
 }
 
 
+#
+# Ensures that a Certificate request is deployed for the application so that
+# the ingresss will be able to function correctly on HTTPS.
+#
+# Silently skips certificate handling if Cert-Manager is not present on the
+# cluster.
+#
+# Expects the variable named "${appName}_CERT_NEEDED" to be present. (see the
+# checkCertificate() method for producing it).
+#
+# If this variable is true (Y), it will try to apply the template named
+# "certificate.yaml" of the application in order to request an application-specific
+# certificate for the ingress.
+#
+# If {appName}_CERT_NEEDED is false (N), and a Cluster-Level certificate
+# is supposed to be present (a wildcard cert), it will deploy an empty
+# secret that is to be filled up automatically by Replicator.
+#
+function ensureCertificate() {
+
+    local appName=${1}
+    local secretName=${2:-"cluster-fqn-tls"}
+    local secretTemplateName=${3:-"cluster-fqn-tls-secret.yaml"}
+    local certTemplateName=${4:-"certificate.yaml"}
+
+    echoSection "Checking certificate requirements for the application"
+
+    if ! namespaceExists "cert-manager"
+    then
+        echo "Cert-Manager not present. Skipping certificate installs."
+        return
+    fi
+
+    local varName="${appName^^}_CERT_NEEDED"
+
+    if [[ "${!varName}" == "Y" ]]
+    then
+        echo "A dedicated certificate is needed"
+        echo "Deploying a dedicated TLS certificate-request"
+
+        applyTemplate "${certTemplateName}"
+
+    else
+        echo "A cluster-level, wildcard cert needs to be replicated into the namespace"
+
+        if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
+        then
+            deleteKubeObject "secret" "${secretName}" "${GITEA_APP_NAME}"
+            applyTemplate "${secretTemplateName}"
+        fi
+    fi
+}

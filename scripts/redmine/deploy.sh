@@ -82,19 +82,7 @@ waitAllPodsActive ${REDMINE_APP_NAME}
 
 cd "${DEPLOYMENT_DIR}"
 
-if [[ "${REDMINE_CERT_NEEDED}" == "Y" ]]
-then
-    echoSection "Installing a dedicated TLS certificate-request"
-
-    applyTemplate certificate.yaml
-else
-    # A cluster-level, wildcard cert needs to be replicated into the namespace
-    if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
-    then
-        deleteKubeObject "secret" "cluster-fqn-tls" "${REDMINE_APP_NAME}"
-        applyTemplate cluster-fqn-tls-secret.yaml
-    fi
-fi
+ensureCertificate "${REDMINE_APP_NAME}"
 
 # ------------------------------------------------------------
 echoSection "Installing the Ingress (with TLS by cert-manager)"
