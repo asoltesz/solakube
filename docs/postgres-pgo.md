@@ -186,8 +186,10 @@ PGO/pgBackrest requires that you provide the full public certificate chain for t
 Place all of them in the following file:
  
 ~~~
-~/.solakube/${SK_CLUSTER}/s3-cert-chain.pem
+certificates/s3-cert-chain.pem
 ~~~
+
+NOTE: The Andromeda cluster contains sample files for some of the popular S3 providers. 
 
 You can get the certificate chain from your provider with the OpenSSH client tools:
 

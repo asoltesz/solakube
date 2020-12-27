@@ -84,9 +84,9 @@ else
     cexport PGO_CLUSTER_BACKUP_LOCATIONS "local"
 fi
 
-S3_CA_FILE=~/.solakube/${SK_CLUSTER}/s3-cert-chain.pem
+S3_CA_FILE="$(resolvePathOnRoots "certificates/s3-cert-chain.pem" )"
 
-if [[ ${S3_CA_FILE} ]]
+if [[ -n ${S3_CA_FILE} ]]
 then
     echo "Deploying S3 CA cert chain"
 
