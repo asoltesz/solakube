@@ -66,7 +66,7 @@ errorHandler() {
 function cexport()
 {
 
-    if [[ ! "${!1}" ]]
+    if [[ -z "${!1}" ]]
     then
         export ${1}="${2}";
     fi
@@ -159,7 +159,7 @@ defineS3AccessParams() {
         local var
         var="${source}_ENDPOINT"
 
-        if [[ ! ${!var} ]]
+        if [[ -z "${!var}" ]]
         then
             continue
         fi
@@ -240,7 +240,7 @@ function normalizeVariable() {
 
     [[ ! -z ${newPrefix} ]] && varName="${newPrefix}_${varName}"
 
-    export ${varName}=${!var}
+    export ${varName}="${!var}"
     # echo "Exported: $varName (${!varName})"
 }
 

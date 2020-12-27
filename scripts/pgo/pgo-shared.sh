@@ -313,8 +313,8 @@ function ensurePgoCluster() {
         varName="${cluster^^}_${varName}"
     fi
 
-    pgoCluster=${!varName}
-    pgoCluster=${pgoCluster:-"${cluster}"}
+    pgoCluster="${!varName}"
+    pgoCluster="${pgoCluster:-"${cluster}"}"
 
     if pgoClusterExists "${pgoCluster}"
     then

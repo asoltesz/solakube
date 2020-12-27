@@ -43,7 +43,7 @@ paramValidation() {
     local envVarName=${1}
     local instructions=${2}
 
-    if [[ ! ${!envVarName} ]]
+    if [[ -z "${!envVarName}" ]]
     then
         echo "ERROR: ${envVarName} environment variable is not defined."
 
@@ -134,7 +134,7 @@ checkAppName() {
     local appNameUC="${1^^}"
     local envVarName="${appNameUC}_APP_NAME"
 
-    if [[ ! "${!envVarName}" ]]
+    if [[ -z "${!envVarName}" ]]
     then
         echo "Defaulting (${envVarName}) to '${appName}' "
         export ${envVarName}="${appName}"
@@ -289,7 +289,7 @@ function shouldDeployBackupProfile() {
 
     local envVarName="${application^^}_BACKUP_ENABLED"
     envVarName="${envVarName//-/_}"
-    local BACKUP_ENABLED=${!envVarName}
+    local BACKUP_ENABLED="${!envVarName}"
 
     if [[ ${BACKUP_ENABLED:-"Y"} != "Y" ]]
     then
