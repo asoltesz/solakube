@@ -127,7 +127,8 @@ fi
 # ------------------------------------------------------------
 echoSection "Installing application with Helm chart (without ingress)"
 
-helm install ${MAILU_APP_NAME} ${MAILU_CHART_REPO_LOCAL_PATH}/mailu \
+helm upgrade ${MAILU_APP_NAME} ${MAILU_CHART_REPO_LOCAL_PATH}/mailu \
+    --install \
     --namespace ${MAILU_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml
@@ -193,6 +194,8 @@ then
         --values ${TMP_DIR}/chart-values-extdns.yaml
 
     echoSection "Deploying MEDOK"
+
+    export MEDOK_DEPLOYMENT_NAME="medok-${CLUSTER_FQN//./-}"
 
     applyTemplate medok-rbac.yaml
     applyTemplate medok-deployment.yaml
