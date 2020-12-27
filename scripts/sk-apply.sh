@@ -16,13 +16,12 @@ echo "Rancher cluster ID: ${RANCHER_CLUSTER_ID}"
 
 if [[ $? != 0 ]]
 then
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: ${RANCHER_CLUSTER_ID}"
-    echo "WARNING: Failed to load the cluster id from the Terraform state"
+    echo "FATAL: Failed to load the cluster id from the Terraform state"
     exit 1
 fi
 
 # Exporting the cluster ID for the other scripts to load
-file=~/.solakube/${SK_CLUSTER}/rancher_cluster_id.sh
-echo "export RANCHER_CLUSTER_ID=${RANCHER_CLUSTER_ID}" > ${file}
+file=~/.solakube/${SK_CLUSTER}/state/rancher_cluster_id.sh
+echo "cexport RANCHER_CLUSTER_ID '${RANCHER_CLUSTER_ID}'" > ${file}
 chmod +x ${file}
 

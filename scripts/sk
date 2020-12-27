@@ -34,7 +34,7 @@ export SK_SCRIPT_HOME="${DIR}"
 #
 if [[ ! ${SK_CLUSTER} ]]
 then
-    echo "SK_CLUSTER not specified in the shell. Aborting."
+    echo "FATAL: SK_CLUSTER not defined. Aborting."
     exit 1
 fi
 
@@ -50,8 +50,36 @@ then
     fi
 fi
 
-# Loading variables from each SK_ROOT
+# Adding the cluster-level override folder (SK_ROOT) for easy, temporary overrides
+# This can be used for providing variables that are specific to a cluster
+# and not intended to be placed under version control
+SK_OVERRIDE_HOME=~/.solakube/${SK_CLUSTER}/overrides
+export SK_ROOTS="${SK_OVERRIDE_HOME}:${SK_ROOTS}"
+mkdir -p "${SK_OVERRIDE_HOME}"
 
+# The global overrides SK_HOME
+# This can be used for providing variables that are global for all SolaKube clusters
+# and not intended to be placed under version control
+SK_OVERRIDE_HOME=~/.solakube/globals/overrides
+export SK_ROOTS="${SK_OVERRIDE_HOME}:${SK_ROOTS}"
+mkdir -p "${SK_OVERRIDE_HOME}"
+
+# Phase 1
+# Loading context variables from each SK_ROOT
+# These are very-low level variables that are too late to define
+# in variables.sh for "normal" variables
+for root in ${SK_ROOTS//:/ }
+do
+    if [[ -f "${root}/variables-context.sh" ]]
+    then
+        # echo "Loading context variables from root: ${root}"
+
+        . ${root}/variables-context.sh
+    fi
+done
+
+# Phase 2
+# Loading "normal" variables from each SK_ROOT
 for root in ${SK_ROOTS//:/ }
 do
     if [[ -f "${root}/variables.sh" ]]
@@ -59,6 +87,19 @@ do
         # echo "Loading variables from root: ${root}"
 
         . ${root}/variables.sh
+    fi
+done
+
+# Phase 3
+# Defaults and transformations that can be done based on the "normal" variable
+# declarations
+for root in ${SK_ROOTS//:/ }
+do
+    if [[ -f "${root}/variables-defaults.sh" ]]
+    then
+        # echo "Loading context variables from root: ${root}"
+
+        . ${root}/variables-defaults.sh
     fi
 done
 

@@ -12,10 +12,10 @@ metadata:
 spec:
     tls:
     -   hosts:
-        - rook-ceph.andromeda.mk
-        secretName: rook-ceph.andromeda.mk
+        - rook-ceph.${CLUSTER_FQN}
+        secretName: rook-ceph.${CLUSTER_FQN}
     rules:
-    -   host: rook-ceph.andromeda.mk
+    -   host: rook-ceph.${CLUSTER_FQN}
         http:
             paths:
             -   path: /

@@ -40,6 +40,18 @@ then
     exit 1
 fi
 
+# Exporting SK variables from each SK_ROOT to Terraform
+
+for root in ${SK_ROOTS//:/ }
+do
+    if [[ -f "${root}/variables-export-terraform.sh" ]]
+    then
+        # echo "Exporting variables for Terraform: ${root}"
+
+        . ${root}/variables-export-terraform.sh
+    fi
+done
+
 TF_COMMAND=${1}
 
 terraform "$@"

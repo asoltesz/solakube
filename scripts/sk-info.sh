@@ -13,7 +13,7 @@
 EXTENDED=$1
 
 echo "-------------------------------------------------------------------------"
-echo "Information about the ${SK_CLUSTER} cluster"
+echo "Information about the ${SK_CLUSTER^} cluster"
 echo "-------------------------------------------------------------------------"
 echo "SolaKube scripts folder (SK_SCRIPT_HOME):   ${SK_SCRIPT_HOME}"
 echo "Project roots (SK_ROOTS):                   ${SK_ROOTS}"

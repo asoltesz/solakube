@@ -39,7 +39,7 @@ IMPORTANT: Unfortunately, sometimes minikube changes its IP address and currentl
 minikube dashboard
 ~~~
 
-# Configure .variables.sh
+# Configure variables.sh
 
 Set the "minikube" cluster type to instruct variables.sh for special actions.
 
@@ -49,8 +49,14 @@ Set the "minikube" cluster type to instruct variables.sh for special actions.
 SK_CLUSTER_TYPE="minikube"
 ~~~
 
-This should result in an automatic reconfiguration of the Cluster FQN to andromeda.mk (see the variables.sh template)
+This should result in an automatic reconfiguration of the Cluster FQN according to the cluster name under the .mk domain (signifying Minikube). 
 
+In case of the "andromeda" cluster:
+~~~
+andromeda.mk
+~~~
+
+NOTE: In case you work with minikube and a public cluster in parallel, you may want to set this in the variables.sh in the cluster override folder (~/.solakube/andromeda/overrides/variables.sh)  
 
 # Typical operations around SolaKube
 

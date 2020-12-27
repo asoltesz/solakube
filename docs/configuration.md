@@ -25,7 +25,9 @@ This is a file that contains the password for the Ansible vault for the processe
 
 It is placed on the ~/.solakube/ansible-vault-pass path and its only content is the password in plain text.
 
-It is shared among all clusters.
+For the Andromeda sample cluster project, the password is 'secret'.
+
+It is global and shared among all clusters.
 
 # Ansible Vault file - vault.yml
 
@@ -35,7 +37,9 @@ This is an encrypted file and may be placed under version control.
 
 The variables and structure is documented in templates/vault.yml
 
-Use **sk create-vault** for creating an empty vault file (you need to remove the one coming with SolaKube/Andromeda). 
+The Andromeda sample cluster project also includes a file sample.
+
+Use **sk create-vault** for creating an empty vault file (you need to remove the one coming with SolaKube/Andromeda before using it). 
 
 Use **sk edit-vault** for easily make/change sensitive settings in the Ansible vault (tokens, passwords). These are only used for secrets that will be passed to Ansible.
 

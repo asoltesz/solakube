@@ -244,3 +244,89 @@ function normalizeVariable() {
     # echo "Exported: $varName (${!varName})"
 }
 
+#
+# Finds the Ansible root folder in the SK_ROOTS.
+#
+function findAnsibleProjectDir() {
+
+    export ANSIBLE_PROJ_DIR="$(resolvePathOnRoots "ansible")"
+
+    if [[ -z "${ANSIBLE_PROJ_DIR}" ]] || [[ ! -d "${ANSIBLE_PROJ_DIR}" ]]
+    then
+        echo "FATAL: Couldn't find the Ansible root folder ('ansible') in the project root folders"
+        exit 1
+    fi
+
+}
+
+#
+# Copies a set of SMTP parameters with a certain prefix to an other set
+# starting with a different prefix.
+#
+# 1 - Prefix of the source variables (defaults to "smtp")
+# 2 - Prefix of the target variables (defaults to the name of the application)
+#
+function normalizeSmtpParams() {
+
+    local sourcePrefix=${1^^}
+    local targetPrefix=${2^^}
+
+    normalizeVariable "SMTP_ENABLED"  "${sourcePrefix}" "${targetPrefix}"
+    normalizeVariable "SMTP_HOST"     "${sourcePrefix}" "${targetPrefix}"
+    normalizeVariable "SMTP_PORT"     "${sourcePrefix}" "${targetPrefix}"
+    normalizeVariable "SMTP_USERNAME" "${sourcePrefix}" "${targetPrefix}"
+    normalizeVariable "SMTP_PASSWORD" "${sourcePrefix}" "${targetPrefix}"
+    normalizeVariable "SMTP_PROPS"    "${sourcePrefix}" "${targetPrefix}"
+}
+
+#
+# Imports the SMTP parameters for an application if the application doesn't have
+# the SMTP parameters directly configured.
+#
+# It checks the application SMTP server selector which identifies the source
+# of the parameters.
+#
+# For example, for the application/deployer Limes (appName="limes"):
+#
+# If the LIMES_SMTP_HOST variable is already configured, no SMTP setting will
+# be imported because we assume that the application has manually configured
+# SMTP settings.
+#
+# If the LIMES_SMTP variable is not set at all, then the global SMTP_xxx variables
+# will be imported into the LIMES_SMTP_xxx variables.
+#
+# If the LIMES_SMTP variable is set to something (say, "postfix-relay"), then the
+# SMTP_RELAY_SMTP_xxx variables will be imported into the LIMES_SMTP_xxx variables.
+#
+# 1 - The name of the application
+# 2 - Prefix of the target variables
+#     Optional, defaults to the name of the application + _SMTP_
+#     Will only be used if variables actually need to be imported.
+#
+function importApplicationSmtpParams() {
+
+    local appName="${1^^}"
+    appName="${appName//-/_}"
+
+    local targetPrefix=${2:-"${appName}_"}
+
+    local varName="${appName}_SMTP_HOST"
+
+    if [[ -n "${!varName}" ]]
+    then
+        # The application has directly configured SMTP variables
+        return 0
+    fi
+
+    # Importing from the "SMTP_" variables by default
+    local sourcePrefix=""
+
+    local varName="${appName}_SMTP_CONFIG"
+    if [[ -n "${!varName}" ]]
+    then
+        # The application wants specific SMTP access variables
+        sourcePrefix="${!varName}"
+    fi
+
+    normalizeSmtpParams "${sourcePrefix}" "${targetPrefix}"
+}
