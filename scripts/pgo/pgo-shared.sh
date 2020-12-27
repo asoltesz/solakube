@@ -157,7 +157,7 @@ checkPgoStorageClasses() {
 #
 # 1 - Name of the cluster (e.g.: 'nextcloud')
 #
-function importPgoClusterVariables {
+function importPgoClusterVariables() {
 
     local cluster=$1
 
@@ -198,7 +198,7 @@ function importPgoClusterVariables {
 #
 # 1 - The name of the cluster in SolaKube (if possible to provide)
 #
-function setPgoClusterDefaults {
+function setPgoClusterDefaults() {
 
     local cluster=$1
 
