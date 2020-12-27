@@ -37,6 +37,7 @@ Storage & persistence
 
 Email Services ([Mailu](mailu.md))
 - You can install a cluster-internal SMTP server (and other email services like IMAP and webmail) by deploying [Mailu](mailu.md).
+- An internal Postfix based non-authenticating relay may be deployed for bridging old, non-TLS capable applications and mail delivery services ([Postfix-Relay](postfix-relay.md))
  
 Cluster Management
 - The newly provisioned cluster is registered into your Rancher instance, so RBAC, Monitoring, Catalog, Etcd backups and other management features are available for it.
