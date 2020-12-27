@@ -985,7 +985,7 @@ function ensureCertificate() {
 
         if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
         then
-            deleteKubeObject "secret" "${secretName}" "${GITEA_APP_NAME}"
+            deleteKubeObject "secret" "${secretName}" "${appName}"
             applyTemplate "${secretTemplateName}"
         fi
     fi
