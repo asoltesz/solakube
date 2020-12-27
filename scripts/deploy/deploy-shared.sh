@@ -611,6 +611,26 @@ waitAllPodsActive() {
 
     local now=$(date +%s)
 
+    # Often, the method is called before K8s could create the pods for a
+    # deployment. We have to wait until at least one pod appears
+    while (( ${now} < ${limit} ))
+    do
+        # Check for any pods to appear (Pending state is not enough)
+        local result=$(
+          kubectl get pods --no-headers --namespace=${namespace} \
+                  --field-selector=status.phase=Running
+        )
+
+        if [[ -n "${result}" ]]
+        then
+            break
+        fi
+
+        echo "waiting ${checkInterval}s ...."
+        sleep ${checkInterval}s
+        now=$(date +%s)
+    done
+
     local jsonPath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'
 
     while (( ${now} < ${limit} ))
@@ -620,7 +640,7 @@ waitAllPodsActive() {
         local result=$(kubectl get pods -o jsonpath="${jsonPath}" \
                           --namespace=${namespace} | grep "Ready=False")
 
-        if [[ ! "${result}" ]]
+        if [[ -z "${result}" ]]
         then
             echo "All pods are 'Ready' (time in waiting: $(( ${now} - ${startTime} ))s)"
             return 0
@@ -633,11 +653,8 @@ waitAllPodsActive() {
 
     echo "Timeout passed (${timeout}). Stopping checking attempts. Check failed."
 
-    local result=$(kubectl get pods -o jsonpath="${jsonPath}" \
-                      --namespace=${namespace} | grep "Ready=False")
-
-    echo "Pods that are NOT ready:"
-    echo "${result}"
+    echo "Pods in the namespace:"
+    kubectl get pods --namespace=${namespace}
 
     return 1
 }
@@ -710,6 +727,29 @@ waitSinglePodActive() {
 
     local now=$(date +%s)
 
+    # Often, the method is called before K8s could create the pods for a
+    # deployment. We have to wait until the pod appears
+    while (( ${now} < ${limit} ))
+    do
+        # Check for any pods to appear
+        local result=$(
+            kubectl get pods \
+                --no-headers \
+                --field-selector=status.phase=Running \
+                --namespace=${namespace}  \
+                | grep "${podNamePart}"
+        )
+
+        if [[ -n "${result}" ]]
+        then
+            break
+        fi
+
+        echo "waiting ${checkInterval}s ...."
+        sleep ${checkInterval}s
+        now=$(date +%s)
+    done
+
     local jsonPath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'
 
     while (( ${now} < ${limit} ))
@@ -724,7 +764,7 @@ waitSinglePodActive() {
                 | grep "Ready=True" | grep "${podNamePart}"
         )
 
-        if [[ "${result}" ]]
+        if [[ -n "${result}" ]]
         then
             echo "Pod has become 'Ready' (time: $(( ${now} - ${startTime} ))s)"
             return 0
