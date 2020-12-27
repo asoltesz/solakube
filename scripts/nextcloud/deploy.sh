@@ -69,7 +69,8 @@ echoSection "Installing application with Helm chart (without ingress)"
 helm repo add stable https://charts.helm.sh/stable
 helm repo update
 
-helm install ${NEXTCLOUD_APP_NAME} stable/nextcloud \
+helm upgrade ${NEXTCLOUD_APP_NAME} stable/nextcloud \
+    --install \
     --namespace ${NEXTCLOUD_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml
