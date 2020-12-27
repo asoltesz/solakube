@@ -522,21 +522,25 @@ processTemplate() {
 # be set to kubectl.
 #
 # 1 - The path to the template file
+# 2 - The namespace into which the template should be applied
+#     Optional, it defaults to DEPLOY_NAMESPACE (e.g.: set by defineNamespace() )
 #
 applyTemplate() {
 
     local templateFilePath=$1
+    local namespace=${2:-"${DEPLOY_NAMESPACE}"}
+
     local templateFileName=$(basename ${templateFilePath})
 
-    if [[ ! "${DEPLOY_NAMESPACE}" ]]
+    if [[ -z "${namespace}" ]] && [[ -z "${DEPLOY_NAMESPACE}" ]]
     then
         echo "ERROR: DEPLOY_NAMESPACE is not set. Minimally, set to NOT_SPECIFIED."
         return 1
     fi
 
-    local namespaceClause="--namespace ${DEPLOY_NAMESPACE}"
+    local namespaceClause="--namespace ${namespace}"
 
-    if [[ "${DEPLOY_NAMESPACE}" == "NOT_SPECIFIED" ]]
+    if [[ "${namespace}" == "NOT_SPECIFIED" ]]
     then
         namespaceClause=""
     fi
