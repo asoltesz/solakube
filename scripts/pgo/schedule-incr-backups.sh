@@ -10,14 +10,19 @@
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
+CLUSTER=${1:-"${PGO_CURRENT_CLUSTER}"}
+CLUSTER=${CLUSTER:-"default"}
+
+echo "Selected cluster: ${CLUSTER}"
+
 # If a non-default cluster is selected, variables need to be imported
-if [[ ${PGO_CURRENT_CLUSTER:-"default"} != "default" ]]
+if [[ ${CLUSTER} != "default" ]]
 then
-    importPgoClusterVariables "${PGO_CURRENT_CLUSTER}"
+    importPgoClusterVariables "${CLUSTER}"
 fi
 
 # Configuring cluster defaults if not everything is specified
-setPgoClusterDefaults
+setPgoClusterDefaults "${CLUSTER}"
 
 BACKUP_STORAGE_TYPE="${PGO_CLUSTER_BACKUP_SCHEDULED_LOCATIONS}"
 cexport BACKUP_STORAGE_TYPE "${PGO_CLUSTER_BACKUP_LOCATIONS}"
@@ -38,14 +43,15 @@ echoSection "Scheduling Incremental backups for the '${PGO_CLUSTER_NAME}' PG clu
 
 COMMAND=$(cat <<-END
   create schedule ${PGO_CLUSTER_NAME} \
-  --schedule="${INCR_SCHEDULE}" \
+  --schedule='${INCR_SCHEDULE}' \
   --schedule-type=pgbackrest \
-  --pgbackrest-backup-type=incr
+  --pgbackrest-backup-type=incr \
+  --pgbackrest-storage-type=${BACKUP_STORAGE_TYPE}
 END
 )
 
 # Executing the command
-${SK_SCRIPT_HOME}/sk pgo exec "${COMMAND}"
+. ${SK_SCRIPT_HOME}/pgo/exec.sh "${COMMAND}"
 
 
 # ------------------------------------------------------------

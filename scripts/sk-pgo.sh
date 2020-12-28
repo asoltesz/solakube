@@ -23,5 +23,5 @@ export SCRIPTS_SUB_DIR=${SK_SCRIPT_HOME}/pgo
 . ${SCRIPTS_SUB_DIR}/pgo-shared.sh
 
 # Executing the script
-. ${SCRIPTS_SUB_DIR}/${COMMAND}.sh "$@"
+. ${SCRIPTS_SUB_DIR}/${COMMAND}.sh
 

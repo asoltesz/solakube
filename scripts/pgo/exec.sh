@@ -5,6 +5,8 @@
 # Complex parametrization is not possible to pass via kubectl
 # (double quoted parameters mishandled, at least with the PGO client)
 # so we need to put the command into a file and upload it to the container
+#
+
 echo "pgo $@" > /tmp/cmd.sh
 chmod +x /tmp/cmd.sh
 copyFileToPod "name=pgo-client" "pgo" /tmp/cmd.sh /tmp/cmd.sh

@@ -191,6 +191,11 @@ function importPgoClusterVariables() {
 
     normalizeVariable "PGO_CLUSTER_CREATE_EXTRA_OPTIONS" ${prefix}
     normalizeVariable "PGO_CLUSTER_SEARCH_PATH" ${prefix}
+
+    normalizeVariable "PGO_CLUSTER_BACKUP_LOCATIONS" ${prefix}
+    normalizeVariable "PGO_CLUSTER_BACKUP_SCHEDULED_LOCATIONS" ${prefix}
+    normalizeVariable "PGO_CLUSTER_BACKUP_INCR_SCHEDULE" ${prefix}
+    normalizeVariable "PGO_CLUSTER_BACKUP_FULL_SCHEDULE" ${prefix}
 }
 
 #

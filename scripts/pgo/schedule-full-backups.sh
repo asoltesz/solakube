@@ -5,19 +5,27 @@
 # Schedules automated, FULL pgBackrest backups for the currently selected
 # cluster (PGO_CURRENT_CLUSTER).
 #
+# 1 - Name of the cluster for SolaKube variables.
+#     Defaults to PGO_CURRENT_CLUSTER, then to "default"
 # ==============================================================================
 
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
 
+
+CLUSTER=${1:-"${PGO_CURRENT_CLUSTER}"}
+CLUSTER=${CLUSTER:-"default"}
+
+echo "Selected cluster: ${CLUSTER}"
+
 # If a non-default cluster is selected, variables need to be imported
-if [[ ${PGO_CURRENT_CLUSTER:-"default"} != "default" ]]
+if [[ ${CLUSTER} != "default" ]]
 then
-    importPgoClusterVariables "${PGO_CURRENT_CLUSTER}"
+    importPgoClusterVariables "${CLUSTER}"
 fi
 
 # Configuring cluster defaults if not everything is specified
-setPgoClusterDefaults
+setPgoClusterDefaults "${CLUSTER}"
 
 
 BACKUP_STORAGE_TYPE="${PGO_CLUSTER_BACKUP_SCHEDULED_LOCATIONS}"
@@ -38,17 +46,17 @@ echoSection "Scheduling Full backups for the '${PGO_CLUSTER_NAME}' PG cluster"
 
 COMMAND=$(cat <<-END
   create schedule ${PGO_CLUSTER_NAME} \
-  --schedule="${FULL_SCHEDULE}" \
+  --schedule='${FULL_SCHEDULE}' \
   --schedule-type=pgbackrest \
   --pgbackrest-backup-type=full \
+  --pgbackrest-storage-type=${BACKUP_STORAGE_TYPE} \
   --schedule-opts="--repo1-retention-full=${PGO_CLUSTER_BACKUP_FULL_RETENTION}"
 END
 )
 #  --schedule-opts="--db-retention-full=${PGO_CLUSTER_BACKUP_FULL_RETENTION} "
 
-
 # Executing the command
-${SK_SCRIPT_HOME}/sk pgo exec "${COMMAND}"
+. ${SK_SCRIPT_HOME}/pgo/exec.sh "${COMMAND}"
 
 
 # ------------------------------------------------------------
