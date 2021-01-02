@@ -20,7 +20,7 @@ function normalizeConfigVariables {
     local prefix="${application^^}"
     if [[ "${profile}" != "default" ]]
     then
-        prefix="${prefix}_${profile}^^"
+        prefix="${prefix}_${profile^^}"
     fi
 
     export BACKUP_PROFILE_NAME="${profile}"
@@ -35,17 +35,23 @@ function normalizeConfigVariables {
     normalizeVariable "BACKUP_RETENTION_MONTHLY" ${prefix}
     normalizeVariable "BACKUP_RETENTION_YEARLY" ${prefix}
 
-    normalizeVariable "BACKUP_NAMESPACE" ${prefix}
+    normalizeVariable "BACKUP_NAMESPACES" ${prefix}
+    normalizeVariable "BACKUP_NAMESPACES_EXCLUDED" ${prefix}
+
+    normalizeVariable "BACKUP_RESOURCES" ${prefix}
+    normalizeVariable "BACKUP_RESOURCES_EXCLUDED" ${prefix}
+    normalizeVariable "BACKUP_CLUSTER_RESOURCES" ${prefix}
+
+    normalizeVariable "BACKUP_EXCLUDE_CLUSTER_TYPES" ${prefix}
+
+    normalizeVariable "BACKUP_LABELS" ${prefix}
+
+    normalizeVariable "BACKUP_SNAPSHOT_VOLUMES" ${prefix}
 }
 
 
 #
 # Applies defaults for an application backup profile.
-#
-# - BACKUP_NAMESPACE
-# - BACKUP_LOCATION_NAME
-# - BACKUP_SCHEDULE_*
-# - BACKUP_RETENTION_*
 #
 # These are applicable for both filesystem and volumesnapshot backups.
 #
@@ -57,25 +63,25 @@ function applyApplicationDefaults() {
     local application=${1}
     local profile=${2}
 
-    cexport BACKUP_NAMESPACE "${application}"
+    cexport BACKUP_NAMESPACES "${application}"
 
+    cexport BACKUP_RESOURCES "*"
 
-    # The backup repository name to be used
-    cexport BACKUP_LOCATION_NAME "default"
+    # For application backups, we have to include cluster-scoped resources in general
+    # since otherwise Velero will simply leave out PersistentVolumes as well
+    # but we actually don't need them so we will exclude them by types (see below)
+    cexport BACKUP_CLUSTER_RESOURCES "true"
 
-    # Backup retention & scheduling settings
+    local excludedTypes="$(applicationBackupExcludedTypes)"
 
-    cexport BACKUP_RETENTION_DAILY 30
-    cexport BACKUP_RETENTION_MONTHLY 6
-    cexport BACKUP_RETENTION_YEARLY 0
+    # If there are resources specified manually, we only add the cluster-types
+    if [[ -n ${BACKUP_RESOURCES_EXCLUDED} ]]
+    then
+        BACKUP_RESOURCES_EXCLUDED="${BACKUP_RESOURCES_EXCLUDED},"
+    fi
+    BACKUP_RESOURCES_EXCLUDED="${BACKUP_RESOURCES_EXCLUDED}${excludedTypes}"
 
-    # Every day, 01:00 in the morning
-    cexport BACKUP_SCHEDULE_DAILY "0 1 * * *"
-    # First day of the month, 03:00 in the morning
-    cexport BACKUP_SCHEDULE_MONTHLY "0 3 1 * *"
-    # First day of the year, 05:00 in the morning
-    cexport BACKUP_SCHEDULE_YEARLY "0 5 1 1 *"
-
+    cexport BACKUP_LABELS "application=${application},profile=${profile}"
 }
 
 
@@ -187,10 +193,19 @@ executeApplicationBackup() {
 
     export BACKUP_TIMEDATE=$(date +%Y%m%d-%H%M)
 
-    velero backup create ${BACKUP_NAME}-${BACKUP_TIMEDATE} \
-        --include-namespaces=${BACKUP_NAMESPACE} \
-        --storage-location=${BACKUP_LOCATION_NAME} \
-        --snapshot-volumes=false \
+    # The "none" value is only a placeholder for empty
+    local BACKUP_NAMESPACES_INCLUDED="${BACKUP_NAMESPACES//"none"}"
+    local BACKUP_RESOURCES_INCLUDED="${BACKUP_RESOURCES//"none"}"
+
+    velero backup create "${BACKUP_NAME}-${BACKUP_TIMEDATE}" \
+        --include-namespaces="${BACKUP_NAMESPACES_INCLUDED}" \
+        --exclude-namespaces="${BACKUP_NAMESPACES_EXCLUDED}" \
+        --include-cluster-resources="${BACKUP_CLUSTER_RESOURCES}" \
+        --include-resources="${BACKUP_RESOURCES_INCLUDED}" \
+        --exclude-resources="${BACKUP_RESOURCES_EXCLUDED}" \
+        --storage-location="${BACKUP_LOCATION_NAME}" \
+        --snapshot-volumes="${BACKUP_SNAPSHOT_VOLUMES}" \
+        --labels="${BACKUP_LABELS}" \
         --wait
 }
 
@@ -211,35 +226,59 @@ scheduleApplicationBackup() {
 
     if [[ ${BACKUP_RETENTION_DAILY} != 0 ]]
     then
-        velero schedule create ${BACKUP_NAME}-daily \
-            --include-namespaces=${BACKUP_NAMESPACE} \
-            --storage-location=${BACKUP_LOCATION_NAME} \
-            --snapshot-volumes=false \
-            --ttl=$(( 24 * ${BACKUP_RETENTION_DAILY} ))h0m0s \
-            --schedule="${BACKUP_SCHEDULE_DAILY}"
+        BACKUP_SCHEDULE_NAME="${BACKUP_NAME}-daily"
+        BACKUP_TTL="$(( 24 * ${BACKUP_RETENTION_DAILY} ))h0m0s"
+        BACKUP_SCHEDULE_EXPR="${BACKUP_SCHEDULE_DAILY}"
 
+        scheduleBackup
     fi
 
     if [[ ${BACKUP_RETENTION_MONTHLY} != 0 ]]
     then
-        velero schedule create ${BACKUP_NAME}-monthly \
-            --include-namespaces=${BACKUP_NAMESPACE} \
-            --storage-location=${BACKUP_LOCATION_NAME} \
-            --snapshot-volumes=false \
-            --ttl="$(( 24 * 31 * ${BACKUP_RETENTION_MONTHLY} ))"h0m0s \
-            --schedule="${BACKUP_SCHEDULE_MONTHLY}"
+        BACKUP_SCHEDULE_NAME="${BACKUP_NAME}-monthly"
+        BACKUP_TTL="$(( 24 * 31 * ${BACKUP_RETENTION_MONTHLY} ))h0m0s"
+        BACKUP_SCHEDULE_EXPR="${BACKUP_SCHEDULE_MONTHLY}"
+
+        scheduleBackup
     fi
 
     if [[ ${BACKUP_RETENTION_YEARLY} != 0 ]]
     then
-        velero schedule create ${BACKUP_NAME}-yearly \
-            --include-namespaces=${BACKUP_NAMESPACE} \
-            --storage-location=${BACKUP_LOCATION_NAME} \
-            --snapshot-volumes=false \
-            --ttl="$(( 24 * 365 ${BACKUP_RETENTION_YEARLY} ))"h0m0s \
-            --schedule="${BACKUP_SCHEDULE_YEARLY}"
+        BACKUP_SCHEDULE_NAME="${BACKUP_NAME}-yearly"
+        BACKUP_TTL="$(( 24 * 365 * ${BACKUP_RETENTION_YEARLY} ))h0m0s"
+        BACKUP_SCHEDULE_EXPR="${BACKUP_SCHEDULE_YEARLY}"
+
+        scheduleBackup
     fi
 
+}
+
+#
+# Schedules a repeating backup from the normalized backup variables
+#
+# Expected variables on top of the normal backup variables:
+#
+# - BACKUP_SCHEDULE_NAME
+# - BACKUP_TTL
+# - BACKUP_SCHEDULE_EXPR
+#
+scheduleBackup() {
+
+    # The "none" value is only a placeholder for empty namespace list
+    local BACKUP_NAMESPACES_INCLUDED="${BACKUP_NAMESPACES//"none"}"
+    local BACKUP_RESOURCES_INCLUDED="${BACKUP_RESOURCES//"none"}"
+
+    velero schedule create "${BACKUP_SCHEDULE_NAME}" \
+        --ttl=${BACKUP_TTL} \
+        --schedule="${BACKUP_SCHEDULE_EXPR}" \
+        --include-namespaces="${BACKUP_NAMESPACES_INCLUDED}" \
+        --exclude-namespaces="${BACKUP_NAMESPACES_EXCLUDED}" \
+        --include-cluster-resources="${BACKUP_CLUSTER_RESOURCES}" \
+        --include-resources="${BACKUP_RESOURCES_INCLUDED}" \
+        --exclude-resources="${BACKUP_RESOURCES_EXCLUDED}" \
+        --storage-location="${BACKUP_LOCATION_NAME}" \
+        --snapshot-volumes="${BACKUP_SNAPSHOT_VOLUMES}" \
+        --labels="${BACKUP_LABELS}"
 }
 
 #

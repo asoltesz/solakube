@@ -21,6 +21,8 @@ The targeted use-case:
 
 The application/namespace backups are designed to work in tandem with a full etcd backup of the cluster. This can be done with Rancher automatically, periodically. The application backup should be scheduled after the etcd backup for best consistency.
 
+Besides the application backups, there is a "Cluster" backup profile that takes cluster-level resources and infrastructure component namespaces together. 
+
 While Velero supports backing up the whole cluster in one go, that would take a lot of time for any non-trivial cluster. We opt for smaller, more granular backups that have only one application in their scope but finish much faster. This reduces the chance of having inconsistent backups. Also, per-application backups allow for more flexible scheduling (e.g. higher backup frequency for certain apps).  
 
 See the [limitations](#limitations) for a proper view of the capabilities of Velero and the integration provided by SolaKube.
@@ -154,7 +156,9 @@ WARNING: Placing the annotation directly on the pod is not sufficient for long t
 
 ## Backup schedule and retention
 
-This controls the schedule of daily/monthly/yearly backups with their retention. See the relevant limitation section to understand the mechanism better.
+As of v1.4, Velero has no proper retention policy support for backups, only retention based on TTL. See this [issue](https://github.com/vmware-tanzu/velero/issues/2267).
+
+SolaKube approximates a daily/monthly/yearly counting-based retention policy with creating multiple schedules for daily, monthly, yearly backups. See the relevant limitation section below to understand the mechanism better.
 
 ~~~
 # The backup schedule cron expression for automatic starting of the backup
@@ -199,15 +203,71 @@ aws_access_key_id = xxx
 aws_secret_access_key = xxx
 ~~~
 
-## Application namespace
+## Namespaces included/excluded
+
+### Namespaces included into the backup
 
 In case the namespace differs from the name of the application:
 
 ~~~
-export PGADMIN_BACKUP_NAMESPACE=pgadmin2
+export PGADMIN_BACKUP_NAMESPACES=pgadmin2
 ~~~
 
-By default this is not needed and is equal to the name of the application (e.g.: pgadmin).
+This is optional and defaults to the name of the application (e.g.: pgadmin).
+
+In case, the "none" value is specified, SK will not default it to the application name and all namespaces will be included into the backup. This is not typically needed for application backups and used for infrastructure/cluster-level backup (see the Infrastructure backup profile section). In case you set this "none", you may want to exclude namespaces like kube-system. See exclusions below. 
+
+NOTE: In Velero, this is the --include-namespaces parameter 
+
+### Namespaces excluded from the backup
+
+~~~
+export PGADMIN_BACKUP_NAMESPACES_EXCLUDED="kube-system"
+~~~
+
+This is optional and can be left empty.
+
+NOTE: In Velero, this is the --exclude-namespaces parameter 
+
+## Cluster-level resources
+
+Velero allows backing-up cluster-level resources (like Cert-Manager's Certificate Issuer).
+
+This is not needed for simple application backups and used for infrastructure/cluster-level backups (see the Infrastructure backup profile section)
+
+~~~
+export PGADMIN_BACKUP_CLUSTER_RESOURCES="false"
+~~~
+
+This is optional and defaults to "false".
+
+NOTE: In Velero, this is the --include-cluster-resources parameter 
+
+## Resource types to be included/excluded
+
+### Resource types to be included in the backup
+
+It is possible to limit Velero backups to certain K8S resource types (e.g.: secrets).
+
+~~~
+export PGADMIN_BACKUP_RESOURCES="*"
+~~~
+
+This is optional and defaults to "*" (all resource types to be included).
+
+NOTE: In Velero, this is the --include-resources parameter 
+
+### Resource types to be excluded from the backup
+
+It is possible to exclude K8S resource types (e.g.: secrets) when the resource inclusion is "*".
+
+~~~
+export PGADMIN_BACKUP_RESOURCES_EXCLUDED=""
+~~~
+
+This is optional and defaults to empty (no resource types to be excluded).
+
+NOTE: In Velero, this is the --exclude-resources parameter 
 
 
 ## Deploying the backup profile
@@ -233,14 +293,71 @@ Parameter names in this case contain the backup profile as well:
 
 For example, in case of a 'secondary' backup profile:
 ~~~
+PGADMIN_SECONDARY_BACKUP_NAMESPACES="pgadmin3"
 ~~~ 
 
-Deploying a secondary filesystem backup profile:
+Deploying a secondary backup profile schedule:
 
 ~~~
 sk velero backup schedule pgadmin secondary
 ~~~
 
+
+# The 'Cluster' and 'Schedules' backup profiles
+
+SolaKube separates backups into three categories:
+- Cluster-level resources like ClusterRoles, Nodes...stc ("Cluster" backup)
+- Velero backup schedules ("Schedules" backup) 
+- "Normal" application backups
+  - Gitea, Nextcloud, pgAdmin...etc
+  - typically with persistent volumes as well
+
+Schedules for the Cluster and Schedules backup are deployed immediately when Velero is installed to the cluster by SolaKube.
+
+The Schedules and Cluster backups, by default, do not deal with persistent volumes, only take Kubernetes objects. Normal applications usually contain persistent volumes as well.
+
+Backup parameters for these backups can be customized the same way as any other backup profiles (e.g.: schedule, labels).
+
+Taking them manually:
+
+~~~
+sk velero backup execute velero schedules
+sk velero backup execute velero cluster
+~~~ 
+
+# Backing up
+
+## Manually
+
+Executing a backup with a profile with immediate start:
+
+~~~
+sk velero backup execute pgadmin default
+~~~
+
+## Scheduled, automatic
+
+The scheduled backup profiles will be executed automatically by Velero when their schedule make it necessary.
+
+# Restoring from backups
+
+## Restore from latest backup
+
+Restore the manual backup you took before destroying the Nextcloud namespace.
+~~~
+sk velero restore pgadmin default 
+~~~
+
+NOTE: This will auto-query the last fully successful backup and restore from that.
+
+## Restore from earlier backup (optional)
+
+In case you need to restore from an earlier backup, you can query the exact name / time of the backups and restore from tha one you find suitable:
+~~~
+velero get backup | grep pgadmin-default
+
+sk velero restore pgadmin default "--from-backup=pgadmin-default-20200724-2333"
+~~~
 
 
 # Application disaster recovery test
@@ -277,6 +394,7 @@ sk velero backup execute nextcloud
 Check the backup results according to the instructions on screen
 
 Similarly to this:
+
 ~~~
 velero backup describe nextcloud-default-20200724-2333 --details 
 ~~~
@@ -296,22 +414,11 @@ Drop application namespace (but keep its Postgres database).
 kubectl delete namespace nextcloud
 ~~~
 
-## Restore from latest backup
+## Restore 
 
 Restore the manual backup you took before destroying the Nextcloud namespace.
 ~~~
-sk velero restore nextcloud default 
-~~~
-
-NOTE: This will auto-query the last fully successful backup and restore from that.
-
-## Restore from earlier backup (optional)
-
-In case you need to restore from an earlier backup, you can query the exact name of the backup and restore from that:
-~~~
-velero get backup | grep nextcloud-default
-
-sk velero restore nextcloud default "--from-backup=nextcloud-default-20200724-2333"
+sk velero restore nextcloud 
 ~~~
 
 
@@ -362,7 +469,7 @@ As a result, SolaKube cannot - as of yet - support VolumeSnapshot based backups.
 
 ## Coarse retention
 
-As of v1.3, Velero has no proper retention policy support, only retention based on TTL.
+As of v1.4, Velero has no proper retention policy support, only retention based on TTL.
 
 See this [issue](https://github.com/vmware-tanzu/velero/issues/2267).
 
