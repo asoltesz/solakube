@@ -8,7 +8,7 @@
 # Parameters:
 # 1 - Regtool command to execute ("list" or "delete")
 #     - "list" - List in the registry
-#     - "delete" - Delete a tag from the rgistry
+#     - "delete" - Delete a tag from the registry
 # 2 - Image repository to target (e.g.: busybox)
 # 3 - Image tag within the repository to target (e.g.: latest)
 # ==============================================================================
