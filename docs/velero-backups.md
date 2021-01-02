@@ -23,7 +23,9 @@ The application/namespace backups are designed to work in tandem with a full etc
 
 Besides the application backups, there is a "Cluster" backup profile that takes cluster-level resources and infrastructure component namespaces together. 
 
-While Velero supports backing up the whole cluster in one go, that would take a lot of time for any non-trivial cluster. We opt for smaller, more granular backups that have only one application in their scope but finish much faster. This reduces the chance of having inconsistent backups. Also, per-application backups allow for more flexible scheduling (e.g. higher backup frequency for certain apps).  
+While Velero supports backing up the whole cluster in one go, that would take a lot of time for any non-trivial cluster (assuming capturing all of the PVs with Restic). We opt for smaller, more granular backups that have only one application in their scope but finish much faster. This reduces the chance of having inconsistent backups. Also, per-application backups allow for more flexible scheduling (e.g. higher backup frequency for certain apps).
+
+See the [Disaster Recovery](disaster-recovery.md) page for how Velero backups fit in with the Disaster Recovery strategy. 
 
 See the [limitations](#limitations) for a proper view of the capabilities of Velero and the integration provided by SolaKube.
 
