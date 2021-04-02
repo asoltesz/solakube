@@ -7,9 +7,6 @@
 # Installs the appropriate Ingress and cert-manager Certificate descriptor
 # for HTTPS access of Jenkins
 #
-# 1 - The Helm operation to do during deploy
-#     - install (default)
-#     - upgrade
 # ==============================================================================
 
 # Internal parameters
@@ -92,7 +89,8 @@ fi
 helm repo add jenkins https://charts.jenkins.io
 helm repo update
 
-helm ${OPERATION} ${JENKINS_APP_NAME} jenkins/jenkins \
+helm upgrade ${JENKINS_APP_NAME} jenkins/jenkins \
+    --install \
     --namespace ${JENKINS_APP_NAME} \
     --version=${HELM_CHART_VERSION} \
     --values ${TMP_DIR}/chart-values.yaml \
