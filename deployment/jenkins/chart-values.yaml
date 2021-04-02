@@ -28,8 +28,16 @@ controller:
     healthProbeReadinessFailureThreshold: 15
     healthProbesReadinessTimeout: 5
 
+    installPlugins:
+    - configuration-as-code:1.47
+    - kubernetes:1.29.2
+    - workflow-aggregator:2.6
+    - git:4.7.0
+    - pipeline-maven:3.10.0
+
     additionalPlugins:
     - job-dsl:1.77
+
 
     jenkinsUrl: https://${JENKINS_FQN}
     jenkinsAdminEmail: ${JENKINS_ADMIN_EMAIL}
