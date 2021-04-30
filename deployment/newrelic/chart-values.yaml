@@ -5,11 +5,20 @@ global:
 newrelic-infrastructure:
     privileged: true
 
+infrastructure:
+    enabled: true
+
 ksm:
     enabled: true
 
 prometheus:
-    enabled: true
+    enabled: false
 
 kubeEvents:
     enabled: true
+
+logging:
+    enabled: false
+
+webhook:
+    enabled: false
