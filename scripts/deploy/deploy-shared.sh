@@ -489,20 +489,32 @@ createTempDir() {
 #
 # Replaces all environment variables in a template file.
 #
-# 1 - The path to the template file
+# 1 - The path to the template file.
+#     This must be either a relative path or an absolute on (starting with /)
+#     When relative, it must be relative from the "deployment" folder of the
+#     application/component being deployed (DEPLOY_COMPONENT variable).
+#
+# When using a relative path, the template will be resolved by checking in all
+# of the SK_ROOT entries
 #
 # The TMP_DIR variable must be set for this to work. The replaced file will
 # be created in this folder
 #
 processTemplate() {
 
-    local templateFilePath=$1
-    local templateFileName=$(basename ${templateFilePath})
+    local templateFileRelPath=$1
+    templateFileRelPath="deployment/${DEPLOY_COMPONENT}/${templateFileRelPath}"
+
+    local templateFilePath
+    templateFilePath="$(resolvePathOnRoots "${templateFileRelPath}" )"
+
+    local templateFileName="$(basename "${templateFilePath}")"
 
     if [[ ! -f "${templateFilePath}" ]]
     then
-        echo "ERROR: Template file doesn't exist: ${templateFilePath}"
+        echo "ERROR: Template file doesn't exist: ${templateFileRelPath}"
         echo "Current folder: $(pwd)"
+        echo "SK_ROOTS: ${SK_ROOTS}"
         exit 1
     fi
 
