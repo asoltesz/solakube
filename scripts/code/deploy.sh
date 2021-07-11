@@ -16,7 +16,7 @@
 # Internal parameters
 export HELM_CHART_VERSION="1.0.8"
 
-cexport CODE_VERSION="6.4.0.14"
+cexport CODE_VERSION "6.4.10.3"
 
 APP_TITLE="Collabora CODE Document Server"
 
@@ -41,15 +41,16 @@ cexport CODE_VERSION "6.4.0.14"
 
 cexport CODE_DICTIONARIES "en hu"
 
+cexport CODE_ADMIN_USERNAME "admin"
 cexport CODE_ADMIN_PASSWORD "${SK_ADMIN_PASSWORD}"
 
-cexport CODE_DOMAIN "${CLUSTER_FQN}"
-# Escaping the domain as required by CODE docs (\\.)
-export CODE_DOMAIN="${CODE_DOMAIN//"."/"\\\\."}"
+cexport CODE_DOMAIN "nextcloud.${CLUSTER_FQN}"
 
 cexport CODE_SERVER "${CODE_APP_NAME}.${CLUSTER_FQN}"
-# Escaping the server as required by CODE docs (\\.)
-export CODE_SERVER="${CODE_SERVER//"."/"\\\\."}"
+
+# Composing the extra parameters
+cexport CODE_EXTRA_PARAMS "--o:ssl.enable=false --o:ssl.termination=true"
+
 
 # ------------------------------------------------------------
 echoSection "Preparing temp folder"
@@ -57,23 +58,22 @@ echoSection "Preparing temp folder"
 createTempDir "code"
 
 # ------------------------------------------------------------
-echoSection "Preparing Helm chart values"
+echoSection "Preparing deployment descriptors"
 
-processTemplate chart-values.yaml
 
 # ------------------------------------------------------------
 echoSection "Creating namespace"
 
-defineNamespace ${CODE_APP_NAME}
+defineNamespace "${CODE_APP_NAME}"
+
 
 
 # ------------------------------------------------------------
-echoSection "Installing application with Helm chart (without ingress)"
+echoSection "Installing application with deployment templates"
 
-helm install code center/stable/collabora-code \
-    --namespace=${CODE_APP_NAME} \
-    --values ${TMP_DIR}/chart-values.yaml \
-    --version=${HELM_CHART_VERSION} \
+applyTemplate deployment.yaml
+applyTemplate service.yaml
+
 
 # ------------------------------------------------------------
 
