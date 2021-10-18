@@ -502,13 +502,22 @@ createTempDir() {
 #
 processTemplate() {
 
-    local templateFileRelPath=$1
-    templateFileRelPath="deployment/${DEPLOY_COMPONENT}/${templateFileRelPath}"
-
     local templateFilePath
-    templateFilePath="$(resolvePathOnRoots "${templateFileRelPath}" )"
 
-    local templateFileName="$(basename "${templateFilePath}")"
+    templateFilePath="${1}"
+
+    # Trying it as an absolute path
+    if [[ ! -f "${templateFilePath}" ]]
+    then
+        # Not an absolute path
+
+        # Trying it as a relative path
+        local templateFileRelPath
+        templateFileRelPath=$1
+        templateFileRelPath="deployment/${DEPLOY_COMPONENT}/${templateFileRelPath}"
+
+        templateFilePath="$(resolvePathOnRoots "${templateFileRelPath}" )"
+    fi
 
     if [[ ! -f "${templateFilePath}" ]]
     then
@@ -523,6 +532,9 @@ processTemplate() {
         echo "ERROR: TMP_DIR env variable not defined."
         exit 1
     fi
+
+    local templateFileName
+    templateFileName="$(basename "${templateFilePath}")"
 
     envsubst < ${templateFilePath} > ${TMP_DIR}/${templateFileName}
 }
