@@ -229,6 +229,9 @@ function setPgoClusterDefaults() {
     cexport PGO_CLUSTER_APP_PASSWORD "${PGO_ADMIN_PASSWORD}"
 
     cexport PGO_CLUSTER_ADMIN_PASSWORD "${PGO_ADMIN_PASSWORD}"
+
+    cexport PGO_CLUSTER_S3_VERIFY_TLS "true"
+
 }
 
 #

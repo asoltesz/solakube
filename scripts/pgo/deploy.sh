@@ -25,9 +25,10 @@ trap errorHandler ERR
 
 # Internal parameters
 
-export PGO_VERSION="4.5.1"
+export PGO_VERSION="4.7.3"
 
 OPERATION=${1:-"install"}
+export OPERATION
 
 echo "Operation to be executed: ${OPERATION}"
 

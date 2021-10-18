@@ -139,6 +139,7 @@ COMMAND=$(cat <<-END
     --pgbackrest-s3-endpoint=${PGO_CLUSTER_S3_ENDPOINT} \
     --pgbackrest-s3-region=${PGO_CLUSTER_S3_REGION} \
     --pgbackrest-s3-ca-secret=s3-cert-chain \
+    --pgbackrest-s3-verify-tls=${PGO_CLUSTER_S3_VERIFY_TLS} \
     ${REPO_PATH_CLAUSE} \
     --storage-config=${PGO_CLUSTER_PRIMARY_STORAGE_CLASS} \
     --pvc-size=${PGO_CLUSTER_PRIMARY_STORAGE_SIZE} \

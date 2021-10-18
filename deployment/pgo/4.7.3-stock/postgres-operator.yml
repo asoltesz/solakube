@@ -157,7 +157,7 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: DEPLOY_ACTION
-          value: ${OPERATION}
+          value: install
         volumeMounts:
         - name: deployer-conf
           mountPath: "/conf"
