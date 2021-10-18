@@ -11,7 +11,8 @@
 # Mailu version: master (1.8-DEVELOP)
 HELM_CHART_VERSION=0.0.7
 
-export MAILU_VERSION="master"
+# Mailu version as the Docker images are tagged
+export MAILU_VERSION="1.8"
 
 # Stop immediately if any of the deployments fail
 trap errorHandler ERR
