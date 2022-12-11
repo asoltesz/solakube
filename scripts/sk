@@ -14,7 +14,7 @@
 # --------------------------------
 # Path of the current script
 SOURCE="${BASH_SOURCE[0]}"
-while [ -h "${SOURCE}" ]; do # resolve $SOURCE until the file is no longer a symlink
+while [[ -h "${SOURCE}" ]]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
   SOURCE="$(readlink "$SOURCE")"
   [[ ${SOURCE} != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
@@ -24,11 +24,9 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 # Home of the scripts, if not yet set
 export SK_SCRIPT_HOME="${DIR}"
-# Home of the deployment descriptors
-export SK_DEPLOYMENT_HOME="${DIR}/../deployment"
 
 # Loading the shared library
-source ${SK_SCRIPT_HOME}/sk-shared.sh
+. ${SK_SCRIPT_HOME}/sk-shared.sh
 
 
 #
@@ -36,14 +34,74 @@ source ${SK_SCRIPT_HOME}/sk-shared.sh
 #
 if [[ ! ${SK_CLUSTER} ]]
 then
-    echo "SK_CLUSTER not specified in the shell. Aborting."
+    echo "FATAL: SK_CLUSTER not defined. Aborting."
     exit 1
 fi
 
 
-# Loading variables
-. ~/.solakube/${SK_CLUSTER}/variables.sh
+# If the SK_ROOTS has not been set, we construct it
+if [[ -z "${SK_ROOTS}" ]]
+then
+    export SK_ROOTS="$(realpath "${SK_SCRIPT_HOME}/..")"
 
+    if [[ -d "${SK_PROJECT_HOME}" ]]
+    then
+        export SK_ROOTS="${SK_ROOTS}:${SK_PROJECT_HOME}"
+    fi
+fi
+
+# Adding the cluster-level override folder (SK_ROOT) for easy, temporary overrides
+# This can be used for providing variables that are specific to a cluster
+# and not intended to be placed under version control
+SK_OVERRIDE_HOME=~/.solakube/${SK_CLUSTER}/overrides
+export SK_ROOTS="${SK_OVERRIDE_HOME}:${SK_ROOTS}"
+mkdir -p "${SK_OVERRIDE_HOME}"
+
+# The global overrides SK_HOME
+# This can be used for providing variables that are global for all SolaKube clusters
+# and not intended to be placed under version control
+SK_OVERRIDE_HOME=~/.solakube/globals/overrides
+export SK_ROOTS="${SK_OVERRIDE_HOME}:${SK_ROOTS}"
+mkdir -p "${SK_OVERRIDE_HOME}"
+
+# Phase 1
+# Loading context variables from each SK_ROOT
+# These are very-low level variables that are too late to define
+# in variables.sh for "normal" variables
+for root in ${SK_ROOTS//:/ }
+do
+    if [[ -f "${root}/variables-context.sh" ]]
+    then
+        # echo "Loading context variables from root: ${root}"
+
+        . ${root}/variables-context.sh
+    fi
+done
+
+# Phase 2
+# Loading "normal" variables from each SK_ROOT
+for root in ${SK_ROOTS//:/ }
+do
+    if [[ -f "${root}/variables.sh" ]]
+    then
+        # echo "Loading variables from root: ${root}"
+
+        . ${root}/variables.sh
+    fi
+done
+
+# Phase 3
+# Defaults and transformations that can be done based on the "normal" variable
+# declarations
+for root in ${SK_ROOTS//:/ }
+do
+    if [[ -f "${root}/variables-defaults.sh" ]]
+    then
+        # echo "Loading context variables from root: ${root}"
+
+        . ${root}/variables-defaults.sh
+    fi
+done
 
 # ------------------------------
 # Execute the sub-script
@@ -53,26 +111,39 @@ COMMAND=$1
 
 if [[ ! "${COMMAND}" ]]
 then
-    echo "Command not specified"
+    echo "SolaKube command not specified"
     exit 1
 fi
 
 if [[ "${COMMAND}" != "SK_NO_COMMAND" ]]
 then
 
-    COMMAND_SCRIPT="${SK_PROJECT_HOME}/scripts/sk-${COMMAND}.sh"
+    COMMAND_SCRIPT="$(resolvePathOnRoots "scripts/sk-${COMMAND}.sh")"
 
     if [[ ! -f "${COMMAND_SCRIPT}" ]]
     then
-        # not a project-specific EM script, it must be a core EM script
-        COMMAND_SCRIPT="${SK_SCRIPT_HOME}/sk-${COMMAND}.sh"
+        FOLDER="$(resolvePathOnRoots "scripts/${COMMAND}")"
+
+        if [[ ! -d "${FOLDER}" ]]
+        then
+            echo "ERROR: Command script/folder not found: ${COMMAND}"
+            exit 1
+        else
+            # The COMMAND was a folder, there must be an actual COMMAND too
+            shift
+
+            SUB_COMMAND=$1
+            COMMAND_SCRIPT="$(resolvePathOnRoots "scripts/${COMMAND}/${SUB_COMMAND}.sh")"
+
+            if [[ ! -f "${COMMAND_SCRIPT}" ]]
+            then
+                echo "ERROR: Command script not found: ${COMMAND}/${SUB_COMMAND}.sh"
+                exit 1
+            fi
+        fi
     fi
 
-    if [[ ! -f "${COMMAND_SCRIPT}" ]]
-    then
-        echo "Command script not found: ${COMMAND_SCRIPT}"
-        exit 1
-    fi
+    # Command script found, proceeding
 
     shift
 

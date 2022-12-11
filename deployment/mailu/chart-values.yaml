@@ -1,0 +1,112 @@
+# Default values for mailu.
+
+# A list of mail hostnames is required. The first will be used as primary mail hostname
+hostnames: ${MAILU_HOSTNAMES}
+
+# The mail domain is required. See https://github.com/Mailu/Mailu/blob/master/docs/faq.rst#what-is-the-difference-between-domain-and-hostnames
+domain: ${MAILU_DOMAIN}
+
+# The secret key is required for protecting authentication cookies and must be set individually for each deployment
+secretKey: ${MAILU_SECRET_KEY}
+
+# An initial account can automatically be created:
+initialAccount:
+  username: ${MAILU_ADMIN_EMAIL_USERNAME}
+  domain: ${MAILU_ADMIN_EMAIL_DOMAIN}
+  password: ${MAILU_ADMIN_PASSWORD}
+
+database:
+    # type of the database for mailu
+    type: postgresql
+
+    # type of the database for roundcube
+    roundcubeType: postgresql
+
+    postgresql:
+        host: ${POSTGRES_SERVICE_HOST}
+
+        database: ${MAILU_APP_NAME}
+        user: ${MAILU_APP_NAME}
+        password: ${MAILU_DB_PASSWORD}
+
+        roundcubeDatabase: ${MAILU_APP_NAME}_roundcube
+        roundcubeUser: ${MAILU_APP_NAME}_roundcube
+        roundcubePassword: ${MAILU_DB_PASSWORD}
+
+persistence:
+    existingClaim: ${MAILU_APP_NAME}
+
+# Change this if you're using different address ranges for pods
+subnet: 10.42.0.0/16
+
+# Version of mailu docker images to use when not specified otherwise
+mailuVersion: ${MAILU_VERSION}
+
+# default log level. can be overridden globally or per service
+logLevel: WARNING
+
+mail:
+    messageSizeLimitInMegabytes: 50
+    authRatelimit: 10/minute;1000/hour
+
+# certmanager settings
+certmanager:
+    issuerType: ClusterIssuer
+    issuerName: letsencrypt
+
+# Set ingress and loadbalancer config
+ingress:
+    externalIngress: true
+    tlsFlavor:  ${MAILU_TLS_FLAVOR}
+    annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+
+admin:
+    resources:
+        requests:
+            memory: 500Mi
+            cpu: 50m
+        limits:
+            memory: 500Mi
+            cpu: 500m
+
+    podAnnotations: {
+        backup.velero.io/backup-volumes: "data"
+    }
+
+redis:
+    resources:
+        requests:
+            memory: 100Mi
+            cpu: 50m
+
+postfix:
+    resources:
+        requests:
+            memory: 100Mi
+            cpu: 50m
+
+dovecot:
+    enabled: ${MAILU_DOVECOT_ENABLED}
+    resources:
+        requests:
+            memory: 100Mi
+            cpu: 50m
+
+rspamd:
+    resources:
+        requests:
+            memory: 100Mi
+            cpu: 50m
+        limits:
+            memory: 500Mi
+            cpu: 200m
+
+clamav:
+    enabled: ${MAILU_CLAMAV_ENABLED}
+
+roundcube:
+    enabled: ${MAILU_ROUNDCUBE_ENABLED}
+
+webdav:
+    enabled: ${MAILU_WEBDAV_ENABLED}

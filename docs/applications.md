@@ -1,28 +1,61 @@
-# Applications
+# Applications / Components
 
 SolaKube supports the automated deployment for a limited set of applications.
 
 Manually, you can deploy applications with the Rancher UI (from its catalogs) or with Helm.
 
-# Postgres
+SolaKube installers do a more complex/complete installation for the supported applications than a simple Helm chart can. 
 
-A simple, one-node Postgres installation with the Bitnami images can be done with the "postgres" deployer module. This can be extended for your needs but it is meant to be as an entry-level solution.
+These include:
+- Ingress that handles the cluster-level wildcard certificate or a dedicated certificate managed by Cert-Manager
+- Auto-creating a database for the application in the cluster-level Postgres DB service (PGO or Postgres-Simple DB clusters)
+- Auto-selection of the most appropriate storage class for the application's persistent data
+- Backup/restore profile with Velero
+- Auto-creation of the admin user in the application
+- Reasonable defaults for less-well-tuned Helm charts
+- Application specific fine-tuning (e.g.: sync-client HTTPS settings for Nextcloud) 
 
-Via the SolaKube deployer, you typically combine it with Hetzner Cloud Volumes or the Rook storage cluster so you should get a minimally acceptable fault tolerance since the DB itself is stored on distributed/HA storage and the Postgres pod itself gets rescheduled if the node fails under it.
+# Components
 
-With this solution, you need to roll your own backup/restore strategy.
+## BackBlaze B2 support for S3-compatible storage
 
-For a higher-grade Postgres setup, you need to use a full-blown Kubernetes Postgres Operator, like that of [CrunchyData](https://github.com/CrunchyData/postgres-operator) or [Zalando](https://github.com/zalando/postgres-operator). These all support streaming replication with failover, full/incremental backups, restores, multi-cluster DB user management...etc.
+In case you prefer B2, you can use it from your cluster services via Minio.
 
-The deployment of the CrunchyData Operator is planned to be integrated into SolaKube, since it has Ansible support and preliminary tests were successful with it. You may track its progress on [issue #11](https://github.com/asoltesz/hetzner-k8s-builder/issues/11).
+See the [BackBlaze B2 page](backblaze-b2-s3-storage.md)
 
-# pgAdmin
+## Postgres Database Service
 
-Whichever Postgres DBMS setup you implement, you will probably need to have a web administrative interface for your DBs. 
+SolaKube supports the deployment of Postgres onto your cluster and simplifies database/user creation for applications needing a database.  
 
-The "pgadmin" deploy module deploys pgAdmin4 on your cluster.
+See the [Postgres page for details](postgres.md). 
 
-Note: Your Postgres DBMS deployments are typically visible on a ClusterIP within the cluster. Check them on the Rancher UI or with kubectl.   
+# Developer Tools
+
+## Gitea (Git Repo Manager)
+
+Gitea is a lightweight GitHub clone for managing Git repositories, pull-requests, code-reviews and providing developers with limited wikis and issue management.
+
+Features in detail on the [Gitea project website](https://gitea.io).
+
+SolaKube support in the [deployer docs page](gitea.md)
+
+# Applications
+
+## NextCloud (groupware + online office)
+
+NextCloud is an open-source groupware server (files, contacts, calendars, chat) that also provides you with the ability for online, collaborative office document editing.  
+
+Features in detail on the [Nextcloud website](https://nextcloud.com/).
+
+SolaKube support in the [deployer docs page](nextcloud.md)
+
+## Redmine (Task / Issue / Project Management)
+
+Redmine is a lightweight issue and project management software.
+
+Features in detail on the [Redmine project website](https://redmine.org).
+
+SolaKube support in the [deployer docs page](redmine.md)
 
 # Your own application/components deployments
 

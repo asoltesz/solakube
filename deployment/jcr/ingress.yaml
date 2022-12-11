@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: ${JCR_APP_NAME}
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+        nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+        # certmanager.k8s.io/cluster-issuer: 'letsencrypt-http01'
+    labels:
+        app: ${JCR_APP_NAME}
+spec:
+    tls:
+    -   secretName: ${JCR_TLS_SECRET_NAME}
+        hosts:
+        - ${JCR_FQN}
+    rules:
+    -   host: ${JCR_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${JCR_APP_NAME}-artifactory-nginx
+                        port:
+                            name: http

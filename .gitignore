@@ -1,9 +1,10 @@
-.terraform
-.terraform.tfstate.lock.info
-terraform.tfstate
-terraform.tfstate.backup
+
+.vagrant
+
+# IDEA project files
 .idea
-/terraform/modules/modules.json
-/terraform/external-modules/
-/rke-test/cluster.rkestate
-/rke-test/kube_config_cluster.yml
+*.iml
+
+# RKE state and generated cluster access yaml
+cluster.rkestate
+kube_config_cluster.yml

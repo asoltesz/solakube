@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: ${PGADMIN_APP_NAME}
@@ -11,14 +11,17 @@ metadata:
         app: ${PGADMIN_APP_NAME}
 spec:
     tls:
-        - secretName: ${PGADMIN_TLS_SECRET_NAME}
-          hosts:
-              - ${PGADMIN_FQN}
+    -   secretName: ${PGADMIN_TLS_SECRET_NAME}
+        hosts:
+        - ${PGADMIN_FQN}
     rules:
-        - host: ${PGADMIN_FQN}
-          http:
-              paths:
-                  - path: /
-                    backend:
-                        serviceName: ${PGADMIN_APP_NAME}
-                        servicePort: http
+    -   host: ${PGADMIN_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${PGADMIN_APP_NAME}
+                        port:
+                            name: http

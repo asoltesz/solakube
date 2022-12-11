@@ -1,0 +1,31 @@
+
+# The test job section of the chart values
+
+#
+# Must define all of the jobs you want to execute with Jenkins
+#
+
+controller:
+    JCasC:
+        configScripts:
+            test-jobs: |
+                jobs:
+                - script: >
+                    job('test_bash_job_1') {
+                        scm {
+                            git {
+                                remote {
+                                    url('${JENKINS_MAIN_GIT_BASE_URL}/${JENKINS_MAIN_GIT_TEST_REPO_PATH}')
+                                    credentials('${JENKINS_MAIN_GIT_ID}-${JENKINS_MAIN_GIT_USERNAME}')
+                                }
+                            }
+                        }
+                        steps {
+                            shell('echo Hello World!')
+                        }
+                        publishers {
+                            mailer('${JENKINS_ADMIN_EMAIL}', true, false)
+                        }
+                        // Linking the node to specific build pod types (templates)
+                        // label('x86 && ubuntu')
+                    }

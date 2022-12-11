@@ -1,0 +1,167 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pgo-deployer-sa
+  namespace: pgo
+  labels:
+    vendor: crunchydata
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pgo-deployer-cr
+  labels:
+    vendor: crunchydata
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - create
+  - patch
+  - delete
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - list
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - list
+  - get
+  - create
+  - delete
+  - patch
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  - services
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - create
+  - delete
+  - list
+  - patch
+- apiGroups:
+  - ''
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - create
+  - delete
+  - patch
+  - list
+- apiGroups:
+  - apps
+  - extensions
+  resources:
+  - deployments
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - create
+  - delete
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - roles
+  - rolebindings
+  verbs:
+  - get
+  - create
+  - delete
+  - bind
+  - escalate
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  verbs:
+  - create
+  - delete
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - delete
+  - list
+- apiGroups:
+  - crunchydata.com
+  resources:
+  - pgclusters
+  - pgreplicas
+  - pgpolicies
+  - pgtasks
+  verbs:
+  - delete
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pgo-deployer-crb
+  labels:
+    vendor: crunchydata
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pgo-deployer-cr
+subjects:
+- kind: ServiceAccount
+  name: pgo-deployer-sa
+  namespace: pgo
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pgo-deploy
+  namespace: pgo
+  labels:
+    vendor: crunchydata
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      name: pgo-deploy
+      labels:
+        vendor: crunchydata
+    spec:
+      serviceAccountName: pgo-deployer-sa
+      restartPolicy: Never
+      containers:
+      - name: pgo-deploy
+        image: registry.developers.crunchydata.com/crunchydata/pgo-deployer:centos8-4.7.3
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DEPLOY_ACTION
+          value: install
+        volumeMounts:
+        - name: deployer-conf
+          mountPath: "/conf"
+      volumes:
+      - name: deployer-conf
+        configMap:
+          name: pgo-deployer-cm

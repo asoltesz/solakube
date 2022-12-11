@@ -1,0 +1,24 @@
+global:
+    licenseKey: ${NEWRELIC_LICENSE_KEY}
+    cluster: ${SK_CLUSTER}
+
+newrelic-infrastructure:
+    privileged: true
+
+infrastructure:
+    enabled: true
+
+ksm:
+    enabled: true
+
+prometheus:
+    enabled: false
+
+kubeEvents:
+    enabled: true
+
+logging:
+    enabled: false
+
+webhook:
+    enabled: false

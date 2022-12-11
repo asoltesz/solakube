@@ -1,0 +1,119 @@
+## User of the application
+## ref: https://github.com/bitnami/bitnami-docker-redmine/#environment-variables
+##
+redmineUsername: admin
+
+## Application password
+## Defaults to a random 10-character alphanumeric string if not set
+## ref: https://github.com/bitnami/bitnami-docker-redmine#environment-variables
+##
+redminePassword: ${REDMINE_ADMIN_PASSWORD}
+
+## Admin email
+## ref: https://github.com/bitnami/bitnami-docker-redmine/#environment-variables
+##
+redmineEmail: ${REDMINE_APP_NAME}@${REDMINE_FQN}
+
+## Redmine default data language
+## ref: https://github.com/bitnami/bitnami-docker-redmine/#environment-variables
+##
+redmineLanguage: en
+
+## SMTP mail delivery configuration
+## ref: https://github.com/bitnami/bitnami-docker-redmine/#smtp-configuration
+smtpHost: ${SMTP_HOST}
+smtpPort: ${SMTP_PORT}
+smtpUser: ${SMTP_USERNAME}
+smtpPassword: ${SMTP_PASSWORD}
+smtpTls: false
+
+
+## Redmine containers' resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits: {}
+    #  cpu: 2
+    #  memory: 1Gi
+    requests:
+        cpu: 200m
+        memory: 500Mi
+
+
+## Pod annotations
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+podAnnotations: {
+    backup.velero.io/backup-volumes: "redmine-data"
+}
+
+## Configure extra options for liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)
+##
+livenessProbe:
+    enabled: true
+    initialDelaySeconds: 300
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+readinessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 30
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+    enabled: true
+    ## A manually manage Persistent Volume Claim
+    ## Requires persistence.enable: true
+    ## If defined, PVC must be created manually before volume will be bound
+    existingClaim: "${REDMINE_APP_NAME}"
+
+## Database type. Allowed values: "mariadb" and "postgresql"
+## ref: https://github.com/bitnami/bitnami-docker-redmine#run-the-application-using-postgresql-database
+##
+databaseType: postgresql
+
+
+
+## All of these values are only used when:
+## a) mariadb.enabled is set to false and databaseType=mariadb
+## b) postgresql.enabled is set to false and databaseType=postgresql
+externalDatabase:
+    ## Database host
+    host: "${POSTGRES_SERVICE_HOST}"
+
+    ## Database name
+    name: "${REDMINE_APP_NAME}"
+
+    ## Database User
+    user: "${REDMINE_APP_NAME}"
+
+    ## Database Password
+    password: "${REDMINE_DB_PASSWORD}"
+
+    ## Database port number (use 5432 when using PostgreSQL)
+    port: 5432
+
+mariadb:
+    enabled: false
+postgresql:
+    enabled: false
+
+## Kubernetes configuration
+##   minikube: NodePort
+##   ingress: ClusterIP
+##   elsewhere: LoadBalancer
+##
+service:
+    type: ClusterIP

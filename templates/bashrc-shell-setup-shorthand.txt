@@ -2,24 +2,29 @@
 # A shorthand command to setup a Bash shell for running SolaKube commands
 # with the Andromeda cloud
 #
-
-
+# Place it in your ~/.bashrc
 #
-# SolaKube for the Andromeda cluster
+# Replace "short-function-name-for-quickly-configuring-a-shell" with something
+# like "anc" as a shorthand for (An)dromeda (c)onfig.
 #
-anc() {
 
-    # !!!!! Correct this to your own folder !!!!!!
-    export SK_PROJECT_ROOT=/path/to/where/solakube/is/checked/out
 
-    # Define script home here if it is not the default path
-    export SK_SCRIPT_HOME="${SK_PROJECT_ROOT}/scripts"
+# ------------------------------------------------------------------------------
+# Shell configuration for the XXXX cluster building project
+# ------------------------------------------------------------------------------
+short-function-name-for-quickly-configuring-a-shell() {
 
-    cd "${SK_SCRIPT_HOME}"
+    export SK_HOME=/path/to/where/solakube/is/checked/out
+
+    export SK_PROJECT_HOME=/path/to/where/your/solakube/project/files/are/checked/out
+
+    cd "${SK_PROJECT_HOME}"
 
     export SK_CLUSTER="andromeda"
 
-    alias sk=${SK_SCRIPT_HOME}/sk
+    alias sk=${SK_HOME}/scripts/sk
+
+    ${SK_HOME}/scripts/sk-info.sh
 
     echo
     echo "Your shell is now configured for the SolaKube/${SK_CLUSTER} project."

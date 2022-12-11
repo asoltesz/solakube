@@ -43,7 +43,7 @@ paramValidation() {
     local envVarName=${1}
     local instructions=${2}
 
-    if [[ ! ${!envVarName} ]]
+    if [[ -z "${!envVarName}" ]]
     then
         echo "ERROR: ${envVarName} environment variable is not defined."
 
@@ -53,6 +53,28 @@ paramValidation() {
     fi
 
 }
+
+#
+# Checks the existence of a namespace in the cluster.
+#
+# $1 - Name of the namespace
+#
+namespaceExists() {
+
+    local namespace=$1
+
+    # Checking the namespace, dropping error messages
+    local description="$(kubectl describe namespace ${namespace} 2> /dev/null)"
+
+    if [[ "${description}" ]]
+    then
+        # Namespace is present in the cluster
+        return
+    fi
+
+    false
+}
+
 
 #
 # Adds a namespace to the cluster if it doesn't exist.
@@ -65,10 +87,7 @@ defineNamespace() {
 
     local namespace=$1
 
-    # Checking the namespace, dropping error messages
-    local description="$(kubectl describe namespace ${namespace} 2> /dev/null)"
-
-    if [[ "${description}" ]]
+    if namespaceExists "${namespace}"
     then
         echo "Namespace already present"
         export DEPLOY_NAMESPACE=${namespace}
@@ -83,7 +102,7 @@ defineNamespace() {
 }
 
 #
-# Adds a namespace to the cluster if it exist
+# Deletes a namespace from the cluster if it exist
 #
 # $1 - Name of the namespace
 #
@@ -91,11 +110,9 @@ deleteNamespace() {
 
     local namespace=$1
 
-    local description="$(kubectl describe namespace ${namespace})"
-
-    if [[ ! "${description}" ]]
+    if ! namespaceExists "${namespace}"
     then
-        # namespace doesn't exists
+        echo "${namespace} namespace doesn't exists in the cluster."
         return
     fi
 
@@ -117,9 +134,9 @@ checkAppName() {
     local appNameUC="${1^^}"
     local envVarName="${appNameUC}_APP_NAME"
 
-    if [[ ! "${!envVarName}" ]]
+    if [[ -z "${!envVarName}" ]]
     then
-        echo "App name override was not defined (${envVarName}): using '${appName}' "
+        echo "Defaulting (${envVarName}) to '${appName}' "
         export ${envVarName}="${appName}"
     else
         echo "Using pre-defined app name: '"${!envVarName}"' "
@@ -131,33 +148,160 @@ checkAppName() {
 #
 # Checks the storage class variable of the application.
 #
+# The application storage class variable may contain one or more storage classes
+# in a comma separated list. The first storage class that is present in the
+# cluster will be selected.
+#
 # If not defined, it defines it with "default"
 #
-# 1 - The unix name of the application (e.g.: pgadmin). It will be made
-#     uppercase when the env variable name is calculated
+# 1 - The unix name of the application or usage-purpose (e.g.: pgadmin).
+#     It will be made uppercase when the env variable name is calculated
 #
+# 2 - The preferred list of storage classes
 #
 checkStorageClass() {
 
-    local envVarName="${1^^}_STORAGE_CLASS"
+    local appName=$1
+    local preferredClasses=$2
 
-    if [[ ! "${!envVarName}" ]]
+    local envVarName="${appName^^}_STORAGE_CLASS"
+
+    # Querying the storage classes available in the cluster
+    local classesInCluster=$(kubectl get sc)
+
+    # The classes requested by the application storage class variable
+    local classList="${!envVarName}"
+
+    if [[ "${classList}" ]]
     then
-        echo "Storage class was not specifically defined for the application (${envVarName}) "
-
-        if [[ ! "${DEFAULT_STORAGE_CLASS}" ]]
-        then
-            echo "DEFAULT_STORAGE_CLASS var is not defined. Defaulting to 'hcloud-volumes'"
-            export ${envVarName}="hcloud-volumes"
-        else
-            echo "Switching to defined default storage class: '${DEFAULT_STORAGE_CLASS}'"
-            export ${envVarName}="${DEFAULT_STORAGE_CLASS}"
-        fi
-
-    else
-        echo "Using pre-defined storage class: '"${!envVarName}"' "
+        echo "${appName}: Using application-configured storage class(es): '"${classList}"' "
     fi
+
+    if [[ ! "${classList}" ]] && [[ ${preferredClasses} ]]
+    then
+        classList="${preferredClasses}"
+        echo "${appName}: Using the preferred class(es): '${classList}'"
+    fi
+
+    # Using the global default (if set)
+    if [[ ! "${classList}" ]] && [[ ${DEFAULT_STORAGE_CLASS} ]]
+    then
+        classList="${DEFAULT_STORAGE_CLASS}"
+        echo "${appName}: Using the default storage class(es): ${classList}"
+    fi
+
+    # Using the built-in default set (all possible classes)
+    if [[ ! "${classList}" ]]
+    then
+        classList="rook-ceph-block,hcloud-volumes,openebs-hostpath,standard"
+        echo "${appName}: Defaulting to the complete list of supported classes: ${classList}"
+    fi
+
+    # The storage class to be used for the application
+    local storageClass
+
+    for class in ${classList//,/ }; do
+
+        local found="$( echo "${classesInCluster}" | grep ${class} )"
+
+        if [[ ${found} ]]
+        then
+            storageClass=${class}
+            break
+        fi
+    done
+
+    if [[ ! "${storageClass}" ]]
+    then
+        echo "FATAL: ${appName}: No suitable storage class could be found in the cluster"
+        exit 1
+    fi
+
+    echo "${appName}: selected storage class: ${storageClass}"
+    export ${envVarName}="${storageClass}"
 }
+
+#
+# Tells if the backup system is available on the cluster or not.
+#
+# Application deployers can use this to check if the application's default
+# backup profile can be deployed at all.
+#
+function isBackupSystemAvailable() {
+
+    # Checking the Velero namespace in the cluster
+    local description="$(kubectl describe namespace "velero" 2> /dev/null)"
+
+    if [[ ! "${description}" ]]
+    then
+        echo "Velero namespace is not present"
+        return
+    fi
+
+    # Checking the Velero CLI client
+    local version="$(velero version 2> /dev/null)"
+
+    if [[ ! "${version}" ]]
+    then
+        echo "Velero client CLI is not available"
+        return
+    fi
+
+    echo "true"
+}
+
+
+
+
+#
+# Whether we should deploy a scheduled backup profile for an application or not.
+#
+# If the VELERO_APP_BACKUPS_ENABLED is not "Y" (the default), it returns false.
+#
+# If the backup system is not available, it returns false.
+#
+# If the <APPLICATION_NAME>_BACKUP_ENABLED is not "Y" (the default), it returns false.
+#
+# 1 - The name of the application
+#
+function shouldDeployBackupProfile() {
+
+    local application=$1
+
+    if [[ ${SK_CLUSTER_TYPE} == "minikube" ]]
+    then
+        echo "Cluster type is MiniKube. Dev/Testing environment."
+        return
+    fi
+
+    if [[ ${VELERO_APP_BACKUPS_ENABLED:-"Y"} != "Y" ]]
+    then
+        echo "Velero application backups are disabled globally"
+        return
+    fi
+
+    local backupSystemAvailable="$(isBackupSystemAvailable)"
+    if [[ "${backupSystemAvailable}" != "true" ]]
+    then
+        echo "Backup system is not available: ${backupSystemAvailable}"
+        return
+    fi
+
+    local envVarName="${application^^}_BACKUP_ENABLED"
+    envVarName="${envVarName//-/_}"
+    local BACKUP_ENABLED="${!envVarName}"
+
+    if [[ ${BACKUP_ENABLED:-"Y"} != "Y" ]]
+    then
+        echo "Default backup is disabled for the application"
+        return
+    fi
+
+    echo "true"
+}
+
+
+
 
 #
 # Checks the if the FQN is set for the service/application with the environment
@@ -168,11 +312,16 @@ checkStorageClass() {
 #
 # If not defined and cannot be derived either, it fails with an error.
 #
+# 1 - servicename (e.g.: nextcloud)
+# 2 - instance name (e.g.: nextcloud2). Defaults to the servicename if not
+#     specified
 #
 checkFQN() {
 
     local serviceName=${1}
     local serviceNameUC=${serviceName^^}
+
+    local instanceName=${2:-"${serviceName}"}
 
     local envVarName="${serviceNameUC}_FQN"
 
@@ -185,7 +334,7 @@ checkFQN() {
             echo "ERROR: CLUSTER_FQN not defined, cannot derive service FQN."
             return 1
         else
-            export ${envVarName}="${serviceName}.${CLUSTER_FQN}"
+            export ${envVarName}="${instanceName}.${CLUSTER_FQN}"
         fi
 
     else
@@ -207,7 +356,6 @@ checkFQN() {
 # 1 - The unix name of the application (e.g.: pgadmin). It will be made
 #     uppercase when the env variable name is calculated
 #
-#
 checkCertificate() {
 
     local serviceName=${1}
@@ -216,13 +364,21 @@ checkCertificate() {
     local envVarName="${serviceNameUC}_FQN"
     local serviceFQN="${!envVarName}"
 
-    if [[ ! "${serviceFQN}" ]]
+    local envVarCertNeededName="${serviceNameUC}_CERT_NEEDED"
+
+    if [[ "${SK_CLUSTER_TYPE}" == "minikube" ]] || [[ "${SK_CLUSTER_TYPE}" == "vagrant" ]]
     then
-        echo "ERROR: CLUSTER_FQN not defined, cannot derive service FQN."
-        return 1
+        echo "Target cluster is a testing instance (${SK_CLUSTER_TYPE}). Cert is not needed."
+        # New certificate is not required
+        export ${envVarCertNeededName}="N"
+        return 0
     fi
 
-    local envVarCertNeededName="${serviceNameUC}_CERT_NEEDED"
+    if [[ ! "${serviceFQN}" ]]
+    then
+        echo "ERROR: FQN not defined for ${serviceName},"
+        return 1
+    fi
 
     local envVarCertName="${serviceNameUC}_TLS_SECRET_NAME"
     local appCertName="${!envVarCertName}"
@@ -313,14 +469,19 @@ switchNs() {
 # Creates a temp folder for the application deployment
 #
 # 1 - The name of the application to be deployed
+# 2 - Keep existing if present (Y/other) defaults to N
 #
 createTempDir() {
 
     local appName=$1
+    local keepIfPresent=$2
 
     TMP_DIR=/tmp/solakube/${appName}
 
-    rm -Rf ${TMP_DIR}
+    if [[ ${keepIfPresent} != "Y" ]]
+    then
+        rm -Rf ${TMP_DIR}
+    fi
 
     mkdir -p ${TMP_DIR}
 }
@@ -328,21 +489,52 @@ createTempDir() {
 #
 # Replaces all environment variables in a template file.
 #
-# 1 - The path to the template file
+# 1 - The path to the template file.
+#     This must be either a relative path or an absolute on (starting with /)
+#     When relative, it must be relative from the "deployment" folder of the
+#     application/component being deployed (DEPLOY_COMPONENT variable).
+#
+# When using a relative path, the template will be resolved by checking in all
+# of the SK_ROOT entries
 #
 # The TMP_DIR variable must be set for this to work. The replaced file will
 # be created in this folder
 #
 processTemplate() {
 
-    local templateFilePath=$1
-    local templateFileName=$(basename ${templateFilePath})
+    local templateFilePath
+
+    templateFilePath="${1}"
+
+    # Trying it as an absolute path
+    if [[ ! -f "${templateFilePath}" ]]
+    then
+        # Not an absolute path
+
+        # Trying it as a relative path
+        local templateFileRelPath
+        templateFileRelPath=$1
+        templateFileRelPath="deployment/${DEPLOY_COMPONENT}/${templateFileRelPath}"
+
+        templateFilePath="$(resolvePathOnRoots "${templateFileRelPath}" )"
+    fi
+
+    if [[ ! -f "${templateFilePath}" ]]
+    then
+        echo "ERROR: Template file doesn't exist: ${templateFileRelPath}"
+        echo "Current folder: $(pwd)"
+        echo "SK_ROOTS: ${SK_ROOTS}"
+        exit 1
+    fi
 
     if [[ ! "${TMP_DIR}" ]]
     then
         echo "ERROR: TMP_DIR env variable not defined."
         exit 1
     fi
+
+    local templateFileName
+    templateFileName="$(basename "${templateFilePath}")"
 
     envsubst < ${templateFilePath} > ${TMP_DIR}/${templateFileName}
 }
@@ -354,21 +546,25 @@ processTemplate() {
 # be set to kubectl.
 #
 # 1 - The path to the template file
+# 2 - The namespace into which the template should be applied
+#     Optional, it defaults to DEPLOY_NAMESPACE (e.g.: set by defineNamespace() )
 #
 applyTemplate() {
 
     local templateFilePath=$1
+    local namespace=${2:-"${DEPLOY_NAMESPACE}"}
+
     local templateFileName=$(basename ${templateFilePath})
 
-    if [[ ! "${DEPLOY_NAMESPACE}" ]]
+    if [[ -z "${namespace}" ]] && [[ -z "${DEPLOY_NAMESPACE}" ]]
     then
         echo "ERROR: DEPLOY_NAMESPACE is not set. Minimally, set to NOT_SPECIFIED."
         return 1
     fi
 
-    local namespaceClause="--namespace ${DEPLOY_NAMESPACE}"
+    local namespaceClause="--namespace ${namespace}"
 
-    if [[ "${DEPLOY_NAMESPACE}" == "NOT_SPECIFIED" ]]
+    if [[ "${namespace}" == "NOT_SPECIFIED" ]]
     then
         namespaceClause=""
     fi
@@ -381,17 +577,19 @@ applyTemplate() {
 }
 
 #
-# Deletes an application (helm-release) with Helmi if it is present
+# Deletes an application (helm-release) with Helm if it is present
 #
 # 1 - Name of the release
+# 2 - Namespace
 #
 deleteHelmRelease() {
 
     local releaseName=$1
+    local namespace=${2:-"${releaseName}"}
 
     echo "Uninstalling ${releaseName} with Helm"
 
-    local releaseInfo=$(helm ls --all ${releaseName})
+    local releaseInfo=$(helm get all ${releaseName} --namespace="${namespace}" 2> /dev/null)
     if [[ $? != 0 ]]
     then
         echo "Error when checking the release with Helm"
@@ -404,7 +602,7 @@ deleteHelmRelease() {
         return 0
     fi
 
-    helm delete --purge ${releaseName}
+    helm uninstall ${releaseName} --namespace="${namespace}"
     if [[ $? != 0 ]]
     then
         echo "Error when deleting the release with Helm"
@@ -415,13 +613,90 @@ deleteHelmRelease() {
 }
 
 #
-# Waits until all pods become Active in a namespace
+# Waits until all pods become Ready (Active) in a namespace
+#
+# Make sure that all necessary K8s objects are already created and visible
+# via the API before calling this.
 #
 # 1 - namespace
 # 2 - maximum timeout in seconds (defaults to 600 seconds / 10 minutes)
 # 3 - check interval in seconds (defaults to 5 seconds)
 #
 waitAllPodsActive() {
+
+    local namespace=$1
+    local timeout=${2:-600}
+    local checkInterval=${3:-5}
+
+    local startTime=$(date +%s)
+    local limit=$(( ${startTime} + ${timeout} ))
+
+    echo "Checking pods in namespace '${namespace}' to become all Ready"
+
+    local now=$(date +%s)
+
+    # Often, the method is called before K8s could create the pods for a
+    # deployment. We have to wait until at least one pod appears
+    while (( ${now} < ${limit} ))
+    do
+        # Check for any pods to appear (Pending state is not enough)
+        local result=$(
+          kubectl get pods --no-headers --namespace=${namespace} \
+                  --field-selector=status.phase=Running
+        )
+
+        if [[ -n "${result}" ]]
+        then
+            break
+        fi
+
+        echo "waiting ${checkInterval}s ...."
+        sleep ${checkInterval}s
+        now=$(date +%s)
+    done
+
+    local jsonPath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'
+
+    while (( ${now} < ${limit} ))
+    do
+        # Check which nodes are NOT ready
+
+        local result=$(kubectl get pods -o jsonpath="${jsonPath}" \
+                          --namespace=${namespace} | grep "Ready=False")
+
+        if [[ -z "${result}" ]]
+        then
+            echo "All pods are 'Ready' (time in waiting: $(( ${now} - ${startTime} ))s)"
+            return 0
+        fi
+
+        echo "waiting ${checkInterval}s ..."
+        sleep ${checkInterval}s
+        now=$(date +%s)
+    done
+
+    echo "Timeout passed (${timeout}). Stopping checking attempts. Check failed."
+
+    echo "Pods in the namespace:"
+    kubectl get pods --namespace=${namespace}
+
+    return 1
+}
+
+#
+# Waits until all pods start in a namespace.
+#
+# This does not wait until they are ready, only until they have been created
+# and are running.
+#
+# Make sure that all necessary K8s objects are already created and visible
+# via the API before calling this.
+#
+# 1 - namespace
+# 2 - maximum timeout in seconds (defaults to 600 seconds / 10 minutes)
+# 3 - check interval in seconds (defaults to 5 seconds)
+#
+waitAllPodsRunning() {
 
     local namespace=$1
     local timeout=${2:-600}
@@ -441,10 +716,6 @@ waitAllPodsActive() {
         if [[ ! "${result}" ]]
         then
             echo "All pods are 'Running' (time in waiting: $(( ${now} - ${startTime} ))s)"
-
-            # Remove this after no anomalies has been encountered
-            kubectl get pods --namespace=${namespace}
-
             return 0
         fi
 
@@ -458,9 +729,8 @@ waitAllPodsActive() {
 }
 
 
-
 #
-# Waits until a single pod become Active in a namespace
+# Waits until a single pod become Ready in a namespace
 #
 # 1 - namespace
 # 2 - name of the pod (or part of the name)
@@ -470,24 +740,57 @@ waitAllPodsActive() {
 waitSinglePodActive() {
 
     local namespace=$1
-    local podName=$1
-    local timeout=${2:-600}
-    local checkInterval=${3:-5}
+    local podNamePart=$2
+    local timeout=${3:-600}
+    local checkInterval=${4:-5}
 
     local startTime=$(date +%s)
     local limit=$(( ${startTime} + ${timeout} ))
 
-    echo "Checking pods in namespace '${namespace}' to become all Running"
+    echo "Checking single pod '${podNamePart}' in namespace '${namespace}' to become Ready"
 
     local now=$(date +%s)
 
+    # Often, the method is called before K8s could create the pods for a
+    # deployment. We have to wait until the pod appears
     while (( ${now} < ${limit} ))
     do
-        local result=$(kubectl get pods --field-selector=metadata.name=${podName},status.phase=Running --namespace=${namespace})
+        # Check for any pods to appear
+        local result=$(
+            kubectl get pods \
+                --no-headers \
+                --field-selector=status.phase=Running \
+                --namespace=${namespace}  \
+                | grep "${podNamePart}"
+        )
 
-        if [[ "${result}" != "No resources found." ]]
+        if [[ -n "${result}" ]]
         then
-            echo "Pods ${podName} is in 'Running' state (time in waiting: $(( ${now} - ${startTime} ))s"
+            break
+        fi
+
+        echo "waiting ${checkInterval}s ...."
+        sleep ${checkInterval}s
+        now=$(date +%s)
+    done
+
+    local jsonPath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'
+
+    while (( ${now} < ${limit} ))
+    do
+        # Query the pods which are ready and named as the pod
+
+        local result=$( \
+            kubectl get pods \
+                --field-selector=status.phase=Running \
+                --output jsonpath="${jsonPath}" \
+                --namespace=${namespace}  \
+                | grep "Ready=True" | grep "${podNamePart}"
+        )
+
+        if [[ -n "${result}" ]]
+        then
+            echo "Pod has become 'Ready' (time: $(( ${now} - ${startTime} ))s)"
             return 0
         fi
 
@@ -497,5 +800,217 @@ waitSinglePodActive() {
     done
 
     echo "Timeout passed (${timeout}). Stopping checking attempts. Check failed."
+
+    echo "Status of the pod:"
+    kubectl get pods \
+        --namespace=${namespace}  \
+        | grep "${podNamePart}"
+
     return 1
+}
+
+
+#
+# Returns the ClusterIP of a service in a namespace
+#
+# 1 - service name
+# 2 - namespace
+#
+getClusterIP() {
+
+    local serviceName=$1
+    local namespace=$2
+
+    kubectl get service \
+        -o custom-columns=":spec.clusterIP" \
+        --no-headers=true \
+        --namespace=${namespace} \
+        --field-selector metadata.name=${serviceName}
+
+    if [[ $? != 0 ]]
+    then
+        return 1
+    fi
+
+}
+
+#
+# Executes a command in a pod identified by a selector
+#
+# 1 - pod selector. E.g.: "name=pgo-client"
+# 2 - namespace
+# 3 - the command to run
+#
+execInPod() {
+
+    local selector=$1
+    local namespace=$2
+    local command=$3
+
+    # Querying the PGO client CLI pod
+    local podName=$(kubectl get pods \
+                      --selector=${selector} \
+                      --output=jsonpath={.items..metadata.name} \
+                      --namespace ${namespace} \
+                      --no-headers
+                    )
+
+    if [[ ! ${podName} ]]
+    then
+        echo "ERROR: pod not found with selector: ${selector}"
+        exit 1
+    fi
+
+    # Executing the command
+    kubectl exec -it ${podName} -n ${namespace} -- ${command}
+
+    return $?
+}
+
+
+#
+# Uploads a file to a pod identified by a selector
+#
+# 1 - pod selector. E.g.: "name=pgo-client"
+# 2 - namespace
+# 3 - the local path of the file
+# 4 - the path of the file within the pod
+#
+copyFileToPod() {
+
+    local selector=$1
+    local namespace=$2
+    local localPath=$3
+    local podPath=$4
+
+    # Querying the PGO client CLI pod
+    local podName=$(kubectl get pods \
+                      --selector=${selector} \
+                      --output=jsonpath={.items..metadata.name} \
+                      --namespace=${namespace} \
+                      --no-headers
+                    )
+
+    if [[ -z "${podName}" ]]
+    then
+        echo "ERROR: pod not found with selector: ${selector}"
+        return 1
+    fi
+
+    kubectl cp ${localPath} ${podName}:${podPath} -n ${namespace}
+
+    if [[ $? != 0 ]]
+    then
+        echo "ERROR: when copying file into pod '${podName}' found with selector '${selector}'"
+        return 1
+    fi
+
+    return 0
+}
+
+
+
+#
+# Checks if a K8s object is present.
+#
+# It will return false if not
+#
+# 1 - object type
+# 2 - object name
+# 3 - namespace
+#
+isKubeObjectPresent() {
+
+    local objectType=$1
+    local objectName=$2
+    local namespace=$3
+
+    local result=$(kubectl get ${objectType} \
+        --field-selector=metadata.name=${objectName} --no-headers=true \
+        --namespace=${namespace})
+
+    if [[ ${result} ]]
+    then
+        return
+    fi
+
+    false
+}
+
+#
+# Deletes a K8s object if it is present.
+#
+# It will not throw an error if the object is not present.
+#
+# 1 - object type
+# 2 - object name
+# 3 - namespace
+#
+deleteKubeObject() {
+
+    local objectType=$1
+    local objectName=$2
+    local namespace=$3
+
+    if ! isKubeObjectPresent "${objectType}" "${objectName}" "${namespace}"
+    then
+        return 0
+    fi
+
+    kubectl delete ${objectType} ${objectName} --namespace=${namespace}
+    return $?
+}
+
+
+#
+# Ensures that a Certificate request is deployed for the application so that
+# the ingresss will be able to function correctly on HTTPS.
+#
+# Silently skips certificate handling if Cert-Manager is not present on the
+# cluster.
+#
+# Expects the variable named "${appName}_CERT_NEEDED" to be present. (see the
+# checkCertificate() method for producing it).
+#
+# If this variable is true (Y), it will try to apply the template named
+# "certificate.yaml" of the application in order to request an application-specific
+# certificate for the ingress.
+#
+# If {appName}_CERT_NEEDED is false (N), and a Cluster-Level certificate
+# is supposed to be present (a wildcard cert), it will deploy an empty
+# secret that is to be filled up automatically by Replicator.
+#
+function ensureCertificate() {
+
+    local appName=${1}
+    local secretName=${2:-"cluster-fqn-tls"}
+    local secretTemplateName=${3:-"cluster-fqn-tls-secret.yaml"}
+    local certTemplateName=${4:-"certificate.yaml"}
+
+    echoSection "Checking certificate requirements for the application"
+
+    if ! namespaceExists "cert-manager"
+    then
+        echo "Cert-Manager not present. Skipping certificate installs."
+        return
+    fi
+
+    local varName="${appName^^}_CERT_NEEDED"
+
+    if [[ "${!varName}" == "Y" ]]
+    then
+        echo "A dedicated certificate is needed"
+        echo "Deploying a dedicated TLS certificate-request"
+
+        applyTemplate "${certTemplateName}"
+
+    else
+        echo "A cluster-level, wildcard cert needs to be replicated into the namespace"
+
+        if [[ "${CLUSTER_CERT_SECRET_NAME}" ]]
+        then
+            deleteKubeObject "secret" "${secretName}" "${appName}"
+            applyTemplate "${secretTemplateName}"
+        fi
+    fi
 }

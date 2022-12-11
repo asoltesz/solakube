@@ -1,0 +1,7 @@
+global:
+    leaderElection:
+        # We do everything in cert-manager's own namespace, in order to
+        # not needing to backup the "kube-system" namespace
+        # CM stores some things in "kube-system" by default which makes backing
+        # up and restoring complicated
+        namespace: "cert-manager"

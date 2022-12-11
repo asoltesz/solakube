@@ -8,7 +8,7 @@ Scripts - except "sk" - expect that you start them from their own folder.
 
 # Configure Terraform and Ansible
 
-Read [Vito's article](https://vitobotta.com/2019/10/14/kubernetes-hetzner-cloud-terraform-ansible-rancher/)), because I only discuss highlights here.
+See the [Configuration](configuration.md) page for the files and variables.
 
 Major params:
 - Hetzner Cloud token
@@ -18,10 +18,6 @@ Major params:
 Lesser params:
 - Whitelisted IPs (whitelisted_ips) 
 - Fail2Ban Ignored IPs (fail2ban_ignoredips)
-
-Use **create_vault.sh** and **edit_vault.sh** for easily make/change sensitive settings in the Ansible vault (tokens, passwords). These are only used for secrets that will be passed to Ansible.
-
-All other SolaKube settings are configured in ~/.solakube/${NAME_OF_YOUR_CLUSTER}/variables.sh (see [Variables](variables.md) and the [sample variables file](../templates/variables.sh) ). This is automatically loaded when the "sk" script is executed with any sub-commands.
 
 # Cluster creation and provisioning
 
@@ -76,6 +72,8 @@ Execute **sk deploy helm-tiller**.
 
 ## Hetzner-Cloud support
 
+Deploying components needed to integrate the new Kubernetes cluster with the Hetzner Cloud infrastructure (Floating IP, Cloud Volumes ...etc)
+
 Execute **sk deploy hetzner**.
 
 Required [variables](variables.md) are HETZNER_FLOATING_IP, HETZNER_TOKEN for the script.
@@ -98,6 +96,10 @@ This is needed because Nginx-Ingress can only use TLS secrets defined in the sam
 
 Execute **sk deploy replicator**.
 
+# Private Docker/Helm registries
+
+See the [Registries](registries.md) page.
+
 # Rook / Ceph
 
 To utilize the storage directly attached to your Hetzner VMs (in addition to Hetzner Cloud Volumes), you may want to deploy Rook with Ceph. 
@@ -107,6 +109,12 @@ Execute "sk deploy rook-ceph"
 See the relevant [Rook](rook.md) and [Persistent Volumes](persistent-volumes.md) docs for details.
 
 Important: The storage cluster starts up fairly slow and the script doesn't wait for the complete initialization. Make sure you do before deploying persistent workloads.
+
+# Disaster Recovery, Velero
+
+Optionally, you may install the Velero Disaster Recovery tool that allows regularly backing up your application namespaces and restore them in case of a disaster situation.
+
+See details in the [Disaster Recovery](disaster-recovery.md) and the [Velero](velero-backups.md) pages. 
 
 # Further steps
 
@@ -121,6 +129,26 @@ See the [Applications page](applications.md) for more details
 ## Nodes fully initialized 
 
 None of the nodes should have the uninitialized taint on them (see issue #1).
+ 
+## VMs / Nodes properly distributed on physical machines
+
+On Hetzner cloud, virtual machines are not guaranteed to be perfectly distributed on separate virtual machines.
+
+However, the API seems to strive to do this (according to our [testing](https://github.com/asoltesz/solakube/issues/9) ).
+
+It is recommended that you check your nodes after creation so that you ensure that they are on separate physical machines.
+
+Checking the physical machine ith MyTraceRoute:
+
+~~~
+mtr <ip-address-of-the-vm>
+~~~ 
+
+The "<machine-number>.your-cloud.host" entry shows the physical machine. 
+
+All of your VMs should be on a different machine marked by the <machine-number>.
+  
+
  
 ## Further validation checks
 

@@ -1,0 +1,58 @@
+#
+# Pod Templates for different kinds of builds
+#
+agent:
+  podTemplates:
+
+    #
+    # Build container for Python 3 applications
+    #
+    python3: |
+      - name: python3
+        label: python3
+        serviceAccount: jenkins
+        idleMinutes: 10
+        containers:
+          - name: python
+            image: python:3
+            command: "/bin/sh -c"
+            args: "cat"
+            ttyEnabled: true
+            privileged: true
+            resourceRequestCpu: "400m"
+            resourceRequestMemory: "512Mi"
+            resourceLimitCpu: "1"
+            resourceLimitMemory: "1024Mi"
+    #
+    # Maven + Java build agent pod (Maven 3.3.9 + Java OpenJDK 1.8)
+    #
+    maven-33-jdk8-alpine: |
+      - name: maven-33-jdk8-alpine
+        label: maven-33-jdk8-alpine
+        serviceAccount: jenkins
+        containers:
+          - name: 'maven'
+            image: 'maven:3.3.9-jdk-8-alpine'
+            ttyEnabled: true
+            command: "/bin/sh -c"
+            args: "cat"
+            privileged: false
+            resourceRequestCpu: "400m"
+            resourceRequestMemory: "512Mi"
+            resourceLimitCpu: "1"
+            resourceLimitMemory: "1024Mi"
+    #
+    # Agent pod for building Docker images (Docker-in-Docker)
+    #
+    docker1903: |
+      - name: docker1903
+        label: docker1903
+        serviceaccount: jenkins
+        containers:
+        - name: dind
+          image: docker:19.03.12-dind
+          alwaysPullImage: false
+          privileged: true
+        volumes:
+        - emptyDirVolume:
+            mountPath: /var/lib/docker

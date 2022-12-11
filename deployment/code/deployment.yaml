@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: code
+spec:
+    selector:
+        matchLabels:
+            app: code
+    replicas: 1
+    template:
+        metadata:
+            labels:
+                app: code
+        spec:
+            containers:
+                - name: replicator
+                  image: collabora/code:${CODE_VERSION}
+                  env:
+                      - name: domain
+                        value: ${CODE_DOMAIN}
+                      - name: username
+                        value: ${CODE_ADMIN_USERNAME}
+                      - name: password
+                        value: ${CODE_ADMIN_PASSWORD}
+                      - name: dictionaries
+                        value: ${CODE_DICTIONARIES}
+                      - name: extra_params
+                        value: ${CODE_EXTRA_PARAMS}
+                  ports:
+                      - containerPort: 9980
+                        name: http
+                        protocol: TCP

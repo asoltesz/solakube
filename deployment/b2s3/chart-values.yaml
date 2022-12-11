@@ -1,0 +1,23 @@
+# Our custom ingress will be installed
+ingress:
+    enabled: false
+
+# Overriding the default "minio" name
+nameOverride: b2s3
+
+# Operate in Backblaze B2 gateway mode
+b2gateway:
+    enabled: true
+    replicas: 2
+
+accessKey: ${B2_ACCESS_KEY}
+secretKey: ${B2_SECRET_KEY}
+
+# Minio itself will not store data, only works as a gateway
+persistence:
+    enabled: false
+
+resources:
+    requests:
+        memory: 32Mi
+        cpu: 100m

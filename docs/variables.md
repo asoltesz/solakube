@@ -29,7 +29,16 @@ The Rancher API v3 must be available on this host, with https.
 
 The id of the cluster in rancher in the form of "c-s6sds". 
 
-This is printed by the apply-cluster.sh script after Terraform is finished as part of the cluster URL. Copy it out from the URL (the last part of it after the backslash) and define it in this variable.
+Normally, this is not needed to be defined because  sk-apply.sh script writes it into the "rancher_cluster_id.sh" file after Terraform is finished and also automatically loaded at each SK command execution.
+
+In case, you need define it manually (you don't use sk-apply.sh), you may place it in the same file as apply would:
+~~~
+~/.solakube/${SK_CLUSTER}/state/rancher_cluster_id.sh
+~~~
+
+NOTE: This script is not supposed to be under VCS.
+
+You may also define it in variables.sh in case it is OK if this goes under version control.  
 
 ## HETZNER_CLOUD_TOKEN
 

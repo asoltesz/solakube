@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+    name: ${MAILU_APP_NAME}
+spec:
+    secretName: ${MAILU_APP_NAME}-tls
+    issuerRef:
+        name: letsencrypt-http01
+        kind: ClusterIssuer
+    commonName: ${MAILU_FQN}
+    dnsNames:
+        - ${MAILU_FQN}
+    acme:
+        config:
+            - http01:
+                  ingressClass: nginx
+              domains:
+                  - ${MAILU_FQN}

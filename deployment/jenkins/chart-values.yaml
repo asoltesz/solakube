@@ -1,0 +1,56 @@
+
+# The CI/CD coordinator pod
+controller:
+
+    adminUser: "admin"
+    adminPassword: ${JENKINS_ADMIN_PASSWORD}
+
+    resources:
+        requests:
+            cpu: "100m"
+            memory: "256Mi"
+        # The controller itself doesn't need very high limits
+        # actual builds happen in separate containers
+        limits:
+            cpu: "1000m"
+            memory: "512Mi"
+
+    # Forcing Jenkins into the container memory allocation
+    javaOpts: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+
+    podAnnotations:
+        backup.velero.io/backup-volumes: "jenkins-home"
+
+    # Readiness probe starts earlier, tests more often and waits a bit more
+    healthProbes: true
+    healthProbeReadinessInitialDelay: 30
+    healthProbeReadinessPeriodSeconds: 5
+    healthProbeReadinessFailureThreshold: 15
+    healthProbesReadinessTimeout: 5
+
+    installPlugins:
+    - configuration-as-code:1.47
+    - kubernetes:1.29.2
+    - workflow-aggregator:2.6
+    - git:4.7.0
+    - pipeline-maven:3.10.0
+
+    additionalPlugins:
+    - job-dsl:1.77
+
+
+    jenkinsUrl: https://${JENKINS_FQN}
+    jenkinsAdminEmail: ${JENKINS_ADMIN_EMAIL}
+
+    JCasC:
+        enabled: true
+
+# Agent
+agent:
+    idleMinutes: 10
+
+    # Pod templates in a separate file since most likely need editing
+    # podTemplates:
+
+persistence:
+    existingClaim: ${JENKINS_APP_NAME}

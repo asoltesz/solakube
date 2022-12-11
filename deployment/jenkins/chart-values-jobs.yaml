@@ -1,0 +1,36 @@
+# ------------------------------------------------------------------------------
+# The jobs section of the chart values
+#
+# Must define all of the jobs you want to execute with Jenkins
+# ------------------------------------------------------------------------------
+
+#controller:
+#    JCasC:
+#        configScripts:
+#            jobs: |
+#                jobs:
+#                - script: >
+#                    job('job_1') {
+#
+#                        // Code checked out from the test Git repo
+#                        scm {
+#                            git {
+#                                remote {
+#                                    url('${JENKINS_MAIN_GIT_BASE_URL}/nostran-infra/backup-scripts.git')
+#                                    credentials('${JENKINS_MAIN_GIT_ID}-${JENKINS_MAIN_GIT_USERNAME}')
+#                                }
+#                            }
+#                        }
+#
+#                        steps {
+#                            shell('echo Hello World!')
+#                        }
+#
+#                        // Sending emails about build failures
+#                        publishers {
+#                            mailer('${JENKINS_ADMIN_EMAIL}', true, false)
+#                        }
+#
+#                        // Requesting a specific type of build pod
+#                        label('python3'
+#                    }

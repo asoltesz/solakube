@@ -1,0 +1,72 @@
+#
+# RKE version 1.0.6
+#
+# Usage:
+# - Configure the nodes
+# - Ensure that your id_rsa.pub is registered on all nodes as authorized
+#   under the designated installer user configured for the node
+# - rke up
+#
+
+kubernetes_version: v1.19.4-rancher1-1
+
+
+
+nodes:
+#- address: 78.47.58.89 # If in the private net use the proper IP
+#  user: root
+#  role:
+#  - controlplane
+#  - etcd
+#  - worker
+
+# A Vagrant based node (see vagrant-cluster)
+- address: 192.168.1.30
+  user: vagrant
+  role:
+  - controlplane
+  - etcd
+  - worker
+
+# A Vagrant based node (see vagrant-cluster)
+- address: 192.168.1.31
+  user: vagrant
+  role:
+  - controlplane
+  - etcd
+  - worker
+
+# A Vagrant based node (see vagrant-cluster)
+- address: 192.168.1.32
+  user: vagrant
+  role:
+  - controlplane
+  - etcd
+  - worker
+
+# For 1.15, we need to manually provide Snapshotting features
+services:
+
+  kube-api:
+    extra_args:
+      feature-gates: "VolumeSnapshotDataSource=true"
+    pod_security_policy: false
+
+  kube-controller:
+    extra_args:
+      feature-gates: "VolumeSnapshotDataSource=true"
+
+  kubelet:
+    extra_args:
+      feature-gates: "VolumeSnapshotDataSource=true"
+    extra_binds:
+      - "/var/openebs/local:/var/openebs/local"
+    fail_swap_on: false
+
+  scheduler:
+    extra_args:
+      feature-gates: "VolumeSnapshotDataSource=true"
+
+  kubeproxy:
+    extra_args:
+      feature-gates: "VolumeSnapshotDataSource=true"

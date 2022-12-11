@@ -18,6 +18,18 @@ spec:
             labels:
                 app: fip-controller
         spec:
+            affinity:
+                podAntiAffinity:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                    -   weight: 100
+                        podAffinityTerm:
+                            labelSelector:
+                                matchExpressions:
+                                -   key: app
+                                    operator: In
+                                    values:
+                                    - fip-controller
+                            topologyKey: "kubernetes.io/hostname"
             containers:
             - name: fip-controller
               image: cbeneke/hcloud-fip-controller:${HETZNER_FIP_CTRL_VERSION}

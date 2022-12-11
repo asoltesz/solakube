@@ -1,12 +1,12 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: master-ingress-for-cluster-certificate
     namespace: cert-manager
 spec:
     tls:
-    - secretName: ${CLUSTER_CERT_SECRET_NAME}
-      hosts:
-      - 'cluster-master.${CLUSTER_FQN}'
+    -   secretName: ${CLUSTER_CERT_SECRET_NAME}
+        hosts:
+        - 'cluster-master.${CLUSTER_FQN}'
     rules:
-    - host: 'cluster-master.${CLUSTER_FQN}'
+    -   host: 'cluster-master.${CLUSTER_FQN}'

@@ -1,0 +1,22 @@
+---
+
+# Password of the "deploy" user on the VMs
+user_password: xxx
+
+# The hostname/ip-address of the SMTP relay host
+smtp_host: xxx
+
+# The port number of the SMTP relay service on the host
+smtp_port: 587
+
+# The username for the SMTP relay service
+smtp_username: xxxx
+# The password for the SMTP relay service
+smtp_password: xxx
+
+# The hostname that Postfix uses to identify itself to the SMTP relay
+# E.g.: andromeda-vm.example.com
+smtp_hostname: xxx
+
+# API key for the Kernelkare service (if used)
+# kernelcare_key:

@@ -1,0 +1,63 @@
+service:
+    http:
+        externalPort:
+        externalHost: ${GITEA_FQN}
+
+    ssh:
+        serviceType: NodePort
+        port: 22
+        nodePort: 30222
+        externalPort: 8022
+        externalHost: ${GITEA_FQN}
+
+persistence:
+    enabled: true
+    existingGiteaClaim: ${GITEA_APP_NAME}
+    giteaSize: ${GITEA_PVC_SIZE}
+    accessMode: ReadWriteOnce
+
+dbType: "postgres"
+useInPodPostgres: false
+
+externalDB:
+    dbUser: "${GITEA_APP_NAME}"
+    dbPassword: "${GITEA_DB_PASSWORD}"
+    dbHost: "${POSTGRES_SERVICE_HOST}"
+    dbPort: "5432"
+    dbDatabase: "${GITEA_APP_NAME}"
+
+
+podAnnotations: {
+    backup.velero.io/backup-volumes: "gitea-data"
+}
+
+# In order to disable initial install screen you must have secretKey and disableInstaller=true
+config:
+    secretKey: ${GITEA_ADMIN_PASSWORD}
+    disableInstaller: true
+    offlineMode: false
+    requireSignin: true
+    disableRegistration: true
+    openidSignin: true
+    notifyMail: true
+    mailer:
+        enabled: ${SMTP_ENABLED}
+        host: ${SMTP_HOST}
+        port: ${SMTP_PORT}
+        tls: false
+        from: "${GITEA_APP_NAME}@${GITEA_FQN}"
+        user: "${SMTP_USERNAME}"
+        passwd: "${SMTP_PASSWORD}"
+    metrics:
+        enabled: false
+        token: ""
+
+# Resources slightly lowered because if used infrequently (small company)
+# a bare-install Gitea doesn't actually need those resources and memory is
+# especially precious
+# Raise these resources in case you need it
+resources:
+    gitea:
+        requests:
+            cpu: 100m
+            memory: 300Mi

@@ -1,0 +1,55 @@
+image:
+    repository: velero/velero
+    tag: v${VELERO_VERSION}
+    pullPolicy: IfNotPresent
+
+initContainers:
+- name: aws
+  image: velero/velero-plugin-for-aws:v${VELERO_AWS_PLUGIN_VERSION}
+  volumeMounts:
+  - mountPath: /target
+    name: plugins
+
+metrics:
+    enabled: true
+    scrapeInterval: 30s
+
+    # Pod annotations for Prometheus
+    podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8085"
+        prometheus.io/path: "/metrics"
+
+    serviceMonitor:
+        enabled: false
+        additionalLabels: {}
+
+configuration:
+    provider: aws
+    backupStorageLocation:
+        name: default
+        bucket: ${VELERO_S3_BUCKET_NAME}
+        config:
+            region: ${VELERO_S3_REGION}
+            s3ForcePathStyle: "false"
+            publicUrl: ${VELERO_S3_ENDPOINT}
+            s3Url: ${VELERO_S3_ENDPOINT}
+    volumeSnapshotLocation:
+        name: default
+        bucket: ${VELERO_S3_BUCKET_NAME}
+        config:
+            region: ${VELERO_S3_REGION}
+            s3ForcePathStyle: "false"
+            publicUrl: ${VELERO_S3_ENDPOINT}
+            s3Url: ${VELERO_S3_ENDPOINT}
+
+credentials:
+    useSecret: true
+    secretContents:
+        cloud: |
+            [default]
+            aws_access_key_id = ${VELERO_S3_ACCESS_KEY}
+            aws_secret_access_key = ${VELERO_S3_SECRET_KEY}
+
+snapshotsEnabled: ${VELERO_SNAPSHOTS_ENABLED}
+deployRestic: true

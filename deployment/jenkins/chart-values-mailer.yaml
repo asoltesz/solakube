@@ -1,0 +1,19 @@
+#
+# The immutable configuration of Jenkins
+# Configuration as Code Scripts
+#
+
+controller:
+    JCasC:
+        configScripts:
+            mailer: |
+                unclassified:
+                    mailer:
+                        smtpHost: "${SMTP_HOST}"
+                        smtpPort: "${SMTP_PORT}"
+                        authentication:
+                            username: "${SMTP_USERNAME}"
+                            password: "${SMTP_PASSWORD}"
+                        # useSsl: false
+                        # useTls: false
+                        replyToAddress: noreply@${CLUSTER_FQN}

@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: ${NEXTCLOUD_APP_NAME}
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+        nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+        # certmanager.k8s.io/cluster-issuer: 'letsencrypt-http01'
+
+        # Allowing the NextCloud client to upload bigger chunks than usual
+        nginx.ingress.kubernetes.io/proxy-body-size: 512m
+    labels:
+        app: ${NEXTCLOUD_APP_NAME}
+spec:
+    tls:
+    -   secretName: ${NEXTCLOUD_TLS_SECRET_NAME}
+        hosts:
+        - ${NEXTCLOUD_FQN}
+    rules:
+    -   host: ${NEXTCLOUD_FQN}
+        http:
+            paths:
+            -   path: /
+                pathType: Prefix
+                backend:
+                    service:
+                        name: ${NEXTCLOUD_APP_NAME}
+                        port:
+                            name: http
